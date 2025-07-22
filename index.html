@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Knowledge Tiles</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand-title">Samyag Gyan</div>
+    <div class="login-wrapper">
+      <div id="telegram-login-button">Login with Telegram</div>
+      <div id="user-info" class="hidden"></div>
+    </div>
+  </header>
+
+  <main id="articles-container">
+    <!-- TILE 1 -->
+    <div class="article-tile expanded" data-expanded="true">
+      <div class="ribbon-top-left source-ribbon">The Hindu</div>
+      <div class="ribbon-right-top section-ribbon">Economy</div>
+      <div class="ribbon-right-below usability-ribbon">Essay + GS2</div>
+
+      <div class="article-title">Digital Public Infrastructure in India</div>
+      <div class="tags">#Governance #DigitalIndia #CurrentAffairs</div>
+      <div class="prelude-section">
+        It ties digital India with delivery on the ground. You’ll see governance come alive in numbers. Also, it’s a gem for GS2 introductions.
+      </div>
+
+      <div class="content-area highlight-zone" style="display: block;">
+        <span class="question">✦ What is Digital Public Infrastructure (DPI)?</span>
+        <p>DPI refers to foundational systems like Aadhaar, UPI, DigiLocker and more that create a base for scalable public digital services.</p>
+
+        <span class="question">✦ How is DPI transforming governance?</span>
+        <p>Government schemes use Aadhaar-based DBT to directly transfer benefits, avoiding middlemen and leakages.</p>
+
+        <span class="question">✦ Why is India's model globally praised?</span>
+        <p>India's DPI stack is open, low-cost, scalable, and sovereign. It's being adapted by countries globally.</p>
+      </div>
+
+      <div class="end-content-ribbons">
+        <div class="end-content-ribbon-item ribbon-visual" data-type="mindmap" data-src="mindmap_eng1.jpg">🧠 Mindmap (English)</div>
+        <div class="end-content-ribbon-item ribbon-prelims" data-type="prelims">📌 Prelims Pointers</div>
+        <div class="end-content-ribbon-item ribbon-visual" data-type="mindmap" data-src="mindmap_hin1.jpg">🧠 माइंडमैप (Hindi)</div>
+      </div>
+
+      <div class="sub-tile" style="display: none;"></div>
+
+      <div class="arrow-container">
+        <button class="main-arrow-btn rotated">
+          <div class="css-arrow"></div>
+        </button>
+      </div>
+
+   <div class="read-confirmation-area">
+  <button class="mark-read-button" onclick="markAsReadConfirmed(this)">
+    Read It !! <span style="color: green;">&#x2713;&#x2713;</span>
+  </button>
+</div>
+
+    <!-- TILE 2 -->
+    <div class="article-tile expanded" data-expanded="true">
+      <div class="ribbon-top-left source-ribbon">Indian Express</div>
+      <div class="ribbon-right-top section-ribbon">World Affairs</div>
+      <div class="ribbon-right-below usability-ribbon">GS3 Case Study + SDG Linkage</div>
+
+      <div class="article-title">India’s Renewable Energy Transition</div>
+      <div class="tags">#Environment #Energy #GS3</div>
+      <div class="prelude-section">
+        This ties India's green push to global promises. Makes SDGs, solar parks and hydrogen efforts easy to cite.
+      </div>
+
+      <div class="content-area highlight-zone" style="display: block;">
+        <span class="question">✦ Why renewable energy for India?</span>
+        <p>India has rising energy needs and global climate commitments. Renewables offer sustainable alternatives to coal-based power.</p>
+
+        <span class="question">✦ What major steps has India taken?</span>
+        <p>The National Solar Mission, hydrogen incentives, and a 2030 target of 500 GW non-fossil capacity.</p>
+
+        <span class="question">✦ What challenges remain?</span>
+        <p>Storage tech, land acquisition, and coal job transitions remain key concerns.</p>
+      </div>
+
+      <div class="end-content-ribbons">
+        <div class="end-content-ribbon-item ribbon-visual" data-type="mindmap" data-src="mindmap_eng2.jpg">🧠 Mindmap (English)</div>
+        <div class="end-content-ribbon-item ribbon-prelims" data-type="prelims">📌 Prelims Pointers</div>
+        <div class="end-content-ribbon-item ribbon-visual" data-type="mindmap" data-src="mindmap_hin2.jpg">🧠 माइंडमैप (Hindi)</div>
+      </div>
+<div class="read-confirmation-area">
+  <button class="mark-read-button" onclick="markAsReadConfirmed(this)">
+    Read It !! <span style="color: green;">&#x2713;&#x2713;</span>
+  </button>
+</div>
+      <div class="sub-tile" style="display: none;"></div>
+
+      <div class="arrow-container">
+        <button class="main-arrow-btn rotated">
+          <div class="css-arrow"></div>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    &copy; 2025 Samyag Gyan. All rights reserved.
+  </footer>
+
+  <!-- Floating Mindmap Viewer Modal -->
+  <div id="floating-image-viewer" class="floating-viewer hidden">
+    <div class="floating-image-header">
+      <span class="floating-image-title">Mindmap</span>
+      <button id="close-floating-image" class="floating-image-close">×</button>
+    </div>
+    <div class="floating-image-content">
+      <img id="floating-image" src="" alt="Mindmap Preview" />
+    </div>
+  </div>
+
+  <!-- Warning Dialog Modal -->
+  <div id="highlight-block-dialog" class="modal-overlay hidden">
+    <div class="sober-warning-box">
+      <h3>🔒 Highlight Locked</h3>
+      <p>Please read the content!! If already read, scroll down and click <strong>Read It ?? </strong>.</p>
+      <button class="close-button" onclick="dismissHighlightDialog()">OK</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <!-- Warning Dialog Modal -->
+<div id="highlight-block-dialog" class="modal-overlay hidden">
+  <div class="sober-warning-box">
+    <h3>🔒 Highlight Locked</h3>
+    <p>Please read the content!! If already read, scroll down and click 
+      <strong>Read It !! <span style="color: green;">&#x2713;&#x2713;</span></strong>.
+    </p>
+    <button class="close-button" onclick="dismissHighlightDialog()">OK</button>
+  </div>
+</div>
+</body>
+</html>

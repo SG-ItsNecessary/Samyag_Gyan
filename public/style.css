@@ -1,0 +1,155 @@
+/* Font Reset */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+body {
+  font-family: "Segoe UI", "Arial", sans-serif;
+  color: #222;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+}
+
+header h1,
+main article h2 {
+  font-family: "Georgia", serif;
+}
+
+/* Reset some default margins/padding */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background-color: #f9f9f9;
+  color: #222;
+  line-height: 1.6;
+  padding: 0;
+  margin: 0;
+}
+
+/* Layout container */
+#app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+}
+
+nav button {
+  padding: 8px 14px;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+nav button:hover {
+  background-color: #005fa3;
+}
+
+/* Article styling */
+main article {
+  margin-top: 32px;
+  padding: 26px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #ffffff;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+/* Hover effect: intuitive response */
+main article:hover {
+  background-color: #f0f0f0; /* even smoother tone */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px) scale(1.012); /* gentle lift effect */
+  cursor: pointer;
+}
+
+/* Title and paragraph styling */
+main article h2 {
+  font-size: 1.6rem;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+}
+
+main article p {
+  font-size: 1.05rem;
+  color: #3a3a3a;
+  line-height: 1.6;
+}
+/* Responsive layout */
+@media (max-width: 768px) {
+  header, main, footer {
+    padding: 0 15px;
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  nav button {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  main article {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  main article img {
+    margin: 15px 0 0 0;
+    width: 100%;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.2rem;
+  }
+
+  main article h2 {
+    font-size: 1.1rem;
+  }
+
+  main article p {
+    font-size: 0.95rem;
+  }
+
+  footer {
+    font-size: 0.75rem;
+  }
+}
+.tags {
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 8px;
+}
