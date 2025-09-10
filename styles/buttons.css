@@ -1,0 +1,496 @@
+/*
+    -------------------------
+    Global Styles and Layout
+    -------------------------
+*/
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fdfdfc;
+    margin: 0;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+ 
+/* Container for all Buttons in a row */
+.button-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+/*
+    -------------------------
+    Mark as Read Button Styling
+    -------------------------
+*/
+.mark-read-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+ 
+.read-button {
+    background-color: #fadbd8;
+    color: #e74c3c;
+    border: 2px solid #e74c3c;
+    border-radius: 14px;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+.read-button.read-done {
+    border-color: #2ecc71;
+    color: #2ecc71;
+    background-color: rgba(46, 204, 113, 0.1);
+    border-radius: 20px;
+    cursor: not-allowed;
+}
+
+.read-button .read-text {
+    white-space: nowrap;
+}
+
+.read-icon {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2.2;
+}
+
+.ticks {
+    font-size: 20px;
+    color: #2ecc71;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ticks.visible {
+    opacity: 1;
+}
+
+/*
+    -------------------------
+    Action Buttons Styling
+    -------------------------
+*/
+/* Shared Styling for the other buttons */
+.action-btn {
+    background-color: transparent;
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: not-allowed; /* Initial cursor state */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    pointer-events: none; /* Disable interaction until Mark as Read is clicked */
+    opacity: 0.6; /* Faded out initially */
+}
+
+.action-btn.enabled {
+    cursor: pointer;
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.action-btn:hover {
+    border-color: #c0392b;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+}
+ 
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+/* Styles for the clicked state */
+.action-btn.voted, .action-btn.saved, .action-btn.clicked, .action-btn.summarized {
+    background-color: rgba(46, 204, 113, 0.1);
+    border-color: #2ecc71;
+    color: #2ecc71;
+}
+
+.action-btn.voted:hover, .action-btn.saved:hover, .action-btn.clicked:hover, .action-btn.summarized:hover {
+    border-color: #27ae60;
+}
+ 
+/* SVG Icon Styling */
+.action-btn svg {
+    height: 24px;
+    width: 24px;
+}
+ 
+.action-btn .icon-path {
+    fill: #e74c3c;
+    stroke: #e74c3c;
+    stroke-width: 2;
+    transition: fill 0.3s, stroke 0.3s;
+}
+ 
+.action-btn.enabled.voted .icon-path,
+.action-btn.enabled.saved .icon-path,
+.action-btn.enabled.clicked .icon-path,
+.action-btn.enabled.summarized .icon-path {
+    fill: #2ecc71;
+    stroke: #2ecc71;
+}
+
+/*
+    -------------------------
+    Tooltip Styling
+    -------------------------
+*/
+/* Default Tooltip Styles (Dark Theme) */
+.action-btn .tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 10;
+}
+.action-btn:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+.action-btn .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+/* Specific Reminder Button Tooltip (Pink Theme) */
+.action-btn .reminder-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    width: max-content;
+    background-color: #ffe4e6;
+    color: #333;
+    text-align: center;
+    border-radius: 6px;
+    padding: 1px 8px;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: opacity 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-weight: 500;
+    white-space: pre;
+    pointer-events: none;
+    z-index: 10;
+}
+.action-btn:hover .reminder-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+.action-btn .reminder-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #ffe4e6 transparent transparent transparent;
+}
+ 
+/* Specific Styles for the Bookmark Button's Tooltips */
+.action-btn .bookmark-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 10;
+}
+.action-btn:not(.saved):hover .bookmark-tooltip.initial {
+    visibility: visible;
+    opacity: 1;
+}
+.action-btn.saved:hover .bookmark-tooltip.saved {
+    visibility: visible;
+    opacity: 1;
+}
+.action-btn .bookmark-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+.action-btn .red-highlight {
+    color: #fe2c55;
+    font-weight: 600;
+}
+
+/*
+    -------------------------
+    Summary Modal Styling
+    -------------------------
+*/
+.summary-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    background-color: #fdfae6;
+    border: 2px solid #94a3b8;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    z-index: 2000;
+    flex-direction: column;
+    overflow: hidden;
+}
+.summary-container.visible {
+    display: flex;
+}
+.summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f9ff;
+    color: #1f2937;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-bottom: 2px solid #94a3b8;
+}
+.summary-header .save-btn {
+    background: none;
+    border: 2px solid #2ecc71;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+.summary-header .save-btn:hover {
+    background-color: rgba(46, 204, 113, 0.1);
+    transform: scale(1.1);
+}
+.summary-header .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #e74c3c;
+    cursor: pointer;
+}
+.summary-header .word-count-info {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: normal;
+    margin-left: auto; /* Push to the right */
+    padding-right: 1rem;
+}
+.summary-header .word-count-info.error {
+    color: #e74c3c;
+    font-weight: bold;
+}
+textarea.summary-body {
+    flex-grow: 1;
+    min-height: 200px;
+    padding: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5rem;
+    resize: none;
+    border: none;
+    outline: none;
+    background-image: repeating-linear-gradient(
+        to bottom, transparent, transparent 22px, #e2e8f0 23px
+    );
+    background-position: 0 14px;
+}
+
+/*
+    -------------------------
+    Share Button Styles
+    -------------------------
+*/
+.share-btn-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.share-btn {
+    background-color: rgba(36, 161, 222, 0.1);
+    color: #24A1DE;
+    border: 2px solid #24A1DE;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+     
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.share-btn:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+}
+ 
+.share-btn:active {
+    transform: scale(0.98);
+}
+
+/* Styling for the Telegram SVG icon inside the button */
+.telegram-icon {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+/* Tooltip Styling for Share button */
+.share-btn .tooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    background-color: #fdfdfc;
+    color: #24A1DE;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: normal;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e0e0e0;
+}
+ 
+.share-btn .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #fdfdfc transparent transparent transparent;
+}
+ 
+.share-btn:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    bottom: 110%;
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fdfdfc;
+    margin: 0;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 20vh;
+    /* Add this line: */
+    margin-top: 100px; /* Or use '5vh' */
+}
+.highlight-red {
+  color: #FF0000; /* This is pure red. You can adjust the shade if needed. */
+  font-weight: bold; /* Optional: Make it bold for more emphasis */
+}
+
+/* Ensure your existing tooltip styles are set up correctly for visibility and positioning */
+.action-btn {
+  position: relative; /* Essential for positioning the tooltip relative to the button */
+  /* Other button styles */
+}
+
+.action-btn .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  /* Adjust positioning as needed, e.g., top, left, transform */
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  z-index: 1;
+  transition: opacity 0.3s ease;
+  
+  /* Example positioning - adjust as needed */
+  bottom: 125%; 
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap; /* Prevents text from wrapping if you want it on one line */
+}
+
+.action-btn:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+/*
+    -------------------------
+    Specific Tooltip for Vote Button
+    -------------------------
+*/
+#voteBtn .tooltip {
+    background-color: #F5F5DC; /* Off-white color (Beige) */
+    color: #333; /* Dark text for contrast */
+    border: 1px solid #ccc; /* Subtle border for definition */
+}
+
+/* Also, update the tooltip's arrow to match the new background color */
+#voteBtn .tooltip::after {
+    border-color: #F5F5DC transparent transparent transparent;
+}

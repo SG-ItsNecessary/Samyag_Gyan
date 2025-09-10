@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combined Buttons with Custom Tooltips</title>
+    <link rel="stylesheet" href="styles/buttons.css">
+</head>
+<body>
+
+<div class="button-row">
+
+    <div class="mark-read-wrapper">
+        <button class="read-button" id="markReadBtn">
+            <svg class="read-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M18 6V4a2 2 0 1 0-4 0v2"/>
+                <path d="M20 15v6a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H10"/>
+                <rect x="12" y="6" width="8" height="5" rx="1"/>
+            </svg>
+            <span class="read-text">Mark as Read</span>
+        </button>
+        <span class="ticks" id="readTicks">✓✓</span>
+    </div>
+
+    <button class="action-btn" id="voteBtn">
+        <svg viewBox="0 0 490.667 490.667" xml:space="preserve">
+            <path class="icon-path" d="M245.333,0C110.059,0,0,110.059,0,245.333s110.059,245.333,245.333,245.333s245.333-110.059,245.333-245.333 S380.608,0,245.333,0z M103.893,131.989C138.56,88.789,190.123,64,245.333,64s106.752,24.789,141.44,67.989 c3.691,4.587,2.944,11.307-1.643,14.997c-1.963,1.579-4.331,2.347-6.677,2.347c-3.115,0-6.229-1.365-8.341-3.989 c-30.613-38.144-76.075-60.011-124.8-60.011s-94.187,21.867-124.8,60.011c-3.691,4.608-10.389,5.333-14.997,1.643 C100.949,143.296,100.203,136.576,103.893,131.989z M256,213.333c-5.888,0-10.667-4.779-10.667-10.667S250.112,192,256,192h64 c5.888,0,10.667,4.779,10.667,10.667s-4.779,10.667-10.667,10.667h-21.333V288c0,5.888-4.779,10.667-10.667,10.667 s-10.667-4.779-10.667-10.667v-74.667H256z M234.667,224v42.667c0,17.643-14.357,32-32,32c-17.643,0-32-14.357-32-32V224 c0-17.643,14.357-32,32-32C220.309,192,234.667,206.357,234.667,224z M96.683,291.755l-32-85.333 c-2.069-5.525,0.725-11.669,6.229-13.739c5.525-2.027,11.669,0.725,13.739,6.229l22.016,58.709l22.016-58.709 c2.069-5.525,8.192-8.277,13.739-6.229c5.504,2.069,8.299,8.213,6.229,13.739l-32,85.333c-1.557,4.16-5.547,6.912-9.984,6.912 C102.229,298.667,98.24,295.915,96.683,291.755z M376.789,370.005c-34.667,36.523-81.344,56.661-131.456,56.661 s-96.811-20.117-131.456-56.661c-4.053-4.288-3.883-11.029,0.405-15.083c4.288-4.032,11.051-3.861,15.083,0.405 c30.592,32.256,71.787,50.005,115.989,50.005c44.203,0,85.397-17.771,115.989-50.005c4.053-4.267,10.816-4.437,15.083-0.405 C380.693,358.955,380.843,365.739,376.789,370.005z M373.333,234.667c5.888,0,10.667,4.779,10.667,10.667 S379.221,256,373.333,256h-10.667v21.333h32c5.888,0,10.667,4.779,10.667,10.667s-4.779,10.667-10.667,10.667H352 c-5.888,0-10.667-4.779-10.667-10.667v-85.333c0-5.888,4.779-10.667,10.667-10.667h42.667c5.888,0,10.667,4.779,10.667,10.667 s-4.779,10.667-10.667,10.667h-32v21.333H373.333z"/>
+            <path class="icon-path" d="M192,224v42.667c0,5.888,4.779,10.667,10.667,10.667s10.667-4.779,10.667-10.667V224c0-5.888-4.779-10.667-10.667-10.667 S192,218.112,192,224z"/>
+        </svg>
+        <span>Magazine Worthy??</span>
+        <span class="tooltip">
+            <span class="highlight-red">Your Vote</span> decides content for the next magazine.<br>
+            Articles here are for your in-depth understanding.<br>
+            Magazines will have <span class="highlight-red">Mains-ready</span> notes.
+        </span>
+    </button>
+    
+    <button class="action-btn" id="bookmarkBtn">
+        <svg viewBox="0 0 24 24">
+            <path class="icon-path" d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span id="bookmarkText">Bookmark</span>
+        <span class="bookmark-tooltip initial"><span class="red-highlight">Bookmark</span> it to Revise (Mains)</span>
+        <span class="bookmark-tooltip saved">Bookmarked</span>
+    </button>
+
+    
+
+    <!-- <button class="action-btn" id="reminderBtn">
+        <svg viewBox="0 0 496.399 496.4">
+            <path class="icon-path" d="M74.8,96.9V49.3c0-11.288,9.112-20.4,20.4-20.4s20.4,9.112,20.4,20.4v47.6c0,11.288-9.112,20.4-20.4,20.4 S74.8,108.188,74.8,96.9z M292.399,117.3c11.288,0,20.4-9.112,20.4-20.4V49.3c0-11.288-9.112-20.4-20.4-20.4 C281.112,28.9,272,38.012,272,49.3v47.6C272,108.188,281.112,117.3,292.399,117.3z M414.8,341.701h-20.4v-47.602 c0-7.506-6.093-13.6-13.6-13.6s-13.6,6.094-13.6,13.6V355.3c0,7.508,6.093,13.6,13.6,13.6h34c7.507,0,13.6-6.092,13.6-13.6 S422.307,341.701,414.8,341.701z M496.399,351.9c0,63.852-51.748,115.6-115.6,115.6c-45.492,0-84.796-26.383-103.632-64.6H34 c-18.768,0-34-15.232-34-34V117.3c0-18.768,15.232-34,34-34h27.2v13.6c0,18.768,15.232,34,34,34s34-15.232,34-34V83.3h129.2v13.6 c0,18.768,15.232,34,34,34c18.769,0,34-15.232,34-34V83.3h27.2c18.769,0,34,15.232,34,34v119.34 C448.256,240.176,496.399,290.361,496.399,351.9z M252.144,179.86h-110.5v30.532h76.704 c-15.368,18.632-27.812,39.168-37.332,61.473c-9.452,22.371-15.096,45.627-17,69.836h35.156 c0.136-10.812,1.428-22.441,3.808-34.885c2.38-12.512,5.78-24.82,10.2-36.992s9.86-23.664,16.388-34.476 c6.596-10.812,14.076-19.856,22.576-27.268V179.86z M469.2,351.9c0-48.756-39.645-88.4-88.4-88.4s-88.4,39.645-88.4,88.4 s39.645,88.4,88.4,88.4S469.2,400.656,469.2,351.9z"/>
+        </svg>
+        <span>Sunday Revisit !!</span>
+        <span class="reminder-tooltip">SG-Bot <i>I will remind you on Sunday!!</i></span>
+    </button> -->
+     <button class="action-btn" id="summaryBtn">
+        <svg viewBox="0 0 24 24">
+            <path class="icon-path" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path class="icon-path" d="M14 2v6h6M8 15h8M8 11h8M8 19h8"/>
+        </svg>
+        <span>Summary</span>
+    </button>
+
+   
+    
+    <div class="share-btn-wrapper">
+        <button class="share-btn" id="shareBtn">
+            <?xml version="1.0" encoding="iso-8859-1"?>
+            <svg class="telegram-icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                viewBox="0 0 512 512" xml:space="preserve">
+                <circle style="fill:#47B0D3;" cx="256" cy="256" r="256"/>
+                <path style="fill:#3298BA;" d="M34.133,256c0-135.648,105.508-246.636,238.933-255.421C267.424,0.208,261.737,0,256,0
+                    C114.615,0,0,114.615,0,256s114.615,256,256,256c5.737,0,11.424-0.208,17.067-0.579C139.642,502.636,34.133,391.648,34.133,256z"/>
+                <path style="fill:#E5E5E5;" d="M380.263,109.054c-2.486-1.69-5.676-1.946-8.399-0.679L96.777,236.433
+                    c-4.833,2.251-7.887,7.172-7.766,12.501c0.117,5.226,3.28,9.92,8.065,12.015l253.613,110.457c8.468,3.849,18.439-2.21,18.983-11.453
+                    l14.314-243.341C384.161,113.614,382.748,110.742,380.263,109.054z"/>
+                <polygon style="fill:#CCCCCC;" points="171.631,293.421 188.772,408 379.168,108.432 "/>
+                <path style="fill:#FFFFFF;" d="M371.866,108.375L96.777,236.433c-4.737,2.205-7.826,7.121-7.769,12.345
+                    c0.058,5.233,3.276,10.074,8.067,12.171l74.557,32.471l207.536-184.988C376.882,107.33,374.203,107.287,371.866,108.375z"/>
+                <polygon style="fill:#E5E5E5;" points="211.418,310.749 188.772,408 379.168,108.432 "/>
+                <path style="fill:#FFFFFF;" d="M380.263,109.054c-0.351-0.239-0.72-0.442-1.095-0.622l-167.75,202.317l139.27,60.657
+                    c8.468,3.849,18.439-2.21,18.983-11.453l14.314-243.341C384.161,113.614,382.748,110.742,380.263,109.054z"/>
+            </svg>
+            <span class="share-text">Share</span>
+            <span class="tooltip">Share & Discuss with Peers !!!</span>
+        </button>
+    </div>
+
+</div>
+
+<div class="summary-container" id="summaryModal">
+    <div class="summary-header">
+        <div>My Summary</div>
+        <div class="word-count-info">
+            <span id="wordCount">0/100 words</span>
+        </div>
+        <div id="noteDate"></div>
+        <button class="save-btn" id="summarySaveBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-8.69"/>
+                <path d="M22 4L12 14.01l-3-3"/>
+            </svg>
+        </button>
+        <button class="close-btn">&times;</button>
+    </div>
+    <textarea
+        id="unicode-textbox"
+        class="summary-body"
+        placeholder="अपने विचारों को अपनी भाषा में संक्षेपित करें।
+सभी भारतीय लिपियों और हर भाषा (यहाँ तक कि हिंग्लिश भी) का उपयोग नोट्स में किया जा सकता है।
+समय बचाने के लिए, संक्षेपण के लिए Voice Typing / AI टूल्स का उपयोग करें।
+
+Summarize your thoughts in your language. Every Bharatiya Script and every Language (even Hinglish) can be used in notes.
+Use Voice Typing and AI tools to save time to summarize.."
+        spellcheck="false"
+    ></textarea>
+</div>
+
+<script src="scripts/buttons.js"></script>
+</body>
+</html>

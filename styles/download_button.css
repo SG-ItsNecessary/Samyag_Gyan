@@ -1,0 +1,110 @@
+/*
+ * This file contains the styles for the download button.
+ * It has been separated into its own file for better organization
+ * within the 'styles' folder.
+ */
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    font-family: Verdana, Geneva, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.download-button-container {
+    position: relative;
+    display: inline-block;
+}
+
+.download-button {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    border: 2px solid #fff; /* Permanent white border */
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+    text-align: center;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    z-index: 1;
+
+    /* Selected Style */
+    background-color: #3498db;
+    color: #fff;
+}
+
+/* --- Common Styles --- */
+.button-text {
+    text-transform: capitalize;
+    font-weight: 600;
+    color: #fff;
+}
+    
+.button-text span.initial {
+    text-transform: uppercase;
+}
+
+.reg-symbol {
+    font-weight: 300;
+    font-size: 0.6em;
+    margin-left: 4px;
+    position: relative;
+    top: -3px;
+    color: #fff;
+}
+    
+.download-button:hover {
+    transform: translateY(-2px); /* Lifts the button up */
+    /* A single, neutral shadow on hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+/* --- Custom Tooltip Styling --- */
+.tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    width: max-content;
+    background: linear-gradient(to right, #FFD4B5, #FFFFFF, #B4EDB4);
+    color: #333;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: normal;
+    transition: opacity 0.3s, visibility 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid #ccc;
+    bottom: 120%; 
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: normal;
+    z-index: 10;
+}
+
+.tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #B4EDB4 transparent transparent transparent;
+}
+
+.download-button:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+    font-weight: bold;
+}

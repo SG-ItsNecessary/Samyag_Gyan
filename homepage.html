@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samyak Gyan</title>
+    <link rel="stylesheet" href="styles/homepage.css">
+</head>
+<body>
+    <div class="main-app-wrapper">
+        <h2 style="font-family: Georgia, serif; text-align:center;">Samyak Gyan</h2>
+
+        <nav class="nav-container">
+            <button class="nav-btn btn-main">How to Use?</button>
+            <button class="nav-btn btn-ethics">Essay & Ethics</button>
+            <button class="nav-btn btn-beginner">Beginners Corner</button>
+            <button class="nav-btn btn-tri-color">Mission & Vision</button>
+            <button class="nav-btn btn-journal">Your Journal</button>
+        </nav>
+        
+        <div class="container">
+            <h1>Recent Uploads</h1>
+
+            <div class="recent-buttons">
+                <button id="saffron-btn" class="recent-btn btn-saffron"></button>
+                <button id="white-btn" class="recent-btn btn-white"></button>
+                <button id="green-btn" class="recent-btn btn-green"></button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="w-full text-center">
+                <h2>Last 7 Days</h2>
+                <div id="last-seven-days-container" class="last-7-days"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="w-full text-center">
+                <button id="calendar-toggle-btn" class="calendar-toggle">Select Date</button>
+                <div id="calendar-container" class="hidden">
+                    <div class="calendar">
+                        <div class="calendar-header">
+                            <button id="prev-month" class="nav-btn">‹</button>
+                            <h2 id="current-month-year" class="month-title"></h2>
+                            <button id="next-month" class="nav-btn">›</button>
+                        </div>
+                        <div class="calendar-grid">
+                            <div class="weekday">Sun</div>
+                            <div class="weekday">Mon</div>
+                            <div class="weekday">Tue</div>
+                            <div class="weekday">Wed</div>
+                            <div class="weekday">Thu</div>
+                            <div class="weekday">Fri</div>
+                            <div class="weekday">Sat</div>
+                        </div>
+                        <div id="calendar-grid" class="calendar-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="scripts/homepage.js"></script>
+</body>
+</html>
+
+
