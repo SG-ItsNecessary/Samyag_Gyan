@@ -186,6 +186,42 @@ app.get('/upsc-editorials/:date/:slug', authenticateUser, async (req, res) => {
 - ✅ Users know it's recent analysis, not old content
 - ✅ Better CTR (Click-Through Rate)
 
+**Archive Page Route:**
+```javascript
+// All editorials archive page
+app.get('/upsc-editorials/', authenticateUser, async (req, res) => {
+  const user = req.user;
+
+  if (!hasAccess(user, 'current_affairs')) {
+    return res.redirect('/pricing?message=subscribe-current-affairs');
+  }
+
+  // Fetch all editorials ordered by date (newest first)
+  const editorials = await db.query(`
+    SELECT * FROM articles
+    WHERE article_type = 'editorial'
+    AND status = 'published'
+    ORDER BY publish_date DESC, created_at DESC
+    LIMIT 100
+  `);
+
+  res.render('articles', {
+    articles: editorials.rows,
+    pageTitle: 'All Editorials - UPSC Analysis Archive',
+    metaDescription: 'Browse all editorial analyses for UPSC preparation. In-depth current affairs analysis and insights.',
+    canonicalUrl: 'https://www.samyak-gyan.com/upsc-editorials/',
+    isArchive: true,
+    archiveType: 'editorial'
+  });
+});
+```
+
+**Archive Button Integration:**
+- Archive button appears at bottom of every editorial tile
+- Button text: "All Editorials on SG"
+- Opens in new tab (`target="_blank"`)
+- URL: `/upsc-editorials/`
+
 ---
 
 ### 3. Ethics & Essays - Combined Landing Page
@@ -351,8 +387,35 @@ app.get('/upsc-ethics-essays/page-:pageNum', authenticateUser, async (req, res) 
 - ✅ Better long-term Google ranking
 - ✅ Cleaner, more shareable URLs
 
-**Backend Route:**
+**Backend Routes:**
 ```javascript
+// All ethics archive page
+app.get('/upsc-ethics/', authenticateUser, async (req, res) => {
+  const user = req.user;
+
+  if (!hasAccess(user, 'ethics_essays')) {
+    return res.redirect('/pricing?message=subscribe-ethics-essays');
+  }
+
+  // Fetch all ethics ordered by date (newest first)
+  const ethics = await db.query(`
+    SELECT * FROM articles
+    WHERE article_type = 'ethics'
+    AND status = 'published'
+    ORDER BY publish_date DESC, created_at DESC
+    LIMIT 100
+  `);
+
+  res.render('articles', {
+    articles: ethics.rows,
+    pageTitle: 'All Ethics Case Studies - UPSC GS4 Preparation',
+    metaDescription: 'Browse all ethics case studies for UPSC GS4. Practice ethical dilemmas and governance scenarios.',
+    canonicalUrl: 'https://www.samyak-gyan.com/upsc-ethics/',
+    isArchive: true,
+    archiveType: 'ethics'
+  });
+});
+
 // Individual ethics case study
 app.get('/upsc-ethics/:slug', authenticateUser, async (req, res) => {
   const { slug } = req.params;
@@ -381,6 +444,12 @@ app.get('/upsc-ethics/:slug', authenticateUser, async (req, res) => {
   });
 });
 ```
+
+**Archive Button Integration:**
+- Archive button appears at bottom of every ethics tile
+- Button text: "All Ethics on SG"
+- Opens in new tab (`target="_blank"`)
+- URL: `/upsc-ethics/`
 
 ---
 
@@ -419,8 +488,35 @@ app.get('/upsc-ethics/:slug', authenticateUser, async (req, res) => {
 - ✅ Better SEO for long-tail keywords
 - ✅ Professional, clean URLs
 
-**Backend Route:**
+**Backend Routes:**
 ```javascript
+// All essays archive page
+app.get('/upsc-essays/', authenticateUser, async (req, res) => {
+  const user = req.user;
+
+  if (!hasAccess(user, 'ethics_essays')) {
+    return res.redirect('/pricing?message=subscribe-ethics-essays');
+  }
+
+  // Fetch all essays ordered by date (newest first)
+  const essays = await db.query(`
+    SELECT * FROM articles
+    WHERE article_type = 'essay'
+    AND status = 'published'
+    ORDER BY publish_date DESC, created_at DESC
+    LIMIT 100
+  `);
+
+  res.render('articles', {
+    articles: essays.rows,
+    pageTitle: 'All Essays - UPSC Mains Essay Preparation',
+    metaDescription: 'Browse all essay analyses for UPSC Mains. Practice essay writing with expert insights and frameworks.',
+    canonicalUrl: 'https://www.samyak-gyan.com/upsc-essays/',
+    isArchive: true,
+    archiveType: 'essay'
+  });
+});
+
 // Individual essay analysis
 app.get('/upsc-essays/:slug', authenticateUser, async (req, res) => {
   const { slug } = req.params;
@@ -449,6 +545,12 @@ app.get('/upsc-essays/:slug', authenticateUser, async (req, res) => {
   });
 });
 ```
+
+**Archive Button Integration:**
+- Archive button appears at bottom of every essay tile
+- Button text: "All Essays on SG"
+- Opens in new tab (`target="_blank"`)
+- URL: `/upsc-essays/`
 
 ---
 
