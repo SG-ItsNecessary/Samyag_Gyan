@@ -400,7 +400,9 @@ function renderEthicsEssayArticles() {
 
     if (articleType === 'editorial') {
       archiveBtnLeft.innerHTML = `
-        <a href="/upsc-current-affairs/editorial/"
+        <a href="/upsc-editorials/"
+           target="_blank"
+           rel="noopener noreferrer"
            class="chip-btn"
            style="
              background-color: #fc7306;
@@ -420,12 +422,14 @@ function renderEthicsEssayArticles() {
            onmouseout="this.style.backgroundColor='#fc7306'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.08)';"
            onmousedown="this.style.backgroundColor='#e45e00';"
            onmouseup="this.style.backgroundColor='#ff8b33';">
-          All Editorial on SG
+          All Editorials on SG
         </a>
       `;
     } else if (articleType === 'ethics') {
       archiveBtnLeft.innerHTML = `
-        <a href="/upsc-ethics-case-study/"
+        <a href="/upsc-ethics/"
+           target="_blank"
+           rel="noopener noreferrer"
            class="chip-btn"
            style="
              background-color: #fc7306;
@@ -450,7 +454,9 @@ function renderEthicsEssayArticles() {
       `;
     } else if (articleType === 'essay') {
       archiveBtnLeft.innerHTML = `
-        <a href="/upsc-essay/"
+        <a href="/upsc-essays/"
+           target="_blank"
+           rel="noopener noreferrer"
            class="chip-btn"
            style="
              background-color: #fc7306;
@@ -526,17 +532,17 @@ function updateURLForArticle(title, publishDate, articleType = 'news') {
   // Convert "18 July 2025" to "2025-07-18" for clean, SEO-friendly URLs
   const isoDate = convertDateToISO(publishDate);
 
-  // SEO-optimized URL structure based on article type
+  // SEO-optimized URL structure based on article type (v2.0)
   let newPath;
   switch(articleType) {
     case 'editorial':
-      newPath = `/upsc-current-affairs/editorial/${isoDate}/${slug}`;
+      newPath = `/upsc-editorials/${isoDate}/${slug}`;  // ✅ Updated: cleaner URL
       break;
     case 'ethics':
-      newPath = `/upsc-ethics-case-study/${isoDate}/${slug}`;
+      newPath = `/upsc-ethics/${slug}`;  // ✅ Updated: NO DATE (timeless content)
       break;
     case 'essay':
-      newPath = `/upsc-essay/${isoDate}/${slug}`;
+      newPath = `/upsc-essays/${slug}`;  // ✅ Updated: NO DATE (timeless content) + plural
       break;
     case 'news':
     default:
@@ -551,49 +557,60 @@ function updateURLForArticle(title, publishDate, articleType = 'news') {
 // Get publish Date and slug from URL
 // -----------------------------
 function getArticleDataFromURL() {
-  // Example pathnames:
+  // Example pathnames (v2.0):
   // "/upsc-current-affairs/2025-08-25" → all articles for date
   // "/upsc-current-affairs/2025-08-25/article-slug" → specific news article
-  // "/upsc-current-affairs/editorial/2025-08-25/article-slug" → specific editorial
-  // "/upsc-ethics-case-study/2025-08-25/article-slug" → specific ethics case study
-  // "/upsc-essay/2025-08-25/article-slug" → specific essay
+  // "/upsc-editorials/2025-08-25/article-slug" → specific editorial (NEW!)
+  // "/upsc-editorials/" → all editorials archive
+  // "/upsc-ethics/article-slug" → specific ethics (NO DATE - NEW!)
+  // "/upsc-ethics/" → all ethics archive
+  // "/upsc-essays/article-slug" → specific essay (NO DATE - NEW!)
+  // "/upsc-essays/" → all essays archive
 
   const pathParts = window.location.pathname.split("/").filter(Boolean);
 
-  // Handle Current Affairs (News & Editorial)
+  // Handle Current Affairs (News only)
   if (pathParts[0] === 'upsc-current-affairs') {
-    if (pathParts[1] === 'editorial') {
-      // Editorial article
-      if (pathParts.length === 3) {
-        return { articleType: 'editorial', publishDate: pathParts[2], slug: null };
-      } else if (pathParts.length >= 4) {
-        return { articleType: 'editorial', publishDate: pathParts[2], slug: pathParts[3] };
-      }
-    } else {
-      // Regular news article
-      if (pathParts.length === 2) {
-        return { articleType: 'news', publishDate: pathParts[1], slug: null };
-      } else if (pathParts.length >= 3) {
-        return { articleType: 'news', publishDate: pathParts[1], slug: pathParts[2] };
-      }
+    if (pathParts.length === 2) {
+      return { articleType: 'news', publishDate: pathParts[1], slug: null };
+    } else if (pathParts.length >= 3) {
+      return { articleType: 'news', publishDate: pathParts[1], slug: pathParts[2] };
     }
   }
 
-  // Handle Ethics Case Studies
-  if (pathParts[0] === 'upsc-ethics-case-study') {
-    if (pathParts.length === 2) {
-      return { articleType: 'ethics', publishDate: pathParts[1], slug: null };
+  // Handle Editorials (separate category now - v2.0)
+  if (pathParts[0] === 'upsc-editorials') {
+    if (pathParts.length === 1) {
+      // Archive page: /upsc-editorials/
+      return { articleType: 'editorial', publishDate: null, slug: null, isArchive: true };
+    } else if (pathParts.length === 2) {
+      // Date page: /upsc-editorials/2025-01-18
+      return { articleType: 'editorial', publishDate: pathParts[1], slug: null };
     } else if (pathParts.length >= 3) {
-      return { articleType: 'ethics', publishDate: pathParts[1], slug: pathParts[2] };
+      // Specific article: /upsc-editorials/2025-01-18/article-slug
+      return { articleType: 'editorial', publishDate: pathParts[1], slug: pathParts[2] };
     }
   }
 
-  // Handle Essays
-  if (pathParts[0] === 'upsc-essay') {
-    if (pathParts.length === 2) {
-      return { articleType: 'essay', publishDate: pathParts[1], slug: null };
-    } else if (pathParts.length >= 3) {
-      return { articleType: 'essay', publishDate: pathParts[1], slug: pathParts[2] };
+  // Handle Ethics (NO DATE - v2.0)
+  if (pathParts[0] === 'upsc-ethics') {
+    if (pathParts.length === 1) {
+      // Archive page: /upsc-ethics/
+      return { articleType: 'ethics', publishDate: null, slug: null, isArchive: true };
+    } else if (pathParts.length >= 2) {
+      // Specific article: /upsc-ethics/article-slug (NO DATE!)
+      return { articleType: 'ethics', publishDate: null, slug: pathParts[1] };
+    }
+  }
+
+  // Handle Essays (NO DATE - v2.0)
+  if (pathParts[0] === 'upsc-essays') {
+    if (pathParts.length === 1) {
+      // Archive page: /upsc-essays/
+      return { articleType: 'essay', publishDate: null, slug: null, isArchive: true };
+    } else if (pathParts.length >= 2) {
+      // Specific article: /upsc-essays/article-slug (NO DATE!)
+      return { articleType: 'essay', publishDate: null, slug: pathParts[1] };
     }
   }
 
