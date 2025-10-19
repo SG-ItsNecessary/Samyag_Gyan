@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Journal - Samyak Gyan</title>
+<link rel="stylesheet" href="styles/header.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: system-ui, sans-serif; background-color:#f3f4f6; color:#1f2937; padding:1rem; }
+
+/* Layout - HORIZONTAL SIDE-BY-SIDE */
+.main-app-wrapper {
+  max-width:1200px; margin:1rem auto 0 auto; display:flex; flex-direction:row;
+  gap:1.5rem; flex-wrap:nowrap; align-items:stretch;
+}
+
+/* Left Block - Compact */
+.left-block {
+  flex:1 1 50%; background-color: rgba(255,255,255,0.1); padding:0.8rem 1rem;
+  border-radius:0.5rem; border:2px solid #888; box-shadow:0 3px 8px rgba(0,0,0,0.08);
+  display:flex; flex-direction:column;
+}
+#stats-header { text-align:center; margin-bottom:0.6rem; font-weight:bold; font-size:1rem; }
+.stats-buttons { display:flex; flex-direction:column; gap:0.4rem; width:100%; }
+.stat-btn {
+  padding:0.3rem 0.6rem; border-radius:1.5rem; border:1px solid #ccc; background-color:white;
+  cursor:pointer; text-align:center; font-size:0.8rem; font-weight:600; transition: all 0.2s ease;
+}
+.stat-btn:hover { transform: scale(1.02); box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+.stat-btn.active { background-color:#ff8775; border-color:#ccc; }
+
+/* Right Block - Compact */
+.right-block {
+  flex:1 1 50%; background-color: rgba(255,255,255,0.1); padding:0.8rem 1rem;
+  border-radius:0.5rem; border:2px solid #888; box-shadow:0 3px 8px rgba(0,0,0,0.08);
+  display:flex; flex-direction:column;
+}
+.info-box { position:relative; width:100%; }
+
+/* User ID & Date - Compact */
+.user-id-row { display:flex; justify-content:space-between; margin-bottom:0.4rem; font-weight:bold; font-size:0.85rem; }
+
+/* Name & Language - Compact */
+.info-row { display:flex; align-items:center; margin-bottom:0.25rem; }
+.info-row label { font-weight:600; margin-right:4px; flex-shrink:0; font-size:0.85rem; }
+.info-row input[type="text"], .info-row select { padding:0.2rem 0.3rem; font-size:0.85rem; flex-shrink:0; width:auto; }
+
+/* Edit Button - Compact */
+#edit-info { padding:0.2rem 0.5rem; font-size:0.75rem; border:none; border-radius:0.3rem; background-color:#fc7306; color:white; cursor:pointer; margin-left:auto; }
+
+/* Divider - Compact */
+hr { margin:4px 0; border:1px solid #ccc; }
+
+/* Subscriptions Section - Compact */
+.subscriptions-section { text-align:center; margin-top:0.15rem; display:flex; flex-direction:column; gap:0.25rem; }
+.subscriptions-title { font-weight:bold; font-size:1rem; text-align:center; margin-bottom:1px; }
+
+/* Trial & Extend Trial - Compact */
+.trial-extend-container { display:flex; justify-content:space-between; align-items:center; gap:0.4rem; margin-bottom:3px; }
+#trial-end { background-color:white; color:green; border:1px solid green; padding:0.2rem 0.4rem; border-radius:0.3rem; font-weight:bold; font-size:0.8rem; flex-shrink:0; }
+#extend-trial { background-color:white; color:#FF0000; border:2px solid #FF0000; border-radius:0.3rem; padding:0.25rem 0.55rem; cursor:pointer; font-weight:200; font-size:0.8rem; flex-shrink:0; animation: blink 1.2s infinite; }
+@keyframes blink { 0%,50%,100% { border-color:#FF0000; } 25%,75% { border-color:transparent; } }
+
+/* Topic Chips - Compact */
+.topic-container { display:flex; justify-content:flex-start; gap:8px; margin-top:2px; align-items:center; flex-wrap:wrap; }
+.topic-chip { padding:0.2rem 0.5rem; border-radius:1.2rem; border:2px solid black; font-size:0.8rem; font-weight:700; cursor:pointer; text-align:center; min-width:100px; }
+.topic-chip.current-affairs { background-color:transparent; color:#333; }
+.topic-chip.ethics-essay { background-color:transparent; color:#333; }
+
+/* Subscript note - Compact */
+.subscribe-note { font-size:0.65rem; text-align:right; margin-top:1px; font-style:italic; color:#333; }
+
+/* ===== GLOW PULSE ANIMATION (Redirect Flow) ===== */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); transform: scale(1); }
+  50% { box-shadow: 0 0 40px rgba(255, 0, 0, 1); transform: scale(1.05); }
+}
+
+.topic-chip.glow-pulse {
+  animation: glowPulse 1.5s ease-in-out infinite;
+  z-index: 1000;
+}
+
+/* ===== SUBSCRIPTION OVERLAY MESSAGE ===== */
+.subscription-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.88);
+  color: white;
+  padding: 1.2rem 2.5rem;
+  border-radius: 0.8rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  z-index: 10001;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.5px;
+}
+
+.subscription-overlay.show {
+  opacity: 1;
+}
+
+/* Dynamic Panel */
+.dynamic-panel { margin-top:2rem; padding:2rem 1.5rem; background-color:white; border-radius:0.5rem; border:2px solid #888; box-shadow:0 3px 8px rgba(0,0,0,0.08); width:100%; text-align:center; }
+#dynamic-chip { display:inline-block; padding:1rem 2rem; border-radius:2rem; border:1px solid #ccc; background-color:#ff8775; font-weight:700; font-size:1.4rem; margin-bottom:2rem; }
+.analytics-panel { display:flex; flex-direction:column; align-items:center; gap:1.5rem; }
+.analytics-chips { display:flex; justify-content:center; align-items:center; gap:2.5rem; flex-wrap:wrap; }
+.month-dropdown { position:relative; display:inline-flex; align-items:center; justify-content:center; background-color:white; border:1px solid #ccc; border-radius:2rem; padding:0.5rem 1.2rem; font-weight:600; cursor:pointer; }
+.month-dropdown select { border:none; background:transparent; font:inherit; padding-right:1rem; cursor:pointer; outline:none; }
+.month-dropdown::after { content:""; }
+.fortnight-chip { padding:0.45rem 1rem; border-radius:2rem; border:1px solid #ccc; background-color:white; cursor:pointer; font-size:0.9rem; font-weight:600; transition:all 0.2s ease; }
+.fortnight-chip.active { background-color:#ff8775; border-color:#ccc; }
+.chart-placeholder { margin-top:1.5rem; width:90%; max-width:800px; height:220px; border:2px dashed #9abaf3; border-radius:0.5rem; display:flex; align-items:center; justify-content:center; color:#555; font-weight:600; }
+
+/* Referral Popup Overlay */
+.popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center; }
+.popup-overlay.show { display:flex; }
+.popup-box { background:#fff; color:#000; width:90%; max-width:520px; border-radius:1rem; box-shadow:0 6px 20px rgba(0,0,0,0.25); padding:1.8rem 2rem; text-align:center; animation:popupFadeIn 0.4s ease; position:relative; }
+
+/* Darker close button + "Skip" text */
+.popup-close { position:absolute; top:0.6rem; right:0.9rem; background:transparent; border:none; font-size:1.5rem; font-weight:bold; color:#333; cursor:pointer; transition: color 0.2s ease; display: flex; align-items: center; gap: 0.3rem; }
+.popup-close:hover { color:#fc7306; }
+.popup-close-text { font-size: 0.9rem; font-weight: 600; }
+
+.popup-box h2 { color:#fc7306; font-size:1.8rem; font-weight:800; margin-bottom:0.6rem; }
+.popup-box p { font-size:1.05rem; line-height:1.5; color:#111; margin-bottom:0.7rem; }
+.popup-box p strong { font-weight:700; color:#000; }
+.popup-box p em { font-style:italic; font-weight:500; color:#000; }
+.popup-box .big-heart-line { font-size:1.25rem; font-weight:600; }
+.red-trial { color:#dc3545; font-weight:700; font-size:1.2rem; }
+
+.popup-button { background-color:#1877F2; color:white; border:none; border-radius:0.5rem; padding:0.7rem 1.5rem; font-size:1rem; font-weight:600; cursor:pointer; transition: all 0.2s ease; margin-top:0.5rem; width:100%; }
+.popup-button:hover { background-color:#155dbf; transform:scale(1.03); }
+
+.popup-caption { font-size:0.75rem; color:#333; font-style:italic; margin-top:0.4rem; line-height:1.3; }
+.popup-caption .sg-no-ads { color:#fc7306; font-style:italic; font-weight:450; }
+.popup-caption .sg { font-style:italic; font-weight:600; }
+
+@keyframes popupFadeIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
+
+/* ===== SUBSCRIPTION POPUP (When user clicks inactive date) ===== */
+.subscription-popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10001; justify-content:center; align-items:center; }
+.subscription-popup-overlay.show { display:flex; }
+.subscription-popup-box { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; width:90%; max-width:450px; border-radius:1.2rem; box-shadow:0 10px 30px rgba(0,0,0,0.4); padding:2rem 2rem 2.5rem 2rem; text-align:center; animation:popupFadeIn 0.4s ease; position:relative; }
+
+.subscription-popup-close { position:absolute; top:0.8rem; right:1rem; background:rgba(255,255,255,0.2); border:none; font-size:1.8rem; font-weight:bold; color:white; cursor:pointer; transition: all 0.2s ease; width:2rem; height:2rem; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.subscription-popup-close:hover { background:rgba(255,255,255,0.4); transform:rotate(90deg); }
+
+.subscription-popup-icon { font-size:3rem; margin-bottom:1rem; }
+.subscription-popup-title { font-size:1.8rem; font-weight:700; margin-bottom:0.8rem; color:white; line-height:1.3; }
+.subscription-popup-message { font-size:1.1rem; margin-bottom:1.8rem; color:rgba(255,255,255,0.95); line-height:1.5; }
+
+.subscription-popup-btn { background:linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%); color:white; border:none; border-radius:0.6rem; padding:0.9rem 2rem; font-size:1.1rem; font-weight:600; cursor:pointer; transition: all 0.3s ease; box-shadow:0 4px 15px rgba(0,0,0,0.2); width:100%; }
+.subscription-popup-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.3); }
+
+@media(max-width:768px){
+  .main-app-wrapper{ flex-direction:column; flex-wrap:wrap; }
+  .left-block, .right-block { flex:1 1 100%; }
+  .analytics-chips { flex-direction:column; gap:1rem; }
+  .trial-extend-container { flex-direction:column; align-items:flex-start; gap:4px; }
+  .topic-container { flex-direction:column; gap:4px; padding:0; }
+}
+</style>
+</head>
+<body>
+
+<!-- Unified Header Component (Banner + Navigation + Rotate Message) -->
+<div id="header-placeholder"></div>
+
+<!-- Load Header Component -->
+<script>
+  fetch('components/header.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+
+      // Trigger orientation check after header is loaded
+      if (typeof checkOrientation === 'function') {
+        checkOrientation();
+      }
+
+      // Setup "Got it" handler after header is loaded
+      if (typeof setupGotItHandler === 'function') {
+        setupGotItHandler();
+      }
+    });
+</script>
+
+<!-- Orientation Detection Script -->
+<script src="scripts/orientation-detection.js"></script>
+
+<div class="main-app-wrapper">
+
+  <!-- Left Block: My Stats & Compilations -->
+  <div class="left-block">
+    <h3 id="stats-header">My Stats & Compilations</h3>
+    <div class="stats-buttons">
+      <button class="stat-btn active" data-target="reading">Reading Insight</button>
+      <button class="stat-btn" data-target="voting">Voting Pattern</button>
+      <button class="stat-btn" data-target="notes">Notes Dashboard</button>
+      <button class="stat-btn" data-target="time">Time Spent</button>
+      <button class="stat-btn" data-target="bookmarked">Bookmarked Articles</button>
+    </div>
+  </div>
+
+  <!-- Right Block: Personal Info + Subscriptions -->
+  <div class="right-block">
+    <div class="info-box">
+      <!-- User ID & Date -->
+      <div class="user-id-row">
+        <span><strong>User ID:</strong> *****345</span>
+        <span><strong>Date Joined:</strong> 10 Oct 2025</span>
+      </div>
+
+      <!-- Name & Language -->
+      <div class="info-row">
+        <label>Name:</label>
+        <input type="text" value="Deepanshu Anand" disabled>
+        <button id="edit-info">Edit</button>
+      </div>
+      <div class="info-row">
+        <label>Language:</label>
+        <select disabled>
+          <option>English</option>
+          <option>Hindi</option>
+        </select>
+      </div>
+
+      <hr>
+
+      <!-- Subscriptions -->
+      <div class="subscriptions-section">
+        <div class="subscriptions-title">Subscriptions</div>
+        <div class="trial-extend-container">
+          <div id="trial-end">Your Trial Ends: Oct 25, 2025</div>
+          <button id="extend-trial">Help Us Grow !!</button>
+        </div>
+        <div class="topic-container">
+          <button class="topic-chip current-affairs" data-topic="current-affairs">Current Affairs</button>
+          <button class="topic-chip ethics-essay" data-topic="ethics-essay">Ethics & Essay</button>
+          <span class="subscribe-note">* Click on (Button) to Subscribe</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Subscription Popup (When user clicks inactive date) -->
+<div class="subscription-popup-overlay" id="subscription-popup">
+  <div class="subscription-popup-box">
+    <button class="subscription-popup-close" id="close-subscription-popup">×</button>
+
+    <div class="subscription-popup-icon">🔒</div>
+    <div class="subscription-popup-title" id="subscription-popup-title">Subscribe to Read</div>
+    <div class="subscription-popup-message" id="subscription-popup-message">
+      Get unlimited access to enriching content and create notes with 1-click!
+    </div>
+
+    <!-- This button will dynamically change based on which subscription is needed -->
+    <button class="subscription-popup-btn" id="subscription-popup-btn" data-topic="">
+      Subscribe Now
+    </button>
+  </div>
+</div>
+
+<!-- Referral Popup (Hidden by default) -->
+<div class="popup-overlay" id="referral-popup">
+  <div class="popup-box">
+    <!-- Darker × with "Skip" text -->
+    <button class="popup-close" id="close-popup">
+      <span>×</span>
+      <span class="popup-close-text">Skip</span>
+    </button>
+
+    <h2>🎉 Welcome to <strong>Samyak Gyan!</strong></h2>
+
+    <p>✨ You've got a <strong>15-day free access</strong> to explore.</p>
+
+    <p>
+      🧠 Read Enriching Content <br>
+      ☝️ Create Notes in 1-Click !!
+    </p>
+
+    <p class="big-heart-line">❤️ Find the Platform useful ??</p>
+
+    <p style="margin-top:0.6rem;">
+      🔗 Refer it to <strong>all of your friends</strong> and help <strong><em>SG</em></strong> reach them!!
+    </p>
+
+    <p style="margin-top:0.6rem;">
+      👥 When <strong>3 of your friends</strong> join via your Link, you get<br>
+      <span class="red-trial">1 month free access !!</span>
+    </p>
+
+    <button class="popup-button" id="get-referral-link">📲 Send Link to My Telegram</button>
+
+    <p class="popup-caption">
+      <span class="sg-no-ads">Samyak Gyan is not spending on ads on Youtube-Instagram!!</span><br>
+      Help <span class="sg">SG</span> grow!! Do refer it to all your friends!!
+    </p>
+  </div>
+</div>
+
+<!-- Dynamic Panel -->
+<div id="dynamic-content" class="dynamic-panel">
+  <div id="dynamic-chip">My Reading Insight</div>
+  <div class="analytics-panel">
+    <div class="analytics-chips">
+      <div class="month-dropdown">
+        <select id="month-select">
+          <option selected>Month</option>
+          <option>January</option>
+          <option>February</option>
+          <option>March</option>
+          <option>April</option>
+          <option>May</option>
+          <option>June</option>
+          <option>July</option>
+          <option>August</option>
+          <option>September</option>
+          <option>October</option>
+          <option>November</option>
+          <option>December</option>
+        </select>
+      </div>
+      <div class="fortnight-chip active" id="first-fortnight">1st Fortnight</div>
+      <div class="fortnight-chip" id="second-fortnight">2nd Fortnight</div>
+    </div>
+    <div class="chart-placeholder">
+      Chart / Stats will appear here based on selected month & fortnight
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== STATS BUTTON NAVIGATION ====================
+const statBtns = document.querySelectorAll(".stat-btn");
+const dynamicChip = document.getElementById("dynamic-chip");
+statBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    statBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    dynamicChip.textContent = "My " + btn.textContent;
+  });
+});
+
+// ==================== FORTNIGHT TOGGLE ====================
+const fortnightChips = document.querySelectorAll(".fortnight-chip");
+fortnightChips.forEach(chip => {
+  chip.addEventListener("click", () => {
+    fortnightChips.forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+  });
+});
+
+// ==================== EDIT/SAVE PROFILE ====================
+const editBtn = document.getElementById("edit-info");
+const nameInput = document.querySelector(".info-row input[type='text']");
+const langSelect = document.querySelector(".info-row select");
+let isEditing = false;
+editBtn.addEventListener("click", () => {
+  isEditing = !isEditing;
+  nameInput.disabled = !isEditing;
+  langSelect.disabled = !isEditing;
+  editBtn.textContent = isEditing ? "Save" : "Edit";
+  editBtn.style.fontSize = isEditing ? "0.85rem" : "1rem";
+});
+
+// ==================== SUBSCRIPTION POPUP ====================
+
+/**
+ * Shows subscription popup with the appropriate topic button
+ * Also triggers background glow effect on the dashboard button
+ * @param {string} topic - 'current-affairs' or 'ethics-essay'
+ */
+function showSubscriptionPopup(topic) {
+  const popup = document.getElementById('subscription-popup');
+  const popupBtn = document.getElementById('subscription-popup-btn');
+  const popupTitle = document.getElementById('subscription-popup-title');
+  const popupMessage = document.getElementById('subscription-popup-message');
+  const dashboardButton = document.querySelector(`.topic-chip[data-topic="${topic}"]`);
+
+  // Set popup content based on topic
+  if (topic === 'current-affairs') {
+    popupTitle.textContent = 'Subscribe to Current Affairs';
+    popupMessage.textContent = 'Get daily updates on current affairs and create notes with 1-click!';
+    popupBtn.textContent = 'Subscribe to Current Affairs';
+  } else if (topic === 'ethics-essay') {
+    popupTitle.textContent = 'Subscribe to Ethics & Essay';
+    popupMessage.textContent = 'Get weekly ethics & essay content every Sunday and enhance your preparation!';
+    popupBtn.textContent = 'Subscribe to Ethics & Essay';
+  }
+
+  popupBtn.dataset.topic = topic;
+
+  // Show popup
+  popup.classList.add('show');
+
+  // Also trigger glow effect on dashboard button in background
+  if (dashboardButton) {
+    setTimeout(() => {
+      dashboardButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+
+    setTimeout(() => {
+      dashboardButton.classList.add('glow-pulse');
+    }, 800);
+  }
+
+  // Auto-close popup after 15 seconds
+  setTimeout(() => {
+    popup.classList.remove('show');
+    if (dashboardButton) {
+      dashboardButton.classList.remove('glow-pulse');
+    }
+  }, 15000); // 15 seconds
+}
+
+// Close subscription popup handlers
+const subscriptionPopup = document.getElementById('subscription-popup');
+const closeSubscriptionPopupBtn = document.getElementById('close-subscription-popup');
+
+closeSubscriptionPopupBtn.addEventListener('click', () => {
+  subscriptionPopup.classList.remove('show');
+  // Remove glow from dashboard buttons
+  document.querySelectorAll('.topic-chip.glow-pulse').forEach(btn => {
+    btn.classList.remove('glow-pulse');
+  });
+});
+
+// Close when clicking outside
+subscriptionPopup.addEventListener('click', (e) => {
+  if (e.target === subscriptionPopup) {
+    subscriptionPopup.classList.remove('show');
+    document.querySelectorAll('.topic-chip.glow-pulse').forEach(btn => {
+      btn.classList.remove('glow-pulse');
+    });
+  }
+});
+
+// Handle subscription button click in popup
+document.getElementById('subscription-popup-btn').addEventListener('click', function() {
+  const topic = this.dataset.topic;
+  console.log(`TODO: Redirect to Razorpay payment for ${topic}`);
+  // TODO: Backend: POST /api/subscriptions/:userId/subscribe
+  // TODO: Integrate with Razorpay payment gateway
+
+  // Temporary feedback
+  this.textContent = '✓ Processing...';
+  this.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+});
+
+/**
+ * Legacy function for backward compatibility
+ * Scrolls to subscription block and adds glow to button
+ * @param {string} topic - 'current-affairs' or 'ethics-essay'
+ */
+function highlightSubscriptionButton(topic) {
+  // Now calls the new popup function instead
+  showSubscriptionPopup(topic);
+}
+
+// ==================== CHECK FOR HIGHLIGHT PARAMETER ON PAGE LOAD ====================
+function checkHighlightParameter() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const highlightTopic = urlParams.get('highlight');
+
+  if (highlightTopic) {
+    console.log(`Highlight parameter detected: ${highlightTopic}`);
+    highlightSubscriptionButton(highlightTopic);
+
+    // Remove parameter from URL (clean up)
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.delete('highlight');
+    window.history.replaceState({}, '', newUrl.toString());
+  }
+}
+
+// ==================== REFERRAL POPUP ====================
+const extendTrialBtn = document.getElementById('extend-trial');
+const referralPopup = document.getElementById('referral-popup');
+const closePopupBtn = document.getElementById('close-popup');
+const getReferralLinkBtn = document.getElementById('get-referral-link');
+
+extendTrialBtn.addEventListener('click', () => {
+  referralPopup.classList.add('show');
+});
+
+closePopupBtn.addEventListener('click', () => {
+  referralPopup.classList.remove('show');
+});
+
+// Close popup when clicking outside
+referralPopup.addEventListener('click', (e) => {
+  if (e.target === referralPopup) {
+    referralPopup.classList.remove('show');
+  }
+});
+
+getReferralLinkBtn.addEventListener('click', () => {
+  // TODO: Backend: POST /api/telegram/send-referral-link
+  console.log('TODO: Trigger Telegram bot to send referral link');
+
+  // Temporary feedback
+  getReferralLinkBtn.textContent = '✅ Link Sent to Telegram';
+  getReferralLinkBtn.style.backgroundColor = '#2ecc71';
+  setTimeout(() => {
+    referralPopup.classList.remove('show');
+    getReferralLinkBtn.textContent = '📲 Send Link to My Telegram';
+    getReferralLinkBtn.style.backgroundColor = '#1877F2';
+  }, 2000);
+});
+
+// ==================== INITIALIZE ON PAGE LOAD ====================
+document.addEventListener('DOMContentLoaded', () => {
+  checkHighlightParameter(); // Check for redirect highlight
+});
+</script>
+
+</body>
+</html>

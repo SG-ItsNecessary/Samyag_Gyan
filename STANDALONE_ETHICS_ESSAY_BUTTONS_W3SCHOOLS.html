@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ethics & Essay Buttons - Standalone Test</title>
+
+<style>
+/* ==================== BUTTON ROW STYLES ==================== */
+.button-row {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+/* ==================== BUTTON WRAPPER ==================== */
+.button-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+/* ==================== ACTION BUTTONS (SUMMARY) ==================== */
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: white;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1e293b;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  background: #f8fafc;
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+.action-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: #667eea;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.action-btn .icon-path {
+  stroke: #667eea;
+}
+
+/* Summary button when text is saved */
+.action-btn.summarized {
+  background: #dcfce7;
+  border-color: #22c55e;
+}
+
+.action-btn.summarized svg {
+  stroke: #16a34a;
+}
+
+/* ==================== SHARE BUTTON ==================== */
+.share-btn-wrapper {
+  margin-left: auto;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid white;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.share-btn:active {
+  transform: translateY(0);
+}
+
+.share-btn .telegram-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.share-text {
+  font-size: 0.95rem;
+}
+
+/* ==================== INFO ICON ==================== */
+.info-container {
+  position: relative;
+  cursor: help;
+}
+
+.info-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  font-style: italic;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.info-container:hover .info-icon {
+  background: white;
+  border-color: #667eea;
+  transform: scale(1.1);
+}
+
+.info-container .tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  width: 220px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+.info-container:hover .tooltip {
+  opacity: 1;
+}
+
+.info-container .tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1e293b;
+}
+
+/* ==================== SUMMARY MODAL ==================== */
+.summary-container {
+  display: none;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  margin: 1.5rem 0;
+  max-width: 800px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.summary-container.visible {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px 10px 0 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.summary-header #noteDate {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.word-count-info {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.word-count-info.error {
+  background: #ef4444;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.summary-body-wrapper {
+  position: relative;
+  padding: 1.5rem;
+}
+
+.summary-body {
+  width: 100%;
+  min-height: 200px;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: vertical;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: border-color 0.3s ease;
+}
+
+.summary-body:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.save-btn {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #22c55e;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+  background: #f0fdf4;
+}
+
+.save-btn:active {
+  transform: scale(0.95);
+}
+
+.summary-footer {
+  padding: 1rem 1.5rem;
+  background: #f8fafc;
+  border-radius: 0 0 10px 10px;
+  font-size: 0.9rem;
+  color: #64748b;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+}
+
+.get-notes-label {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0 0.25rem;
+}
+
+/* ==================== DEMO CONTAINER ==================== */
+.demo-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.demo-title {
+  text-align: center;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.demo-article {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+
+.article-title {
+  color: #1e293b;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.article-content {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.instruction {
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  color: #92400e;
+}
+</style>
+</head>
+<body>
+
+<div class="demo-container">
+  <h1 class="demo-title">Ethics & Essay Buttons - Standalone (No Conditionality)</h1>
+
+  <div class="instruction">
+    <strong>✅ Test Instructions:</strong><br>
+    1. Click <strong>Summary</strong> button → Modal opens immediately (NO "mark as read" required)<br>
+    2. Type some text → See word count update<br>
+    3. Click <strong>Save</strong> button → Summary button turns green<br>
+    4. Click <strong>Share</strong> button → Opens Telegram share window<br>
+    5. All buttons work independently with NO locks or conditions
+  </div>
+
+  <div class="demo-article">
+    <h2 class="article-title">Whistleblower Dilemma in Bureaucracy</h2>
+    <p class="article-content">
+      This article discusses the ethical challenges faced by civil servants when they witness corruption
+      or malpractice in their departments. The case study examines the conflict between loyalty to
+      superiors and duty to the public.
+    </p>
+
+    <!-- ==================== BUTTON ROW ==================== -->
+    <div class="button-row" data-article-id="ethics-001">
+
+      <!-- Summary Button -->
+      <div class="button-wrapper">
+        <button class="action-btn" id="summaryBtn-ethics-001" data-action="summary" title="Write your own summary notes for this article">
+          <svg viewBox="0 0 24 24">
+            <path class="icon-path" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path class="icon-path" d="M14 2v6h6M8 15h8M8 11h8M8 19h8"/>
+          </svg>
+          <span>Summary</span>
+        </button>
+        <!-- Info Icon Component -->
+        <div class="info-container" data-target="summary-info">
+          <div class="info-icon">i</div>
+          <div class="tooltip">
+            Use this button as your notepad. Jot down notes in any way you like for revision.
+          </div>
+        </div>
+      </div>
+
+      <!-- Share Button -->
+      <div class="share-btn-wrapper">
+        <button class="share-btn" id="shareBtn-ethics-001" data-action="share" title="Share this article on Telegram with your peers">
+          <svg class="telegram-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 0 512 512" xml:space="preserve">
+            <circle style="fill:#47B0D3;" cx="256" cy="256" r="256"/>
+            <path style="fill:#3298BA;" d="M34.133,256c0-135.648,105.508-246.636,238.933-255.421C267.424,0.208,261.737,0,256,0
+              C114.615,0,0,114.615,0,256s114.615,256,256,256c5.737,0,11.424-0.208,17.067-0.579C139.642,502.636,34.133,391.648,34.133,256z"/>
+            <path style="fill:#E5E5E5;" d="M380.263,109.054c-2.486-1.69-5.676-1.946-8.399-0.679L96.777,236.433
+              c-4.833,2.251-7.887,7.172-7.766,12.501c0.117,5.226,3.28,9.92,8.065,12.015l253.613,110.457c8.468,3.849,18.439-2.21,18.983-11.453
+              l14.314-243.341C384.161,113.614,382.748,110.742,380.263,109.054z"/>
+            <polygon style="fill:#CCCCCC;" points="171.631,293.421 188.772,408 379.168,108.432 "/>
+            <path style="fill:#FFFFFF;" d="M371.866,108.375L96.777,236.433c-4.737,2.205-7.826,7.121-7.769,12.345
+              c0.058,5.233,3.276,10.074,8.067,12.171l74.557,32.471l207.536-184.988C376.882,107.33,374.203,107.287,371.866,108.375z"/>
+            <polygon style="fill:#E5E5E5;" points="211.418,310.749 188.772,408 379.168,108.432 "/>
+            <path style="fill:#FFFFFF;" d="M380.263,109.054c-0.351-0.239-0.72-0.442-1.095-0.622l-167.75,202.317l139.27,60.657
+              c8.468,3.849,18.439-2.21,18.983-11.453l14.314-243.341C384.161,113.614,382.748,110.742,380.263,109.054z"/>
+          </svg>
+          <span class="share-text">Share</span>
+        </button>
+      </div>
+
+    </div>
+    <!-- End Button Row -->
+
+  </div>
+</div>
+
+<script>
+// ==================== STANDALONE ETHICS & ESSAY BUTTONS ====================
+// NO CONDITIONALITY - All buttons work immediately
+// NO READ/VOTE/BOOKMARK dependencies
+
+const MAX_WORDS = 150;
+
+// ==================== SUMMARY BUTTON HANDLER ====================
+document.addEventListener('click', function(e) {
+    const summaryBtn = e.target.closest('[data-action="summary"]');
+
+    if (summaryBtn) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const buttonRow = summaryBtn.closest('.button-row');
+        const articleId = buttonRow?.dataset.articleId;
+
+        if (!articleId) return;
+
+        console.log('📝 Opening summary modal for article:', articleId);
+        openSummaryModal(articleId, buttonRow);
+    }
+});
+
+// ==================== SHARE BUTTON HANDLER ====================
+document.addEventListener('click', function(e) {
+    const shareBtn = e.target.closest('[data-action="share"]');
+
+    if (shareBtn) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        console.log('📤 Share button clicked');
+
+        // Get current URL and title
+        const url = encodeURIComponent(window.location.href);
+        const title = encodeURIComponent('Check out this Ethics & Essay article from Samyak Gyan');
+
+        // Construct Telegram share URL
+        const telegramShareUrl = `https://t.me/share/url?url=${url}&text=${title}`;
+
+        // Open sharing dialog
+        window.open(telegramShareUrl, '_blank', 'width=600,height=400');
+    }
+});
+
+// ==================== SUMMARY MODAL CREATION ====================
+function openSummaryModal(articleId, buttonRow) {
+    // Remove any existing summary modals first
+    const existingModal = document.getElementById('summaryModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Create new modal
+    const summaryModal = document.createElement('div');
+    summaryModal.id = 'summaryModal';
+    summaryModal.className = 'summary-container';
+
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+    });
+
+    summaryModal.innerHTML = `
+        <div class="summary-header">
+            <div>My Summary</div>
+            <div id="noteDate">${formattedDate}</div>
+            <div class="word-count-info">
+                <span id="wordCount">0/150 words</span>
+            </div>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div class="summary-body-wrapper">
+            <textarea
+                id="unicode-textbox"
+                class="summary-body"
+                placeholder="अपने विचारों को अपनी भाषा में संक्षेपित करें।
+सभी भारतीय लिपियों और हर भाषा (यहाँ तक कि हिंग्लिश भी) का उपयोग नोट्स में किया जा सकता है।
+समय बचाने के लिए, संक्षेपण के लिए Voice Typing / AI टूल्स का उपयोग करें।
+
+Summarize your thoughts in your language. Every Bharatiya Script and every Language (even Hinglish) can be used in notes.
+Use Voice Typing and AI tools to save time to summarize.."
+                spellcheck="false"
+            ></textarea>
+            <button class="save-btn" id="summarySaveBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-8.69"/>
+                    <path d="M22 4L12 14.01l-3-3"/>
+                </svg>
+            </button>
+        </div>
+        <div class="summary-footer">
+            When you Click on <button class="get-notes-label" disabled>Get Your Notes</button> Button (Bottom of Page), Your Notes here will be part of Downloaded Notes
+        </div>
+    `;
+
+    // Insert summary modal AFTER the button row's parent (article)
+    const article = buttonRow.closest('.demo-article');
+    article.parentNode.insertBefore(summaryModal, article.nextSibling);
+
+    // Store current article ID in modal
+    summaryModal.dataset.currentArticleId = articleId;
+
+    // TODO: BACKEND - Load existing summary if available
+    // const savedSummary = localStorage.getItem(`ethics-essay-summary-${articleId}`) || '';
+    // document.getElementById('unicode-textbox').value = savedSummary;
+
+    // Show modal with animation
+    setTimeout(() => {
+        summaryModal.classList.add('visible');
+    }, 10);
+
+    // Update word count
+    updateWordCount();
+}
+
+// ==================== WORD COUNT UPDATE ====================
+function updateWordCount() {
+    const summaryTextBox = document.getElementById('unicode-textbox');
+    const wordCountSpan = document.getElementById('wordCount');
+    const wordCountInfo = document.querySelector('.word-count-info');
+
+    if (!summaryTextBox || !wordCountSpan) return;
+
+    const words = summaryTextBox.value.trim().split(/\s+/).filter(word => word.length > 0);
+    const currentWords = words.length;
+
+    wordCountSpan.textContent = `${currentWords}/${MAX_WORDS} words`;
+
+    if (currentWords > MAX_WORDS) {
+        wordCountInfo.classList.add('error');
+        summaryTextBox.value = words.slice(0, MAX_WORDS).join(' ');
+    } else {
+        wordCountInfo.classList.remove('error');
+    }
+}
+
+// ==================== SUMMARY SAVE BUTTON ====================
+document.addEventListener('click', function(e) {
+    if (e.target.closest('#summarySaveBtn')) {
+        const summaryModal = document.getElementById('summaryModal');
+        const summaryTextBox = document.getElementById('unicode-textbox');
+        const articleId = summaryModal?.dataset.currentArticleId;
+
+        if (summaryTextBox && summaryTextBox.value.trim() !== '' && articleId) {
+            // Mark summary button as completed (green background)
+            const summaryBtn = document.querySelector(`[data-article-id="${articleId}"] [data-action="summary"]`);
+            if (summaryBtn) {
+                summaryBtn.classList.add('summarized');
+                console.log('✅ Summary button marked as completed');
+            }
+
+            // TODO: BACKEND - Save summary text to database
+            // localStorage.setItem(`ethics-essay-summary-${articleId}`, summaryTextBox.value.trim());
+            console.log('💾 Summary saved for article:', articleId);
+            console.log('📝 Summary text:', summaryTextBox.value.trim());
+        }
+
+        // Close modal
+        if (summaryModal) {
+            summaryModal.classList.remove('visible');
+            setTimeout(() => summaryModal.remove(), 300);
+        }
+    }
+});
+
+// ==================== SUMMARY CLOSE BUTTON ====================
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.summary-container .close-btn')) {
+        const summaryModal = document.getElementById('summaryModal');
+        if (summaryModal) {
+            summaryModal.classList.remove('visible');
+            setTimeout(() => summaryModal.remove(), 300);
+        }
+    }
+});
+
+// ==================== REAL-TIME WORD COUNTING ====================
+document.addEventListener('input', function(e) {
+    if (e.target.id === 'unicode-textbox') {
+        updateWordCount();
+    }
+});
+
+console.log('✅ Ethics & Essay standalone buttons initialized');
+console.log('📋 Features: Summary (always active), Share (always active)');
+console.log('🔓 NO conditionality - all buttons work immediately');
+</script>
+
+</body>
+</html>

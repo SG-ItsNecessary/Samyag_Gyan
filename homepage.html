@@ -3,64 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samyak Gyan</title>
+    <title>Samyak Gyan - Homepage</title>
+    <link rel="stylesheet" href="styles/header.css">
     <link rel="stylesheet" href="styles/homepage.css">
 </head>
 <body>
     <div class="main-app-wrapper">
-        <h2 style="font-family: Georgia, serif; text-align:center;">Samyak Gyan</h2>
-
-        <nav class="nav-container">
-            <button class="nav-btn btn-main">How to Use?</button>
-            <button class="nav-btn btn-ethics">Essay & Ethics</button>
-            <button class="nav-btn btn-beginner">Beginners Corner</button>
-            <button class="nav-btn btn-tri-color">Mission & Vision</button>
-            <button class="nav-btn btn-journal">Your Journal</button>
-        </nav>
+        <!-- Unified Header Component (Banner + Navigation) -->
+        <div id="header-placeholder"></div>
         
         <div class="container">
-            <h1>Recent Uploads</h1>
 
-            <div class="recent-buttons">
-                <button id="saffron-btn" class="recent-btn btn-saffron"></button>
-                <button id="white-btn" class="recent-btn btn-white"></button>
-                <button id="green-btn" class="recent-btn btn-green"></button>
-            </div>
+    <h1 class="section-title">Latest Upload</h1>
+<button id="latest-upload-btn" class="nav-btn btn-tri-color btn-latest"></button>
 
-            <div class="divider"></div>
+<div class="divider"></div>
 
-            <div class="w-full text-center">
-                <h2>Last 7 Days</h2>
-                <div id="last-seven-days-container" class="last-7-days"></div>
-            </div>
+<h1 class="section-title">Recent Uploads</h1>
+<div class="recent-buttons">
+    <button id="saffron-btn" class="recent-btn btn-saffron"></button>
+    <button id="white-btn" class="recent-btn btn-white"></button>
+    <button id="green-btn" class="recent-btn btn-green"></button>
+</div>
 
-            <div class="divider"></div>
+<div class="divider"></div>
 
-            <div class="w-full text-center">
-                <button id="calendar-toggle-btn" class="calendar-toggle">Select Date</button>
-                <div id="calendar-container" class="hidden">
-                    <div class="calendar">
-                        <div class="calendar-header">
-                            <button id="prev-month" class="nav-btn">‹</button>
-                            <h2 id="current-month-year" class="month-title"></h2>
-                            <button id="next-month" class="nav-btn">›</button>
-                        </div>
-                        <div class="calendar-grid">
-                            <div class="weekday">Sun</div>
-                            <div class="weekday">Mon</div>
-                            <div class="weekday">Tue</div>
-                            <div class="weekday">Wed</div>
-                            <div class="weekday">Thu</div>
-                            <div class="weekday">Fri</div>
-                            <div class="weekday">Sat</div>
-                        </div>
-                        <div id="calendar-grid" class="calendar-grid"></div>
-                    </div>
-                </div>
-            </div>
+<h1 class="section-title">Choose Date: To Read</h1>
+
+<!-- Mobile-Only Date Picker (Portrait mode only) -->
+<div class="mobile-date-selector">
+    <div class="mobile-date-input-group">
+        <label for="mobile-date-picker">Select Date:</label>
+        <input type="date" id="mobile-date-picker" class="mobile-date-input">
+    </div>
+
+    <div class="selected-date-display">
+        <div class="date-circle">
+            <span class="date-number" id="selected-date-number">15</span>
+            <span class="date-month" id="selected-date-month">Oct</span>
         </div>
     </div>
+</div>
+
+<!-- Full Calendar (Desktop, Tablet, Mobile Landscape) -->
+<div id="calendar-container">
+
+</div>
+
+        <div class="calendar calendar-full">
+            <div class="calendar-header">
+                <button id="prev-month" class="nav-btn">‹</button>
+                <h2 id="current-month-year" class="month-title"></h2>
+                <button id="next-month" class="nav-btn">›</button>
+            </div>
+            <div class="calendar-grid">
+                <div class="weekday">Sun</div>
+                <div class="weekday">Mon</div>
+                <div class="weekday">Tue</div>
+                <div class="weekday">Wed</div>
+                <div class="weekday">Thu</div>
+                <div class="weekday">Fri</div>
+                <div class="weekday">Sat</div>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Authentication Script (must be loaded first) -->
+    <script src="scripts/auth.js"></script>
+
+    <!-- Load Unified Header Component -->
+    <script>
+        fetch('components/header.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('header-placeholder').innerHTML = html;
+            });
+    </script>
+
+    <!-- Homepage Script -->
     <script src="scripts/homepage.js"></script>
+
+    <!-- Orientation Detection Script -->
+    <script src="scripts/orientation-detection.js"></script>
+
+    <!-- Mobile Date Picker Script -->
+    <script>
+        // Mobile date picker functionality
+        const mobileDatePicker = document.getElementById('mobile-date-picker');
+        const selectedDateNumber = document.getElementById('selected-date-number');
+        const selectedDateMonth = document.getElementById('selected-date-month');
+
+        // Set today's date as default
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+        mobileDatePicker.value = todayString;
+
+        // Update circle display when date changes
+        mobileDatePicker.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const day = selectedDate.getDate();
+            const month = selectedDate.toLocaleString('en-US', { month: 'short' });
+
+            selectedDateNumber.textContent = day;
+            selectedDateMonth.textContent = month;
+        });
+
+        // Initialize display with today's date
+        selectedDateNumber.textContent = today.getDate();
+        selectedDateMonth.textContent = today.toLocaleString('en-US', { month: 'short' });
+    </script>
+
+    <!-- Auth Protection & User Display -->
+    <script>
+        // Require authentication for this page
+        requireAuth();
+
+        // Display user info in header
+        displayUserInfo('user-info-display');
+
+        // Check trial status and show warning if needed
+        showTrialWarningIfNeeded();
+    </script>
 </body>
 </html>
 

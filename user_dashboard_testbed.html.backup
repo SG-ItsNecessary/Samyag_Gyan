@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Journal - Testbed - Samyak Gyan</title>
+<link rel="stylesheet" href="styles/header.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: system-ui, sans-serif; background-color:#f3f4f6; color:#1f2937; padding:1rem; }
+
+/* Layout - HORIZONTAL SIDE-BY-SIDE */
+.main-app-wrapper {
+  max-width:1200px; margin:1rem auto 0 auto; display:flex; flex-direction:row;
+  gap:1.5rem; flex-wrap:nowrap; align-items:stretch;
+}
+
+/* Left Block - Compact */
+.left-block {
+  flex:1 1 50%; background-color: rgba(255,255,255,0.1); padding:0.8rem 1rem;
+  border-radius:0.5rem; border:2px solid #888; box-shadow:0 3px 8px rgba(0,0,0,0.08);
+  display:flex; flex-direction:column;
+}
+#stats-header { text-align:center; margin-bottom:0.6rem; font-weight:bold; font-size:1rem; }
+.stats-buttons { display:flex; flex-direction:column; gap:0.4rem; width:100%; }
+.stat-btn {
+  padding:0.3rem 0.6rem; border-radius:1.5rem; border:1px solid #ccc; background-color:white;
+  cursor:pointer; text-align:center; font-size:0.8rem; font-weight:600; transition: all 0.2s ease;
+}
+.stat-btn:hover { transform: scale(1.02); box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+.stat-btn.active { background-color:#ff8775; border-color:#ccc; }
+
+/* Right Block - Compact */
+.right-block {
+  flex:1 1 50%; background-color: rgba(255,255,255,0.1); padding:0.8rem 1rem;
+  border-radius:0.5rem; border:2px solid #888; box-shadow:0 3px 8px rgba(0,0,0,0.08);
+  display:flex; flex-direction:column;
+}
+.info-box { position:relative; width:100%; }
+
+/* User ID & Date - Compact */
+.user-id-row { display:flex; justify-content:space-between; margin-bottom:0.4rem; font-weight:bold; font-size:0.85rem; }
+
+/* Name & Language - Compact */
+.info-row { display:flex; align-items:center; margin-bottom:0.25rem; }
+.info-row label { font-weight:600; margin-right:4px; flex-shrink:0; font-size:0.85rem; }
+.info-row input[type="text"], .info-row select { padding:0.2rem 0.3rem; font-size:0.85rem; flex-shrink:0; width:auto; }
+
+/* Edit Button - Compact */
+#edit-info { padding:0.2rem 0.5rem; font-size:0.75rem; border:none; border-radius:0.3rem; background-color:#fc7306; color:white; cursor:pointer; margin-left:auto; }
+
+/* Divider - Compact */
+hr { margin:4px 0; border:1px solid #ccc; }
+
+/* Subscriptions Section - Compact */
+.subscriptions-section { text-align:center; margin-top:0.15rem; display:flex; flex-direction:column; gap:0.25rem; }
+.subscriptions-title { font-weight:bold; font-size:1rem; text-align:center; margin-bottom:1px; }
+
+/* Trial & Extend Trial - Compact */
+.trial-extend-container { display:flex; justify-content:space-between; align-items:center; gap:0.4rem; margin-bottom:3px; }
+#trial-end { background-color:white; color:green; border:1px solid green; padding:0.2rem 0.4rem; border-radius:0.3rem; font-weight:bold; font-size:0.8rem; flex-shrink:0; }
+#extend-trial { background-color:white; color:#FF0000; border:2px solid #FF0000; border-radius:0.3rem; padding:0.25rem 0.55rem; cursor:pointer; font-weight:200; font-size:0.8rem; flex-shrink:0; animation: blink 1.2s infinite; }
+@keyframes blink { 0%,50%,100% { border-color:#FF0000; } 25%,75% { border-color:transparent; } }
+
+/* Topic Chips - Compact + State Management */
+.topic-container { display:flex; justify-content:flex-start; gap:8px; margin-top:2px; align-items:center; flex-wrap:wrap; }
+.topic-chip { padding:0.2rem 0.5rem; border-radius:1.2rem; border:2px solid black; font-size:0.8rem; font-weight:700; cursor:pointer; text-align:center; min-width:100px; transition: all 0.3s ease; }
+
+/* Active subscription: transparent background */
+.topic-chip.active { background-color:transparent; color:#333; }
+
+/* Inactive subscription: red background */
+.topic-chip.inactive { background-color:#FF0000; color:white; border-color:#FF0000; }
+
+/* Subscript note - Compact */
+.subscribe-note { font-size:0.65rem; text-align:right; margin-top:1px; font-style:italic; color:#333; }
+
+/* Dynamic Panel */
+.dynamic-panel { margin-top:2rem; padding:2rem 1.5rem; background-color:white; border-radius:0.5rem; border:2px solid #888; box-shadow:0 3px 8px rgba(0,0,0,0.08); width:100%; text-align:center; }
+#dynamic-chip { display:inline-block; padding:1rem 2rem; border-radius:2rem; border:1px solid #ccc; background-color:#ff8775; font-weight:700; font-size:1.4rem; margin-bottom:2rem; }
+.analytics-panel { display:flex; flex-direction:column; align-items:center; gap:1.5rem; }
+.analytics-chips { display:flex; justify-content:center; align-items:center; gap:2.5rem; flex-wrap:wrap; }
+.month-dropdown { position:relative; display:inline-flex; align-items:center; justify-content:center; background-color:white; border:1px solid #ccc; border-radius:2rem; padding:0.5rem 1.2rem; font-weight:600; cursor:pointer; }
+.month-dropdown select { border:none; background:transparent; font:inherit; padding-right:1rem; cursor:pointer; outline:none; }
+.month-dropdown::after { content:""; }
+.fortnight-chip { padding:0.45rem 1rem; border-radius:2rem; border:1px solid #ccc; background-color:white; cursor:pointer; font-size:0.9rem; font-weight:600; transition:all 0.2s ease; }
+.fortnight-chip.active { background-color:#ff8775; border-color:#ccc; }
+.chart-placeholder { margin-top:1.5rem; width:90%; max-width:800px; height:220px; border:2px dashed #9abaf3; border-radius:0.5rem; display:flex; align-items:center; justify-content:center; color:#555; font-weight:600; }
+
+/* Referral Popup Overlay */
+.popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center; }
+.popup-overlay.show { display:flex; }
+.popup-box { background:#fff; color:#000; width:90%; max-width:520px; border-radius:1rem; box-shadow:0 6px 20px rgba(0,0,0,0.25); padding:1.8rem 2rem; text-align:center; animation:popupFadeIn 0.4s ease; position:relative; }
+
+/* Darker close button + "Skip" text */
+.popup-close { position:absolute; top:0.6rem; right:0.9rem; background:transparent; border:none; font-size:1.5rem; font-weight:bold; color:#333; cursor:pointer; transition: color 0.2s ease; display: flex; align-items: center; gap: 0.3rem; }
+.popup-close:hover { color:#fc7306; }
+.popup-close-text { font-size: 0.9rem; font-weight: 600; }
+
+.popup-box h2 { color:#fc7306; font-size:1.8rem; font-weight:800; margin-bottom:0.6rem; }
+.popup-box p { font-size:1.05rem; line-height:1.5; color:#111; margin-bottom:0.7rem; }
+.popup-box p strong { font-weight:700; color:#000; }
+.popup-box p em { font-style:italic; font-weight:500; color:#000; }
+.popup-box .big-heart-line { font-size:1.25rem; font-weight:600; }
+.red-trial { color:#dc3545; font-weight:700; font-size:1.2rem; }
+
+.popup-button { background-color:#1877F2; color:white; border:none; border-radius:0.5rem; padding:0.7rem 1.5rem; font-size:1rem; font-weight:600; cursor:pointer; transition: all 0.2s ease; margin-top:0.5rem; width:100%; }
+.popup-button:hover { background-color:#155dbf; transform:scale(1.03); }
+
+.popup-caption { font-size:0.75rem; color:#333; font-style:italic; margin-top:0.4rem; line-height:1.3; }
+.popup-caption .sg-no-ads { color:#fc7306; font-style:italic; font-weight:600; }
+.popup-caption .sg { font-style:italic; font-weight:600; }
+
+@keyframes popupFadeIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
+
+/* ===== SUBSCRIPTION POPUP (When user clicks inactive date) ===== */
+.subscription-popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10001; justify-content:center; align-items:center; }
+.subscription-popup-overlay.show { display:flex; }
+.subscription-popup-box { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; width:90%; max-width:450px; border-radius:1.2rem; box-shadow:0 10px 30px rgba(0,0,0,0.4); padding:2rem 2rem 2.5rem 2rem; text-align:center; animation:popupFadeIn 0.4s ease; position:relative; }
+
+.subscription-popup-close { position:absolute; top:0.8rem; right:1rem; background:rgba(255,255,255,0.2); border:none; font-size:1.8rem; font-weight:bold; color:white; cursor:pointer; transition: all 0.2s ease; width:2rem; height:2rem; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.subscription-popup-close:hover { background:rgba(255,255,255,0.4); transform:rotate(90deg); }
+
+.subscription-popup-icon { font-size:3rem; margin-bottom:1rem; }
+.subscription-popup-title { font-size:1.8rem; font-weight:700; margin-bottom:0.8rem; color:white; line-height:1.3; }
+.subscription-popup-message { font-size:1.1rem; margin-bottom:1.8rem; color:rgba(255,255,255,0.95); line-height:1.5; }
+
+.subscription-popup-btn { background:linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%); color:white; border:none; border-radius:0.6rem; padding:0.9rem 2rem; font-size:1.1rem; font-weight:600; cursor:pointer; transition: all 0.3s ease; box-shadow:0 4px 15px rgba(0,0,0,0.2); width:100%; }
+.subscription-popup-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.3); }
+
+/* ===== GLOW PULSE ANIMATION (Redirect Flow) ===== */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); transform: scale(1); }
+  50% { box-shadow: 0 0 40px rgba(255, 0, 0, 1); transform: scale(1.05); }
+}
+
+.topic-chip.glow-pulse {
+  animation: glowPulse 1.5s ease-in-out infinite;
+  z-index: 1000;
+}
+
+/* ===== SUBSCRIPTION OVERLAY MESSAGE ===== */
+.subscription-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.88);
+  color: white;
+  padding: 1.2rem 2.5rem;
+  border-radius: 0.8rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  z-index: 10001;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.5px;
+}
+
+.subscription-overlay.show {
+  opacity: 1;
+}
+
+/* ===== SIMULATED DATE BUTTONS (For Testing Redirect) ===== */
+.test-section {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 0.5rem;
+  border: 2px dashed #fc7306;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.test-section h3 {
+  color: #fc7306;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.test-section p {
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.test-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.test-date-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  border: 2px solid #888;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.test-date-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.test-date-btn.sunday {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+@media(max-width:768px){
+  .main-app-wrapper{ flex-direction:column; flex-wrap:wrap; }
+  .left-block, .right-block { flex:1 1 100%; }
+  .analytics-chips { flex-direction:column; gap:1rem; }
+  .trial-extend-container { flex-direction:column; align-items:flex-start; gap:4px; }
+  .topic-container { flex-direction:column; gap:4px; padding:0; }
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile Rotate Message -->
+<div id="rotate-message" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0, 74, 173, 0.95); color:#ffffff; text-align:center; padding:2rem 1.5rem; font-weight:600; font-size:1.1rem; z-index:9999; box-shadow:0 8px 24px rgba(0,0,0,0.3); border-radius:16px; max-width:90%; backdrop-filter:blur(10px);">
+    <div style="font-size:3rem; margin-bottom:0.5rem;">📱</div>
+    <div style="margin-bottom:0.5rem;">For Better Experience</div>
+    <div style="font-size:1.3rem; font-weight:700;">Please Rotate Your Phone</div>
+</div>
+
+<!-- Banner -->
+<div class="banner-container" onclick="window.location.href='homepage.html'" role="button" tabindex="0" aria-label="Go to Homepage">
+    <span class="banner-text-hindi">सम्यक् ज्ञान</span>
+    <span class="banner-text-english">Samyak Gyan</span>
+</div>
+
+<!-- Navigation Ribbon -->
+<nav class="nav-container" id="main-nav">
+    <span class="home-icon" onclick="window.location.href='homepage.html'" title="Home">🏠</span>
+    <button class="nav-btn btn-main">How to Use?</button>
+    <!-- TODO: Ethics & Essay button checks subscription before allowing access -->
+    <!-- TODO: If subscription inactive, redirect to dashboard with highlight -->
+    <button class="nav-btn btn-ethics" id="nav-ethics-btn">Ethics & Essay</button>
+    <button class="nav-btn btn-beginner">Beginners Corner</button>
+    <button class="nav-btn btn-tri-color">Mission & Vision</button>
+    <button class="nav-btn btn-journal" onclick="window.location.href='user_dashboard.html'">Your Journal</button>
+</nav>
+
+<!-- ===== TESTBED: SIMULATED DATE CLICK BUTTONS ===== -->
+<div class="test-section">
+  <h3>🧪 TESTBED: Simulate Homepage Date Clicks</h3>
+  <p>Click these buttons to test the redirect + glow + overlay flow when subscription is inactive</p>
+  <div class="test-buttons">
+    <!-- Simulate weekday date click (Current Affairs) -->
+    <button class="test-date-btn" id="test-weekday-btn">15 Oct (Weekday) - Test CA Redirect</button>
+
+    <!-- Simulate Sunday date click (Ethics & Essay) -->
+    <button class="test-date-btn sunday" id="test-sunday-btn">19 Oct (Sunday) - Test E&E Redirect</button>
+  </div>
+</div>
+
+<div class="main-app-wrapper">
+
+  <!-- Left Block: My Stats & Compilations -->
+  <div class="left-block">
+    <h3 id="stats-header">My Stats & Compilations</h3>
+    <div class="stats-buttons">
+      <!-- TODO: Each button triggers different analytics panel below -->
+      <!-- TODO: Backend API endpoint per button type (reading, voting, notes, time, bookmarked) -->
+      <button class="stat-btn active" data-target="reading">Reading Insight</button>
+      <button class="stat-btn" data-target="voting">Voting Pattern</button>
+      <button class="stat-btn" data-target="notes">Notes Dashboard</button>
+      <button class="stat-btn" data-target="time">Time Spent</button>
+      <button class="stat-btn" data-target="bookmarked">Bookmarked Articles</button>
+    </div>
+  </div>
+
+  <!-- Right Block: Personal Info + Subscriptions -->
+  <div class="right-block">
+    <div class="info-box">
+      <!-- User ID & Date -->
+      <div class="user-id-row">
+        <!-- TODO: Replace hardcoded User ID with Telegram user ID from backend -->
+        <!-- TODO: Backend: GET /api/users/:userId - returns telegram_id -->
+        <span><strong>User ID:</strong> <span id="user-id-display">*****345</span></span>
+
+        <!-- TODO: Calculate trial end date based on join date (join date + 15 days) -->
+        <!-- TODO: Backend: users.date_of_joining + 15 days = initial trial_end_date -->
+        <!-- TODO: Update trial end date automatically if referral conditions are met (3 referrals = +15 days) -->
+        <span><strong>Date Joined:</strong> <span id="date-joined">10 Oct 2025</span></span>
+      </div>
+
+      <!-- Name & Language -->
+      <div class="info-row">
+        <label>Name:</label>
+        <!-- TODO: Backend: GET /api/users/:userId - returns user.name -->
+        <!-- TODO: Backend: PUT /api/users/:userId/profile - updates user.name on Save -->
+        <input type="text" id="user-name" value="Deepanshu Anand" disabled>
+        <button id="edit-info">Edit</button>
+      </div>
+      <div class="info-row">
+        <label>Language:</label>
+        <!-- TODO: Backend: GET /api/users/:userId - returns user.preferred_language -->
+        <!-- TODO: Backend: PUT /api/users/:userId/profile - updates preferred_language on Save -->
+        <select id="user-language" disabled>
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+        </select>
+      </div>
+
+      <hr>
+
+      <!-- Subscriptions Section -->
+      <div class="subscriptions-section">
+        <div class="subscriptions-title">Subscriptions</div>
+
+        <!-- Trial Extension Section -->
+        <div class="trial-extend-container">
+          <!-- TODO: Display trial_end_date from users table -->
+          <!-- TODO: If trial expired, hide this entire trial-extend-container -->
+          <div id="trial-end">Your Trial Ends: <span id="trial-end-date">Oct 25, 2025</span></div>
+
+          <!-- TODO: Button disabled if trial already extended (users.trial_extended = true) -->
+          <!-- TODO: Button hidden if trial fully expired -->
+          <!-- TODO: On click, open referral popup with Telegram bot integration -->
+          <button id="extend-trial">Help Us Grow !!</button>
+        </div>
+
+        <!-- Subscription Topic Chips -->
+        <div class="topic-container">
+          <!-- TODO: Active subscription = .active class (transparent background) -->
+          <!-- TODO: Inactive subscription = .inactive class (red background) -->
+          <!-- TODO: Backend: GET /api/users/:userId/subscriptions - returns array of subscriptions -->
+          <!-- TODO: Check subscriptions.status for "Current Affairs" and "Ethics & Essay" -->
+          <!-- TODO: If inactive and clicked, scroll to this subscription block and highlight button -->
+          <!-- TODO: If active and clicked, do nothing (prevent accidental clicks) -->
+          <button class="topic-chip current-affairs active" data-topic="current-affairs">Current Affairs</button>
+          <button class="topic-chip ethics-essay inactive" data-topic="ethics-essay">Ethics & Essay</button>
+          <span class="subscribe-note">* Click on (Button) to Subscribe</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Subscription Popup (When user clicks inactive date) -->
+<div class="subscription-popup-overlay" id="subscription-popup">
+  <div class="subscription-popup-box">
+    <button class="subscription-popup-close" id="close-subscription-popup">×</button>
+
+    <div class="subscription-popup-icon">🔒</div>
+    <div class="subscription-popup-title" id="subscription-popup-title">Subscribe to Read</div>
+    <div class="subscription-popup-message" id="subscription-popup-message">
+      Get unlimited access to enriching content and create notes with 1-click!
+    </div>
+
+    <!-- This button will dynamically change based on which subscription is needed -->
+    <button class="subscription-popup-btn" id="subscription-popup-btn" data-topic="">
+      Subscribe Now
+    </button>
+  </div>
+</div>
+
+<!-- Referral Popup (Hidden by default) -->
+<div class="popup-overlay" id="referral-popup">
+  <div class="popup-box">
+    <!-- Darker × with "Skip" text -->
+    <button class="popup-close" id="close-popup">
+      <span>×</span>
+      <span class="popup-close-text">Skip</span>
+    </button>
+
+    <h2>🎉 Welcome to <strong>Samyak Gyan!</strong></h2>
+
+    <p>✨ You've got a <strong>15-day free access</strong> to explore.</p>
+
+    <p>
+      🧠 Read Enriching Content <br>
+      ☝️ Create Notes in 1-Click !!
+    </p>
+
+    <p class="big-heart-line">❤️ Find the Platform useful ??</p>
+
+    <p style="margin-top:0.6rem;">
+      🔗 Refer it to <strong>all of your friends</strong> and help <strong><em>SG</em></strong> reach them!!
+    </p>
+
+    <p style="margin-top:0.6rem;">
+      👥 When <strong>3 of your friends</strong> join via your Link, you get<br>
+      <span class="red-trial">1 month free access !!</span>
+    </p>
+
+    <!-- TODO: Clicking this button triggers Telegram bot API to send referral link -->
+    <!-- TODO: Backend: POST /api/telegram/send-referral-link -->
+    <!-- TODO: Telegram bot sends message with user's referral_code from users table -->
+    <button class="popup-button" id="get-referral-link">📲 Send Link to My Telegram</button>
+
+    <p class="popup-caption">
+      <span class="sg-no-ads">Samyak Gyan is not spending on ads on Youtube-Instagram!!</span><br>
+      Help <span class="sg">SG</span> grow!! Do refer it to all your friends!!
+    </p>
+  </div>
+</div>
+
+<!-- Dynamic Panel -->
+<div id="dynamic-content" class="dynamic-panel">
+  <!-- TODO: Dynamic chip text changes based on selected stat button -->
+  <div id="dynamic-chip">My Reading Insight</div>
+
+  <div class="analytics-panel">
+    <div class="analytics-chips">
+      <!-- TODO: Month dropdown populated with last 12 months dynamically -->
+      <!-- TODO: Backend: Calculate from current date backwards 12 months -->
+      <!-- TODO: Format: "Month 'YY" (e.g., "Oct '25", "Feb '26") -->
+      <!-- TODO: Add "(Ongoing)" badge to current month to indicate incomplete data -->
+      <div class="month-dropdown">
+        <select id="month-select">
+          <option value="" selected>Month</option>
+          <option value="2025-10">Oct '25 (Ongoing)</option>
+          <option value="2025-09">Sep '25</option>
+          <option value="2025-08">Aug '25</option>
+          <option value="2025-07">Jul '25</option>
+          <option value="2025-06">Jun '25</option>
+          <option value="2025-05">May '25</option>
+          <option value="2025-04">Apr '25</option>
+          <option value="2025-03">Mar '25</option>
+          <option value="2025-02">Feb '25</option>
+          <option value="2025-01">Jan '25</option>
+          <option value="2024-12">Dec '24</option>
+          <option value="2024-11">Nov '24</option>
+          <!-- TODO: In production, generate dynamically:
+               1. Get current date
+               2. Generate last 12 months array
+               3. Format as "Mon 'YY"
+               4. Add "(Ongoing)" to current month
+               5. Populate dropdown options
+          -->
+        </select>
+      </div>
+
+      <!-- TODO: Fortnight selection (1st: days 1-15, 2nd: days 16-end) -->
+      <!-- TODO: Backend: Filter data based on selected fortnight range -->
+      <div class="fortnight-chip active" id="first-fortnight" data-fortnight="1">1st Fortnight</div>
+      <div class="fortnight-chip" id="second-fortnight" data-fortnight="2">2nd Fortnight</div>
+    </div>
+
+    <!-- TODO: Chart/stats rendered here based on selected analytics type -->
+    <!-- TODO: Different data structure for each analytics type:
+         - Reading Insight: Total articles vs Read articles (donut chart)
+         - Voting Pattern: Community ranking + user's votes
+         - Notes Dashboard: User's highlights and summaries list
+         - Time Spent: Session duration analytics
+         - Bookmarked Articles: List of bookmarked articles with filters
+    -->
+    <div class="chart-placeholder" id="chart-container">
+      Chart / Stats will appear here based on selected month & fortnight
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================================================
+   SAMYAK GYAN - USER DASHBOARD (YOUR JOURNAL)
+   COMPLETE WORKFLOW & BACKEND INTEGRATION GUIDE
+   ============================================================================================
+
+   📋 OVERVIEW:
+   This dashboard manages user profiles, trial periods, subscriptions, referrals, and analytics.
+   It integrates with Telegram auth, Razorpay payments, and Bhashini translation API.
+
+   ============================================================================================
+   1️⃣ TELEGRAM AUTHENTICATION FLOW
+   ============================================================================================
+
+   WHEN USER LOGS IN VIA TELEGRAM:
+   -------------------------
+   Data Received from Telegram Bot:
+   - username: @D2313 (Telegram username)
+   - id: 681522234 (9-20 digits, Telegram user ID)
+   - first: "Deepanshu" (First name)
+   - last: "Anand" (Last name)
+   - lang: "en" (Language preference)
+
+   Profile Creation Logic:
+   -------------------------
+   1. Display Name: Combine first + last → "Deepanshu Anand"
+   2. User ID Display: Show last 8 digits, mask first 5 → "*****234"
+      - Database stores FULL ID: 681522234
+      - UI shows masked: "*****234"
+   3. Date Joined: Auto-captured from Telegram auth timestamp
+   4. Language: Default to Telegram lang, user can change (EN/HI)
+
+   Backend Endpoints:
+   -------------------------
+   POST /api/auth/telegram
+   Body: { telegram_id, username, first_name, last_name, language_code }
+   Response: { user_id, token, profile_data }
+
+   ============================================================================================
+   2️⃣ TRIAL & REFERRAL SYSTEM
+   ============================================================================================
+
+   Trial Calculation:
+   -------------------------
+   - Initial Trial: date_of_joining + 15 days
+   - Trial End Date Format: "25 October 2025" (Indian DD Month YYYY format)
+   - Display: Green button "Your Trial Ends: 25 October 2025"
+
+   Extend Trial Flow:
+   -------------------------
+   1. User clicks "Help Us Grow !!" (red blinking button)
+   2. Popup appears with referral instructions
+   3. User clicks "Get Your Referral Link"
+   4. Telegram bot sends referral link: https://samyakgyan.com/ref/USER_REF_CODE
+   5. When 3 friends join via link:
+      - Database: trial_end_date += 15 days
+      - Button: Disabled or removed
+      - users.trial_extended = true
+
+   Backend Endpoints:
+   -------------------------
+   POST /api/telegram/send-referral-link
+   Body: { user_id, referral_code }
+   Response: { success: true, message: "Link sent to Telegram" }
+
+   GET /api/users/:userId/referrals
+   Response: { total_referrals: 2, completed_referrals: 1, remaining: 2 }
+
+   Database Trigger:
+   -------------------------
+   -- Auto-extend trial when 3 referrals completed
+   CREATE TRIGGER extend_trial_on_referral
+   AFTER UPDATE ON referrals
+   WHEN (SELECT COUNT(*) FROM referrals WHERE referrer_user_id = NEW.referrer_user_id AND status = 'completed') >= 3
+   BEGIN
+     UPDATE users
+     SET trial_end_date = trial_end_date + INTERVAL '15 days',
+         trial_extended = TRUE
+     WHERE user_id = NEW.referrer_user_id;
+   END;
+
+   ============================================================================================
+   3️⃣ SUBSCRIPTION STATE MANAGEMENT
+   ============================================================================================
+
+   Two Independent Subscriptions:
+   -------------------------
+   1. Current Affairs (CA) - Weekday/Saturday dates
+   2. Ethics & Essay (E&E) - Sunday updates only
+
+   Subscription States:
+   -------------------------
+   | State      | Visual      | Click Action              |
+   |------------|-------------|---------------------------|
+   | Active     | Transparent | Do nothing (already active) |
+   | Inactive   | Red BG      | Scroll + Glow + Overlay   |
+
+   Trial Active Display Logic:
+   -------------------------
+   IF trial_active:
+     Button: "Your Trial Ends: 25 October 2025" (Green)
+     CA: Transparent
+     E&E: Transparent
+
+   Trial Expired Display Logic:
+   -------------------------
+   IF both_subscriptions_active:
+     Button: "Active" (Green)
+   ELSE IF only_CA_active:
+     Button: "Active: Current Affairs" (Green)
+   ELSE IF only_EE_active:
+     Button: "Active: Ethics & Essay" (Green)
+   ELSE IF both_inactive:
+     Button: Hidden or "Subscribe to access"
+
+   Backend Endpoints:
+   -------------------------
+   GET /api/users/:userId/subscriptions
+   Response: {
+     subscriptions: [
+       { topic: 'current-affairs', status: 'active', start_date, end_date },
+       { topic: 'ethics-essay', status: 'inactive', start_date: null, end_date: null }
+     ]
+   }
+
+   POST /api/subscriptions/:userId/subscribe
+   Body: { topic: 'current-affairs' OR 'ethics-essay', razorpay_payment_id }
+   Response: { success: true, subscription_id, active_until }
+
+   ============================================================================================
+   4️⃣ ACCESS CONTROL & REDIRECT FLOW
+   ============================================================================================
+
+   User Clicks Date (Weekday/Saturday):
+   -------------------------
+   1. Check: CA subscription status
+   2. IF inactive:
+      - Redirect: user_dashboard.html?highlight=current-affairs
+      - Auto-scroll to subscription block
+      - CA button: Glow animation (red pulse)
+      - Overlay: "Subscribe to Read" (2 seconds)
+   3. IF active:
+      - Navigate: /articles/YYYY-MM-DD
+
+   User Clicks Date (Sunday):
+   -------------------------
+   1. Check: E&E subscription status + Day of week
+   2. IF inactive OR not_sunday:
+      - Redirect: user_dashboard.html?highlight=ethics-essay
+      - Auto-scroll to subscription block
+      - E&E button: Glow animation (red pulse)
+      - Overlay: "Subscribe to Read" (2 seconds)
+   3. IF active AND sunday:
+      - Navigate: /ethics-essay
+
+   User Clicks "Ethics & Essay" Nav Button:
+   -------------------------
+   1. Check: E&E subscription status
+   2. Same redirect flow as Sunday date click
+
+   Backend Endpoints:
+   -------------------------
+   GET /api/users/:userId/check-access
+   Query: ?topic=current-affairs OR ethics-essay
+   Response: { has_access: true/false, redirect_url: null OR '/user_dashboard.html' }
+
+   ============================================================================================
+   5️⃣ ROLLING 12-MONTH ANALYTICS WINDOW
+   ============================================================================================
+
+   Month Dropdown Logic:
+   -------------------------
+   - Show: Last 12 months from current date
+   - Format: "Oct '25", "Sep '25", "Aug '25" (Month 'YY)
+   - Current Month: "Oct '25 (Ongoing)" - indicates incomplete data
+   - Auto-Prune: Oldest month drops when 13th month arrives
+
+   Example:
+   - Join Date: Oct 2024
+   - Current Date: Feb 2026
+   - Dropdown Shows: Feb '26 (Ongoing), Jan '26, Dec '25... Mar '25 (12 months)
+   - Hidden: Feb '25, Jan '25, Dec '24, Nov '24, Oct '24
+
+   Backend Endpoints:
+   -------------------------
+   GET /api/users/:userId/analytics/available-months
+   Response: {
+     months: [
+       { value: "2026-02", label: "Feb '26 (Ongoing)" },
+       { value: "2026-01", label: "Jan '26" },
+       ...
+     ],
+     oldest_month: "2025-03",
+     newest_month: "2026-02"
+   }
+
+   ============================================================================================
+   6️⃣ LANGUAGE SWITCHING (BHASHINI API)
+   ============================================================================================
+
+   When User Changes Language:
+   -------------------------
+   1. User clicks "Edit" → Changes language to "Hindi" → Clicks "Save"
+   2. Frontend: PUT /api/users/:userId/profile { preferred_language: 'hi' }
+   3. Backend: Updates users.preferred_language = 'hi'
+   4. Bhashini API: Triggered to translate all content to Hindi
+   5. Page reload: Content displayed in Hindi
+
+   Backend Endpoints:
+   -------------------------
+   PUT /api/users/:userId/profile
+   Body: { name: "Updated Name", preferred_language: "hi" }
+   Response: { success: true, updated_fields: ['name', 'preferred_language'] }
+
+   POST /api/translate/content
+   Body: { text: "Article content", source_lang: "en", target_lang: "hi" }
+   Response: { translated_text: "अनुवादित सामग्री" }
+
+   ============================================================================================ */
+
+// ==================== DEMO DATA (Replace with API calls) ====================
+const DEMO_USER = {
+  telegram_id: '*****345',
+  name: 'Deepanshu Anand',
+  preferred_language: 'en',
+  date_of_joining: '2025-10-10',
+  trial_end_date: '2025-10-25',
+  trial_extended: false, // If true, "Extend Trial" button becomes disabled
+  referral_code: 'DEMO_REF_123',
+  subscriptions: [
+    // TESTBED: Both set to INACTIVE to test redirect flow
+    { topic: 'current-affairs', status: 'inactive' },
+    { topic: 'ethics-essay', status: 'inactive' }
+  ]
+};
+
+// ==================== INITIALIZE USER DATA ====================
+function initializeUserData() {
+  // TODO: Replace with actual API call: GET /api/users/:userId
+  document.getElementById('user-id-display').textContent = DEMO_USER.telegram_id;
+  document.getElementById('date-joined').textContent = formatDate(DEMO_USER.date_of_joining);
+  document.getElementById('user-name').value = DEMO_USER.name;
+  document.getElementById('user-language').value = DEMO_USER.preferred_language;
+  document.getElementById('trial-end-date').textContent = formatDate(DEMO_USER.trial_end_date);
+
+  // Update subscription button states
+  DEMO_USER.subscriptions.forEach(sub => {
+    const btn = document.querySelector(`.topic-chip[data-topic="${sub.topic}"]`);
+    if (btn) {
+      btn.classList.remove('active', 'inactive');
+      btn.classList.add(sub.status === 'active' ? 'active' : 'inactive');
+    }
+  });
+
+  // Disable "Extend Trial" button if already extended
+  if (DEMO_USER.trial_extended) {
+    const extendBtn = document.getElementById('extend-trial');
+    extendBtn.disabled = true;
+    extendBtn.style.opacity = '0.5';
+    extendBtn.style.cursor = 'not-allowed';
+    extendBtn.style.animation = 'none';
+  }
+}
+
+function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ==================== STATS BUTTON NAVIGATION ====================
+const statBtns = document.querySelectorAll(".stat-btn");
+const dynamicChip = document.getElementById("dynamic-chip");
+
+statBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    statBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    dynamicChip.textContent = "My " + btn.textContent;
+
+    const target = btn.dataset.target;
+
+    // Handle Notes Dashboard
+    if (target === 'notes') {
+      renderNotesDashboard();
+    } else {
+      // Reset chart container to default styling
+      resetChartContainer();
+
+      // TODO: Load different analytics data based on selected button
+      // TODO: Backend API endpoints:
+      // - Reading Insight: GET /api/users/:userId/analytics/reading?month=X&fortnight=Y
+      // - Voting Pattern: GET /api/users/:userId/analytics/voting?month=X&fortnight=Y
+      // - Time Spent: GET /api/users/:userId/analytics/time?month=X&fortnight=Y
+      // - Bookmarked: GET /api/users/:userId/analytics/bookmarked?month=X&fortnight=Y
+
+      console.log(`TODO: Load ${target} analytics data`);
+    }
+  });
+});
+
+// Reset chart container to default placeholder state
+function resetChartContainer() {
+  const chartContainer = document.getElementById('chart-container');
+  chartContainer.innerHTML = 'Chart / Stats will appear here based on selected month & fortnight';
+  chartContainer.style.border = '2px dashed #9abaf3';
+  chartContainer.style.background = '';
+  chartContainer.style.height = '220px';
+  chartContainer.style.maxWidth = '800px';
+  chartContainer.style.width = '90%';
+}
+
+// ==================== FORTNIGHT TOGGLE ====================
+const fortnightChips = document.querySelectorAll(".fortnight-chip");
+fortnightChips.forEach(chip => {
+  chip.addEventListener("click", () => {
+    fortnightChips.forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+
+    // TODO: Reload analytics data with new fortnight filter
+    console.log(`TODO: Reload data for fortnight ${chip.dataset.fortnight}`);
+  });
+});
+
+// ==================== EDIT/SAVE PROFILE ====================
+const editBtn = document.getElementById("edit-info");
+const nameInput = document.getElementById("user-name");
+const langSelect = document.getElementById("user-language");
+let isEditing = false;
+
+editBtn.addEventListener("click", () => {
+  isEditing = !isEditing;
+  nameInput.disabled = !isEditing;
+  langSelect.disabled = !isEditing;
+  editBtn.textContent = isEditing ? "Save" : "Edit";
+
+  if (!isEditing) {
+    // TODO: Save to backend
+    // TODO: Backend: PUT /api/users/:userId/profile
+    // TODO: Body: { name: nameInput.value, preferred_language: langSelect.value }
+    console.log('TODO: Save profile data', {
+      name: nameInput.value,
+      language: langSelect.value
+    });
+  }
+});
+
+// ==================== REFERRAL POPUP ====================
+const extendTrialBtn = document.getElementById('extend-trial');
+const referralPopup = document.getElementById('referral-popup');
+const closePopupBtn = document.getElementById('close-popup');
+const getReferralLinkBtn = document.getElementById('get-referral-link');
+
+extendTrialBtn.addEventListener('click', () => {
+  referralPopup.classList.add('show');
+});
+
+closePopupBtn.addEventListener('click', () => {
+  referralPopup.classList.remove('show');
+});
+
+// Close popup when clicking outside
+referralPopup.addEventListener('click', (e) => {
+  if (e.target === referralPopup) {
+    referralPopup.classList.remove('show');
+  }
+});
+
+getReferralLinkBtn.addEventListener('click', () => {
+  // TODO: Backend: POST /api/telegram/send-referral-link
+  // TODO: Telegram bot sends message with referral link to user
+  // TODO: Referral link format: https://samyakgyan.com/ref/DEMO_REF_123
+  console.log('TODO: Trigger Telegram bot to send referral link:', DEMO_USER.referral_code);
+
+  // Temporary feedback
+  getReferralLinkBtn.textContent = '✅ Link Sent to Telegram';
+  getReferralLinkBtn.style.backgroundColor = '#2ecc71';
+  setTimeout(() => {
+    referralPopup.classList.remove('show');
+    getReferralLinkBtn.textContent = '📲 Send Link to My Telegram';
+    getReferralLinkBtn.style.backgroundColor = '#1877F2';
+  }, 2000);
+});
+
+// ==================== SUBSCRIPTION BUTTON CLICK ====================
+const topicChips = document.querySelectorAll('.topic-chip');
+topicChips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    const isActive = chip.classList.contains('active');
+
+    if (!isActive) {
+      // TODO: If inactive, scroll to subscription block and highlight
+      // TODO: Show message: "Subscribe please"
+      chip.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      chip.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.6)';
+      setTimeout(() => {
+        chip.style.boxShadow = '';
+      }, 2000);
+
+      console.log(`TODO: Redirect to subscription page for ${chip.dataset.topic}`);
+      // TODO: Backend: POST /api/subscriptions/:userId/subscribe
+      // TODO: Body: { topic: chip.dataset.topic, action: 'subscribe' }
+    } else {
+      // TODO: If active, do nothing (prevent accidental clicks)
+      console.log(`${chip.dataset.topic} is already active`);
+    }
+  });
+});
+
+// ==================== MONTH DROPDOWN ====================
+const monthSelect = document.getElementById('month-select');
+monthSelect.addEventListener('change', () => {
+  // TODO: Reload analytics data with new month filter
+  console.log(`TODO: Reload data for month ${monthSelect.value}`);
+});
+
+// ==================== SUBSCRIPTION POPUP ====================
+
+/**
+ * Shows subscription popup with the appropriate topic button
+ * Also triggers background glow effect on the dashboard button
+ * @param {string} topic - 'current-affairs' or 'ethics-essay'
+ */
+function showSubscriptionPopup(topic) {
+  const popup = document.getElementById('subscription-popup');
+  const popupBtn = document.getElementById('subscription-popup-btn');
+  const popupTitle = document.getElementById('subscription-popup-title');
+  const popupMessage = document.getElementById('subscription-popup-message');
+  const dashboardButton = document.querySelector(`.topic-chip[data-topic="${topic}"]`);
+
+  // Set popup content based on topic
+  if (topic === 'current-affairs') {
+    popupTitle.textContent = 'Subscribe to Current Affairs';
+    popupMessage.textContent = 'Get daily updates on current affairs and create notes with 1-click!';
+    popupBtn.textContent = 'Subscribe to Current Affairs';
+  } else if (topic === 'ethics-essay') {
+    popupTitle.textContent = 'Subscribe to Ethics & Essay';
+    popupMessage.textContent = 'Get weekly ethics & essay content every Sunday and enhance your preparation!';
+    popupBtn.textContent = 'Subscribe to Ethics & Essay';
+  }
+
+  popupBtn.dataset.topic = topic;
+
+  // Show popup
+  popup.classList.add('show');
+
+  // Also trigger glow effect on dashboard button in background
+  if (dashboardButton) {
+    setTimeout(() => {
+      dashboardButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+
+    setTimeout(() => {
+      dashboardButton.classList.add('glow-pulse');
+    }, 800);
+  }
+
+  // Auto-close popup after 15 seconds
+  setTimeout(() => {
+    popup.classList.remove('show');
+    if (dashboardButton) {
+      dashboardButton.classList.remove('glow-pulse');
+    }
+  }, 15000); // 15 seconds
+}
+
+// Close subscription popup handlers
+const subscriptionPopup = document.getElementById('subscription-popup');
+const closeSubscriptionPopupBtn = document.getElementById('close-subscription-popup');
+
+closeSubscriptionPopupBtn.addEventListener('click', () => {
+  subscriptionPopup.classList.remove('show');
+  // Remove glow from dashboard buttons
+  document.querySelectorAll('.topic-chip.glow-pulse').forEach(btn => {
+    btn.classList.remove('glow-pulse');
+  });
+});
+
+// Close when clicking outside
+subscriptionPopup.addEventListener('click', (e) => {
+  if (e.target === subscriptionPopup) {
+    subscriptionPopup.classList.remove('show');
+    document.querySelectorAll('.topic-chip.glow-pulse').forEach(btn => {
+      btn.classList.remove('glow-pulse');
+    });
+  }
+});
+
+// Handle subscription button click in popup
+document.getElementById('subscription-popup-btn').addEventListener('click', function() {
+  const topic = this.dataset.topic;
+  console.log(`TODO: Redirect to Razorpay payment for ${topic}`);
+  // TODO: Backend: POST /api/subscriptions/:userId/subscribe
+  // TODO: Integrate with Razorpay payment gateway
+
+  // Temporary feedback
+  this.textContent = '✓ Processing...';
+  this.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+});
+
+/**
+ * Legacy function for backward compatibility
+ * Scrolls to subscription block and adds glow to button
+ * @param {string} topic - 'current-affairs' or 'ethics-essay'
+ */
+function highlightSubscriptionButton(topic) {
+  // Now calls the new popup function instead
+  showSubscriptionPopup(topic);
+}
+
+// ==================== NOTES DASHBOARD ====================
+
+const CURRENT_DATE = new Date('2025-10-17'); // Today's date for testing
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+
+/**
+ * Renders the Notes Dashboard with fortnight compilations
+ * Uses existing month dropdown and replaces chart container with tables
+ */
+function renderNotesDashboard() {
+  const chartContainer = document.getElementById('chart-container');
+  const monthSelect = document.getElementById('month-select');
+  const fortnightChips = document.querySelectorAll('.fortnight-chip');
+
+  // Get currently selected month from existing dropdown
+  let selectedValue = monthSelect.value;
+
+  // If no month selected, default to current month (October 2025)
+  if (!selectedValue) {
+    selectedValue = '2025-10';
+    monthSelect.value = selectedValue;
+  }
+
+  // Determine current fortnight (1st or 2nd) based on today's date
+  const currentDay = CURRENT_DATE.getDate();
+  const currentFortnightIndex = currentDay <= 15 ? 0 : 1;
+
+  // Set active fortnight chip
+  fortnightChips.forEach((chip, idx) => {
+    chip.classList.remove('active');
+    if (idx === currentFortnightIndex) {
+      chip.classList.add('active');
+    }
+  });
+
+  // Generate the notes dashboard content for current fortnight
+  generateNotesDashboardContent(selectedValue, currentFortnightIndex);
+
+  // Listen for month changes
+  monthSelect.removeEventListener('change', handleMonthChangeForNotes);
+  monthSelect.addEventListener('change', handleMonthChangeForNotes);
+
+  // Listen for fortnight chip clicks
+  fortnightChips.forEach((chip, idx) => {
+    chip.removeEventListener('click', chip._notesFortnightHandler);
+    chip._notesFortnightHandler = () => {
+      fortnightChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      generateNotesDashboardContent(monthSelect.value, idx);
+    };
+    chip.addEventListener('click', chip._notesFortnightHandler);
+  });
+}
+
+/**
+ * Handles month dropdown changes for Notes Dashboard
+ */
+function handleMonthChangeForNotes() {
+  const monthSelect = document.getElementById('month-select');
+  const fortnightChips = document.querySelectorAll('.fortnight-chip');
+
+  // Get currently active fortnight
+  let activeFortnightIndex = 0;
+  fortnightChips.forEach((chip, idx) => {
+    if (chip.classList.contains('active')) {
+      activeFortnightIndex = idx;
+    }
+  });
+
+  generateNotesDashboardContent(monthSelect.value, activeFortnightIndex);
+}
+
+/**
+ * Generates the fortnight tables based on selected month and fortnight
+ * @param {string} monthValue - Format: "YYYY-MM" (e.g., "2025-10")
+ * @param {number} fortnightIndex - 0 for 1st fortnight, 1 for 2nd fortnight
+ */
+function generateNotesDashboardContent(monthValue, fortnightIndex) {
+  const chartContainer = document.getElementById('chart-container');
+
+  if (!monthValue) {
+    chartContainer.innerHTML = '<div style="text-align:center; padding:2rem;">Please select a month to view notes</div>';
+    return;
+  }
+
+  // Parse selected month
+  const [yearStr, monthStr] = monthValue.split('-');
+  const selectedYear = parseInt(yearStr);
+  const selectedMonth = parseInt(monthStr) - 1; // Convert to 0-indexed
+  const monthName = monthNames[selectedMonth];
+
+  // Calculate days in selected month
+  const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+
+  // Define fortnights
+  const fortnights = [
+    { start: 1, end: 15, label: '1st Fortnight' },
+    { start: 16, end: daysInMonth, label: '2nd Fortnight' }
+  ];
+
+  // Get the selected fortnight
+  const fortnight = fortnights[fortnightIndex];
+
+  // Current date info
+  const currentYear = CURRENT_DATE.getFullYear();
+  const currentMonth = CURRENT_DATE.getMonth();
+  const currentDay = CURRENT_DATE.getDate();
+
+  let html = '<div style="width: 100%; max-width: 900px; margin: 0 auto;">';
+  html += '<h3 style="text-align: center; font-size: 1.3rem; font-weight: 700; color: #1f2937; margin-bottom: 1.5rem;">Download your Notes (Fortnight Compilation)</h3>';
+
+  // Generate table for the selected fortnight ONLY
+    // Determine if fortnight is complete
+    let isFortnightComplete = false;
+    let availableDate = '';
+
+    if (selectedYear < currentYear || (selectedYear === currentYear && selectedMonth < currentMonth)) {
+      // Past month - fortnight complete
+      isFortnightComplete = true;
+    } else if (selectedYear === currentYear && selectedMonth === currentMonth) {
+      // Current month - check if fortnight end has passed
+      if (currentDay > fortnight.end) {
+        isFortnightComplete = true;
+      } else {
+        // Calculate available date (day after fortnight ends)
+        const nextDay = fortnight.end + 1;
+        if (nextDay <= daysInMonth) {
+          availableDate = `${nextDay} ${monthName} ${selectedYear}`;
+        } else {
+          // Next month
+          const nextMonth = selectedMonth + 1;
+          if (nextMonth <= 11) {
+            availableDate = `1 ${monthNames[nextMonth]} ${selectedYear}`;
+          } else {
+            availableDate = `1 ${monthNames[0]} ${selectedYear + 1}`;
+          }
+        }
+      }
+    } else {
+      // Future month - not available
+      availableDate = `1 ${monthName} ${selectedYear}`;
+    }
+
+    const disabledClass = isFortnightComplete ? '' : 'disabled';
+    const tooltipText = isFortnightComplete
+      ? 'Download all your notes of the Fortnight'
+      : `Available on ${availableDate}`;
+
+    // Compilation Table
+    html += `
+      <table style="width: 100%; max-width: 700px; margin: 0 auto 1rem auto; border-collapse: separate; border-spacing: 0; border: 2px solid #cce0ff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); background: white;">
+        <thead>
+          <tr>
+            <th style="background: #e0f2ff; color: #1f2937; font-size: 1.1rem; padding: 0.75rem 1rem; font-weight: 600; text-align: center;">
+              ${fortnight.label} - Compilation
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding: 1rem; text-align: center;">
+              <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 2rem;">
+                <span style="font-weight: 700; font-size: 1.1rem; color: #1f2937;">${fortnight.start} - ${fortnight.end} ${monthName}</span>
+                <button class="notes-download-btn ${disabledClass}"
+                        data-fortnight="${idx}"
+                        data-month="${selectedMonth}"
+                        data-year="${selectedYear}"
+                        data-complete="${isFortnightComplete}"
+                        style="position: relative; padding: 12px 24px; border-radius: 9999px; border: 2px solid #fc7306; background: linear-gradient(to right, #FFD4B5, #FFFFFF, #B4EDB4); cursor: ${isFortnightComplete ? 'pointer' : 'not-allowed'}; font-weight: 700; font-size: 1rem; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); ${!isFortnightComplete ? 'opacity: 0.6; background-color: #b0bec5;' : ''}">
+                  <span style="color: ${isFortnightComplete ? '#333' : '#78909c'};">
+                    <span style="color: #fc7306; font-weight: 800;">G</span>et
+                    <span style="color: #fc7306; font-weight: 800;">Y</span>our
+                    <span style="color: #fc7306; font-weight: 800;">N</span>otes
+                  </span>
+                  <span style="font-size: 0.6em; vertical-align: super; color: #fc7306; font-weight: 900;">&reg;</span>
+                  <span class="notes-tooltip" style="visibility: hidden; opacity: 0; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: linear-gradient(to right, #FFD4B5, #FFFFFF, #B4EDB4); color: #333; text-align: center; border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: normal; transition: opacity 0.3s, visibility 0.3s; border: 1px solid #ccc; white-space: nowrap; z-index: 100; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);">${tooltipText}</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+
+    // Daily Downloads Table
+    html += `
+      <table style="width: 100%; max-width: 700px; margin: 0 auto 2rem auto; border-collapse: separate; border-spacing: 0; border: 2px solid #cce0ff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+        <thead>
+          <tr>
+            <th style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; text-align: center; font-size: 1.2rem; font-weight: 700;">
+              ${fortnight.label} - Daily Downloads
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    // Generate rows for each day
+    for (let day = fortnight.start; day <= fortnight.end; day++) {
+      const dateStr = `${day} ${monthName} ${selectedYear}`;
+      const isoDate = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+      // Check if this day has passed
+      let isDayAvailable = false;
+      if (selectedYear < currentYear || (selectedYear === currentYear && selectedMonth < currentMonth)) {
+        isDayAvailable = true;
+      } else if (selectedYear === currentYear && selectedMonth === currentMonth && day <= currentDay) {
+        isDayAvailable = true;
+      }
+
+      const linkStyle = isDayAvailable
+        ? 'color: #3498db; text-decoration: none; font-weight: 600; cursor: pointer;'
+        : 'color: #b0bec5; text-decoration: none; font-weight: 600; cursor: not-allowed; opacity: 0.5;';
+
+      html += `
+        <tr>
+          <td style="padding: 1rem; background-color: white; border-bottom: 1px solid #e0e0e0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem;">
+              <span style="font-weight: 600; color: #1f2937;">${dateStr}</span>
+              <a href="#" class="notes-daily-link" data-date="${isoDate}" data-available="${isDayAvailable}" style="${linkStyle}">Download</a>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    html += `
+        </tbody>
+      </table>
+    `;
+  });
+
+  html += '</div>';
+
+  // Inject HTML and adjust styling for Notes Dashboard
+  chartContainer.innerHTML = html;
+  chartContainer.style.border = 'none';
+  chartContainer.style.background = 'transparent';
+  chartContainer.style.height = 'auto';
+  chartContainer.style.maxWidth = 'none';
+  chartContainer.style.width = '100%';
+
+  // Add hover effect for tooltips
+  document.querySelectorAll('.notes-download-btn').forEach(btn => {
+    btn.addEventListener('mouseenter', function() {
+      const tooltip = this.querySelector('.notes-tooltip');
+      if (tooltip) {
+        tooltip.style.visibility = 'visible';
+        tooltip.style.opacity = '1';
+      }
+    });
+    btn.addEventListener('mouseleave', function() {
+      const tooltip = this.querySelector('.notes-tooltip');
+      if (tooltip) {
+        tooltip.style.visibility = 'hidden';
+        tooltip.style.opacity = '0';
+      }
+    });
+  });
+
+  // Attach event listeners
+  attachNotesDashboardListeners();
+}
+
+/**
+ * Attaches event listeners to download buttons and links
+ */
+function attachNotesDashboardListeners() {
+  // Fortnight compilation buttons
+  document.querySelectorAll('.notes-download-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const isComplete = this.dataset.complete === 'true';
+
+      if (!isComplete) {
+        console.log('⚠️ Fortnight not complete yet - button disabled');
+        return;
+      }
+
+      const fortnight = this.dataset.fortnight;
+      const month = this.dataset.month;
+      const year = this.dataset.year;
+      const fortnightLabel = fortnight === '0' ? '1st' : '2nd';
+
+      console.log(`📥 Download clicked: ${fortnightLabel} Fortnight of ${monthNames[month]} ${year}`);
+      alert(`Downloading ${fortnightLabel} Fortnight notes for ${monthNames[month]} ${year}\n\nThis will include all your:\n✅ Highlights\n✅ Summaries\n✅ Notes\n✅ Article attributes`);
+
+      // TODO: Trigger actual download
+      // window.location.href = `/api/download-fortnight?month=${month}&year=${year}&fortnight=${fortnight}`;
+    });
+  });
+
+  // Daily download links
+  document.querySelectorAll('.notes-daily-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const isAvailable = this.dataset.available === 'true';
+      const date = this.dataset.date;
+
+      if (!isAvailable) {
+        console.log(`⚠️ Notes for ${date} not available yet`);
+        return;
+      }
+
+      console.log(`📥 Daily download clicked: ${date}`);
+      alert(`Downloading notes for ${date}\n\nThis will include:\n✅ Your highlights\n✅ Your summaries\n✅ Article metadata`);
+
+      // TODO: Trigger actual download
+      // window.location.href = `/api/download-daily?date=${date}`;
+    });
+  });
+}
+
+/**
+ * Checks subscription status and redirects if inactive
+ * @param {string} topic - 'current-affairs' or 'ethics-essay'
+ * @param {string} targetUrl - URL to redirect to if active
+ * @returns {boolean} - true if redirect occurred
+ */
+function checkSubscriptionAndRedirect(topic, targetUrl) {
+  // TODO: Backend: GET /api/users/:userId/subscriptions
+  const subscription = DEMO_USER.subscriptions.find(sub => sub.topic === topic);
+
+  if (!subscription || subscription.status !== 'active') {
+    // Subscription INACTIVE - Redirect to dashboard
+    console.log(`❌ ${topic} subscription inactive - Redirecting to dashboard`);
+
+    // Add highlight parameter to URL
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('highlight', topic);
+
+    // Reload page with highlight parameter
+    window.location.href = currentUrl.toString();
+    return true;
+  } else {
+    // Subscription ACTIVE - Allow access
+    console.log(`✅ ${topic} subscription active - Redirecting to content`);
+    window.location.href = targetUrl;
+    return false;
+  }
+}
+
+// ==================== CHECK FOR HIGHLIGHT PARAMETER ON PAGE LOAD ====================
+function checkHighlightParameter() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const highlightTopic = urlParams.get('highlight');
+
+  if (highlightTopic) {
+    console.log(`🎯 Highlight parameter detected: ${highlightTopic}`);
+    highlightSubscriptionButton(highlightTopic);
+
+    // Remove parameter from URL (clean up)
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.delete('highlight');
+    window.history.replaceState({}, '', newUrl.toString());
+  }
+}
+
+// ==================== TESTBED: SIMULATED DATE CLICK HANDLERS ====================
+
+// Simulate weekday date click (Current Affairs)
+document.getElementById('test-weekday-btn')?.addEventListener('click', () => {
+  console.log('🧪 TESTBED: Simulating weekday date click (15 Oct)');
+  // TODO: In production, this would be: window.location.href = '/articles/2025-10-15'
+  // For now, check subscription and redirect if inactive
+  checkSubscriptionAndRedirect('current-affairs', '/articles/2025-10-15');
+});
+
+// Simulate Sunday date click (Ethics & Essay)
+document.getElementById('test-sunday-btn')?.addEventListener('click', () => {
+  console.log('🧪 TESTBED: Simulating Sunday date click (19 Oct)');
+  // TODO: In production, this would be: window.location.href = '/ethics-essay'
+  // For now, check subscription and redirect if inactive
+  checkSubscriptionAndRedirect('ethics-essay', '/ethics-essay');
+});
+
+// ==================== NAV BUTTON: ETHICS & ESSAY SUBSCRIPTION CHECK ====================
+document.getElementById('nav-ethics-btn')?.addEventListener('click', (e) => {
+  e.preventDefault(); // Prevent default navigation
+  console.log('📍 Ethics & Essay nav button clicked');
+
+  // TODO: Backend: GET /api/users/:userId/subscriptions
+  // TODO: Check if ethics-essay subscription is active
+  checkSubscriptionAndRedirect('ethics-essay', '/ethics-essay');
+});
+
+// ==================== INITIALIZE ON PAGE LOAD ====================
+document.addEventListener('DOMContentLoaded', () => {
+  initializeUserData();
+  checkHighlightParameter(); // Check for redirect highlight
+  console.log('=== TESTBED MODE: Using demo data ===');
+  console.log('TODO: Replace all console.log with actual API calls');
+  console.log('📊 Current Subscriptions:', DEMO_USER.subscriptions);
+});
+</script>
+
+</body>
+</html>

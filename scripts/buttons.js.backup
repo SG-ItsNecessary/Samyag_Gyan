@@ -1,0 +1,299 @@
+// ==================== INTERACTION TRACKING ====================
+// TODO (Agentic Coder): Replace console.log with actual API POST request
+// TODO: Ensure backend table `public_interactions` exists with columns:
+//       - user_id (TEXT/UUID)
+//       - article_id (TEXT - using article slug as unique identifier)
+//       - action_type (TEXT - 'mark_read', 'vote', 'bookmark', 'summary', 'share')
+//       - timestamp (TIMESTAMP - auto-generated)
+// TODO: Add UNIQUE constraint on (user_id, article_id, action_type) to prevent duplicates
+// TODO: Handle duplicate interaction prevention on frontend as well
+
+/**
+ * Records user interaction with article buttons
+ * @param {string} userId - Unique user identifier
+ * @param {string} articleId - Article slug or unique identifier
+ * @param {string} actionType - Type of action: 'mark_read', 'vote', 'bookmark', 'summary', 'share'
+ */
+function recordInteraction(userId, articleId, actionType) {
+    console.log("Interaction captured:", {
+        userId: userId,
+        articleId: articleId,
+        actionType: actionType,
+        timestamp: new Date().toISOString()
+    });
+
+    // TODO: Uncomment and implement when backend API is ready
+    /*
+    fetch('/api/articles/interact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_id: userId,
+            article_id: articleId,
+            action_type: actionType
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            console.log("✅ Interaction recorded:", data);
+        } else {
+            console.error("❌ Failed to record interaction:", data.message);
+        }
+    })
+    .catch(err => {
+        console.error("❌ Error recording interaction:", err);
+    });
+    */
+}
+
+// ==================== EVENT DELEGATION FOR DYNAMIC BUTTONS ====================
+// Use event delegation since buttons are dynamically generated per article tile
+
+// Get userId from auth system (placeholder - adjust based on your auth implementation)
+const getUserId = () => {
+    // TODO: Replace with actual user ID retrieval from your auth system
+    return localStorage.getItem('userId') || 'guest-user';
+};
+
+// Helper function to get article ID from button's parent tile
+const getArticleIdFromButton = (button) => {
+    const buttonRow = button.closest('.button-row');
+    return buttonRow ? buttonRow.dataset.articleId : null;
+};
+
+// Helper function to toggle a button's visual state and text
+const toggleButton = (btn, className, defaultText, activeText) => {
+    const isActive = btn.classList.toggle(className);
+    const textSpan = btn.querySelector('span');
+    if (textSpan && defaultText && activeText) {
+        textSpan.textContent = isActive ? activeText : defaultText;
+    }
+    return isActive;
+};
+
+// ==================== MARK AS READ BUTTON (Event Delegation) ====================
+document.addEventListener('click', (e) => {
+    const markReadBtn = e.target.closest('.read-button:not(.read-done)');
+    if (!markReadBtn) return;
+
+    const articleId = getArticleIdFromButton(markReadBtn);
+    if (!articleId) return;
+
+    const userId = getUserId();
+
+    // Update UI
+    markReadBtn.classList.add('read-done');
+    const readText = markReadBtn.querySelector('.read-text');
+    if (readText) readText.textContent = 'Read ✓';
+
+    const readIcon = markReadBtn.querySelector('.read-icon');
+    if (readIcon) {
+        readIcon.innerHTML = `<path d="M12 21V7"/><path d="m16 12 2 2 4-4"/><path d="M22 6V4a1 1 0 0 0-1-1h-5a4 4 0 0 0-4 4 4 4 0 0 0-4-4H3a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h6a3 3 0 0 1 3 3 3 3 0 0 1 3-3h6a1 1 0 0 0 1-1v-1.3"/>`;
+    }
+
+    const ticks = document.getElementById(`readTicks-${articleId}`);
+    if (ticks) ticks.classList.add('visible');
+
+    // Enable all action buttons for this article
+    const buttonRow = markReadBtn.closest('.button-row');
+    if (buttonRow) {
+        buttonRow.querySelectorAll('.action-btn').forEach(btn => {
+            btn.classList.add('enabled');
+        });
+    }
+
+    // Record interaction
+    recordInteraction(userId, articleId, 'mark_read');
+});
+
+// ==================== VOTE BUTTON (Event Delegation) ====================
+document.addEventListener('click', (e) => {
+    const voteBtn = e.target.closest('.action-btn[data-action="vote"].enabled');
+    if (!voteBtn) return;
+
+    const articleId = getArticleIdFromButton(voteBtn);
+    if (!articleId) return;
+
+    const userId = getUserId();
+
+    toggleButton(voteBtn, 'voted', 'Vote', 'Voted ✓');
+
+    // Record interaction
+    recordInteraction(userId, articleId, 'vote');
+});
+
+// ==================== BOOKMARK BUTTON (Event Delegation) ====================
+document.addEventListener('click', (e) => {
+    const bookmarkBtn = e.target.closest('.action-btn[data-action="bookmark"].enabled');
+    if (!bookmarkBtn) return;
+
+    const articleId = getArticleIdFromButton(bookmarkBtn);
+    if (!articleId) return;
+
+    const userId = getUserId();
+
+    const isCurrentlySaved = bookmarkBtn.classList.toggle('saved');
+    const bookmarkTextSpan = bookmarkBtn.querySelector('span');
+    if (bookmarkTextSpan) {
+        bookmarkTextSpan.textContent = isCurrentlySaved ? 'Bookmarked' : 'Bookmark';
+    }
+
+    // Record interaction
+    recordInteraction(userId, articleId, isCurrentlySaved ? 'bookmark' : 'unbookmark');
+});
+
+// ==================== SUMMARY BUTTON (Event Delegation) ====================
+document.addEventListener('click', (e) => {
+    const summaryBtn = e.target.closest('.action-btn[data-action="summary"].enabled');
+    if (!summaryBtn) return;
+
+    const articleId = getArticleIdFromButton(summaryBtn);
+    if (!articleId) return;
+
+    const userId = getUserId();
+
+    // Open summary modal
+    let summaryModal = document.getElementById('summaryModal');
+
+    // Create modal if it doesn't exist
+    if (!summaryModal) {
+        summaryModal = document.createElement('div');
+        summaryModal.id = 'summaryModal';
+        summaryModal.className = 'summary-container';
+        summaryModal.dataset.currentArticleId = articleId;
+
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        summaryModal.innerHTML = `
+            <div class="summary-header">
+                <div>My Summary</div>
+                <div class="word-count-info">
+                    <span id="wordCount">0/100 words</span>
+                </div>
+                <div id="noteDate">${formattedDate}</div>
+                <button class="save-btn" id="summarySaveBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-8.69"/>
+                        <path d="M22 4L12 14.01l-3-3"/>
+                    </svg>
+                </button>
+                <button class="close-btn">&times;</button>
+            </div>
+            <textarea
+                id="unicode-textbox"
+                class="summary-body"
+                placeholder="अपने विचारों को अपनी भाषा में संक्षेपित करें।
+सभी भारतीय लिपियों और हर भाषा (यहाँ तक कि हिंग्लिश भी) का उपयोग नोट्स में किया जा सकता है।
+समय बचाने के लिए, संक्षेपण के लिए Voice Typing / AI टूल्स का उपयोग करें।
+
+Summarize your thoughts in your language. Every Bharatiya Script and every Language (even Hinglish) can be used in notes.
+Use Voice Typing and AI tools to save time to summarize.."
+                spellcheck="false"
+            ></textarea>
+        `;
+
+        document.body.appendChild(summaryModal);
+    }
+
+    // Store current article ID in modal
+    summaryModal.dataset.currentArticleId = articleId;
+    summaryModal.classList.add('visible');
+
+    // Update word count
+    updateWordCount();
+
+    // Record interaction
+    recordInteraction(userId, articleId, 'summary');
+});
+
+// ==================== SUMMARY MODAL LOGIC ====================
+const MAX_WORDS = 100;
+
+const updateWordCount = () => {
+    const summaryTextBox = document.getElementById('unicode-textbox');
+    const wordCountSpan = document.getElementById('wordCount');
+    const wordCountInfo = document.querySelector('.word-count-info');
+
+    if (!summaryTextBox || !wordCountSpan) return;
+
+    const words = summaryTextBox.value.trim().split(/\s+/).filter(word => word.length > 0);
+    const currentWords = words.length;
+
+    wordCountSpan.textContent = `${currentWords}/${MAX_WORDS} words`;
+
+    if (currentWords > MAX_WORDS) {
+        wordCountInfo.classList.add('error');
+        summaryTextBox.value = words.slice(0, MAX_WORDS).join(' ');
+    } else {
+        wordCountInfo.classList.remove('error');
+    }
+};
+
+// Summary Save Button
+document.addEventListener('click', (e) => {
+    const summarySaveBtn = e.target.closest('#summarySaveBtn');
+    if (!summarySaveBtn) return;
+
+    const summaryModal = document.getElementById('summaryModal');
+    const summaryTextBox = document.getElementById('unicode-textbox');
+    const articleId = summaryModal?.dataset.currentArticleId;
+
+    if (summaryTextBox && summaryTextBox.value.trim() !== '' && articleId) {
+        const summaryBtn = document.querySelector(`#summaryBtn-${articleId}`);
+        if (summaryBtn) {
+            summaryBtn.classList.add('summarized');
+        }
+    }
+
+    if (summaryModal) {
+        summaryModal.classList.remove('visible');
+    }
+});
+
+// Summary Close Button
+document.addEventListener('click', (e) => {
+    const closeBtn = e.target.closest('.summary-container .close-btn');
+    if (!closeBtn) return;
+
+    const summaryModal = document.getElementById('summaryModal');
+    if (summaryModal) {
+        summaryModal.classList.remove('visible');
+    }
+});
+
+// Real-time word counting
+document.addEventListener('input', (e) => {
+    if (e.target.id === 'unicode-textbox') {
+        updateWordCount();
+    }
+});
+
+// ==================== SHARE BUTTON (Event Delegation) ====================
+document.addEventListener('click', (e) => {
+    const shareBtn = e.target.closest('.share-btn');
+    if (!shareBtn) return;
+
+    const articleId = getArticleIdFromButton(shareBtn);
+    if (!articleId) return;
+
+    const userId = getUserId();
+
+    // Get current URL and page title
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent(document.title);
+
+    // Construct Telegram share URL
+    const telegramShareUrl = `https://t.me/share/url?url=${url}&text=${title}`;
+
+    // Open sharing dialog
+    window.open(telegramShareUrl, '_blank');
+
+    // Record interaction
+    recordInteraction(userId, articleId, 'share');
+});

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Dashboard - Samyak Gyan</title>
+<link rel="stylesheet" href="styles/header.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #f3f4f6;
+  padding: 2rem;
+  color: #1f2937;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+}
+
+/* Month Selector */
+.month-selector {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.month-selector label {
+  font-weight: 600;
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.month-selector select {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid #cce0ff;
+  background: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Dashboard Table */
+.dashboard-table {
+  width: 100%;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 2px solid #cce0ff;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-table th, .dashboard-table td {
+  text-align: center;
+  padding: 12px 10px;
+}
+
+.dashboard-table th {
+  font-size: 1.1rem;
+  font-weight: bold;
+  background: #e0f2ff;
+  color: #1f2937;
+}
+
+/* Compilation Table - Separate Section (White background, Blue header) */
+.compilation-table {
+  margin-bottom: 1rem;
+  background: white;
+}
+
+.compilation-table th {
+  background: #e0f2ff;
+  color: #1f2937;
+  font-size: 1.1rem;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+
+.compilation-cell {
+  background: white;
+  padding: 1.5rem 1rem;
+}
+
+.compilation-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.fortnight-label {
+  color: #1f2937;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.compilation-button-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Daily Downloads Table */
+.daily-table {
+  margin-bottom: 2.5rem;
+}
+
+.daily-row {
+  background-color: #ffffff;
+}
+
+.daily-row:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.daily-row td a {
+  font-weight: bold;
+  color: black;
+  text-decoration: none;
+}
+
+.daily-row td a:hover {
+  text-decoration: underline;
+  color: #3498db;
+}
+
+td, th {
+  border-bottom: 1px solid #cce0ff;
+  border-right: 1px solid #cce0ff;
+}
+
+td:last-child, th:last-child {
+  border-right: none;
+}
+
+/* Get Your Notes Button */
+.download-button {
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  border: 2px solid #fff;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  letter-spacing: 0.5px;
+  background-color: #3498db;
+  color: #fff;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  margin-right: 8px;
+}
+
+.download-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+.download-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Disabled State - Fortnight Incomplete */
+.download-button.disabled {
+  background-color: #b0bec5;
+  opacity: 0.6;
+  cursor: not-allowed;
+  border-color: #ccc;
+}
+
+.download-button.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.download-button.disabled .button-text {
+  color: #78909c;
+}
+
+.button-text {
+  text-transform: capitalize;
+  font-weight: 600;
+  color: #fff;
+}
+
+.button-text span.initial {
+  text-transform: uppercase;
+}
+
+/* Trademark Symbol */
+.reg-symbol {
+  font-weight: 300;
+  font-size: 0.6em;
+  margin-left: 4px;
+  position: relative;
+  top: -3px;
+  color: #fff;
+}
+
+/* Tooltip - Appears ABOVE the button */
+.tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(to right, #FFD4B5, #FFFFFF, #B4EDB4);
+  color: #333;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: normal;
+  transition: opacity 0.3s, visibility 0.3s;
+  border: 1px solid #ccc;
+  white-space: nowrap;
+  z-index: 100;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Tooltip arrow points DOWN (towards button) */
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #B4EDB4 transparent transparent transparent;
+}
+
+.download-button:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+  font-weight: bold;
+}
+
+/* Info Icon */
+.info-icon {
+  display: inline-block;
+  margin-left: 8px;
+  cursor: pointer;
+  color: #555;
+  font-weight: bold;
+  border-radius: 50%;
+  border: 1px solid #555;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+  line-height: 16px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.info-icon:hover {
+  background-color: #555;
+  color: white;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 200;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: 12px;
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.modal-button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  border: none;
+  background-color: #3498db;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.modal-button:hover {
+  background-color: #2176bd;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  .download-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .tooltip {
+    font-size: 11px;
+    width: 200px;
+    white-space: normal;
+  }
+
+  .compilation-table th {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  .compilation-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .fortnight-label {
+    font-size: 1rem;
+  }
+
+  .dashboard-table th, .dashboard-table td {
+    padding: 8px 5px;
+    font-size: 0.9rem;
+  }
+
+  .month-selector select {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .info-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 11px;
+    line-height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .download-button {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .first-row {
+    font-size: 0.8rem;
+  }
+
+  .dashboard-table th, .dashboard-table td {
+    padding: 6px 4px;
+    font-size: 0.85rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Unified Header Component -->
+<div id="header-placeholder"></div>
+
+<!-- Load Header Component -->
+<script>
+  fetch('components/header.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+
+      if (typeof checkOrientation === 'function') {
+        checkOrientation();
+      }
+
+      if (typeof setupGotItHandler === 'function') {
+        setupGotItHandler();
+      }
+    });
+</script>
+
+<!-- Orientation Detection Script -->
+<script src="scripts/orientation-detection.js"></script>
+
+<h2>Notes Dashboard - Download Your Fortnight Notes</h2>
+
+<!-- Month Selector -->
+<div class="month-selector">
+  <label for="monthSelect">Select Month:</label>
+  <select id="monthSelect">
+    <option value="0">January 2024</option>
+    <option value="1" selected>February 2024 (Leap Year - 29 days)</option>
+    <option value="2">March 2024</option>
+    <option value="3">April 2024</option>
+    <option value="4">May 2024</option>
+    <option value="5">June 2024</option>
+    <option value="6">July 2024</option>
+    <option value="7">August 2024</option>
+    <option value="8">September 2024</option>
+    <option value="9">October 2024</option>
+    <option value="10">November 2024</option>
+    <option value="11">December 2024</option>
+  </select>
+</div>
+
+<!-- Container for Dynamic Tables -->
+<div id="dashboardContainer"></div>
+
+<!-- Modal -->
+<div id="infoModal" class="modal">
+  <div class="modal-content">
+    <p>Download all your notes of the Fortnight</p>
+    <button class="modal-button" id="closeModal">Got it</button>
+  </div>
+</div>
+
+<script>
+// ========== DYNAMIC FORTNIGHT GENERATION ==========
+
+const monthNames = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const monthSelect = document.getElementById('monthSelect');
+const dashboardContainer = document.getElementById('dashboardContainer');
+const modal = document.getElementById('infoModal');
+const closeModalBtn = document.getElementById('closeModal');
+
+// Fixed year for this demo (all months are 2024)
+const DEMO_YEAR = 2024;
+
+// Get days in month (handles leap years)
+function getDaysInMonth(month, year) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+// Generate dashboard tables
+function generateDashboard() {
+  const selectedMonth = parseInt(monthSelect.value);
+  const selectedYear = DEMO_YEAR;
+  const monthName = monthNames[selectedMonth];
+  const daysInMonth = getDaysInMonth(selectedMonth, selectedYear);
+
+  console.log(`📅 Generating dashboard for ${monthName} ${selectedYear} (${daysInMonth} days)`);
+
+  // Clear existing content
+  dashboardContainer.innerHTML = '';
+
+  // Define fortnights
+  const fortnights = [
+    { label: '1st Fortnight', start: 1, end: 15 },
+    { label: '2nd Fortnight', start: 16, end: daysInMonth }
+  ];
+
+  fortnights.forEach((fortnight, idx) => {
+    // ========== CHECK IF FORTNIGHT IS COMPLETE ==========
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const currentDay = today.getDate();
+
+    let isFortnightComplete = false;
+    let availableDate = '';
+
+    // Check if this fortnight is in the past or complete
+    if (selectedYear < currentYear || selectedMonth < currentMonth) {
+      // Past month - always complete
+      isFortnightComplete = true;
+    } else if (selectedYear === currentYear && selectedMonth === currentMonth) {
+      // Current month - check if fortnight end date has passed
+      if (currentDay > fortnight.end) {
+        isFortnightComplete = true;
+      } else {
+        // Not complete yet - calculate available date
+        availableDate = `${fortnight.end + 1} ${monthName} ${selectedYear}`;
+      }
+    } else {
+      // Future month - not available yet
+      const nextMonthDate = new Date(selectedYear, selectedMonth, 1);
+      availableDate = `1 ${monthNames[selectedMonth]} ${selectedYear}`;
+    }
+
+    const disabledClass = isFortnightComplete ? '' : 'disabled';
+    const tooltipText = isFortnightComplete
+      ? 'Download all your notes of the Fortnight'
+      : `Available on ${availableDate}`;
+
+    // ========== COMPILATION SECTION (Separate) ==========
+    const compilationTable = document.createElement('table');
+    compilationTable.className = 'dashboard-table compilation-table';
+
+    const compilationThead = document.createElement('thead');
+
+    // Header row
+    const compilationHeaderRow = document.createElement('tr');
+    const compilationHeaderCell = document.createElement('th');
+    compilationHeaderCell.innerText = 'Download your Notes (Fortnight Compilation)';
+    compilationHeaderRow.appendChild(compilationHeaderCell);
+    compilationThead.appendChild(compilationHeaderRow);
+
+    // Compilation button row
+    const compilationButtonRow = document.createElement('tr');
+    const compilationButtonCell = document.createElement('td');
+    compilationButtonCell.className = 'compilation-cell';
+    compilationButtonCell.innerHTML = `
+      <div class="compilation-content">
+        <span class="fortnight-label">${fortnight.start}-${fortnight.end} ${monthName} ${selectedYear}</span>
+        <div class="compilation-button-wrapper">
+          <button class="download-button ${disabledClass}"
+                  data-fortnight="${idx}"
+                  data-month="${selectedMonth}"
+                  data-year="${selectedYear}"
+                  data-complete="${isFortnightComplete}">
+            <span class="button-text">
+              <span class="initial">G</span>et
+              <span class="initial">Y</span>our
+              <span class="initial">N</span>otes
+            </span>
+            <span class="reg-symbol">&reg;</span>
+            <span class="tooltip">${tooltipText}</span>
+          </button>
+          <span class="info-icon" data-fortnight="${idx}">i</span>
+        </div>
+      </div>
+    `;
+    compilationButtonRow.appendChild(compilationButtonCell);
+    compilationThead.appendChild(compilationButtonRow);
+
+    compilationTable.appendChild(compilationThead);
+    dashboardContainer.appendChild(compilationTable);
+
+    // ========== DAILY DOWNLOADS TABLE (Separate) ==========
+    const dailyTable = document.createElement('table');
+    dailyTable.className = 'dashboard-table daily-table';
+
+    const dailyThead = document.createElement('thead');
+    const dailyHeaderRow = document.createElement('tr');
+    const dailyHeaderCell = document.createElement('th');
+    dailyHeaderCell.colSpan = 2;
+    dailyHeaderCell.innerText = 'Daily Downloads';
+    dailyHeaderRow.appendChild(dailyHeaderCell);
+    dailyThead.appendChild(dailyHeaderRow);
+    dailyTable.appendChild(dailyThead);
+
+    // Body - daily rows
+    const tbody = document.createElement('tbody');
+    for (let d = fortnight.start; d <= fortnight.end; d++) {
+      const tr = document.createElement('tr');
+      tr.className = 'daily-row';
+
+      const tdDate = document.createElement('td');
+      tdDate.innerText = `${d} ${monthName} ${selectedYear}`;
+
+      const tdDownload = document.createElement('td');
+      tdDownload.innerHTML = `<a href="#" data-date="${d}" data-month="${selectedMonth}" data-year="${selectedYear}">Download</a>`;
+
+      tr.appendChild(tdDate);
+      tr.appendChild(tdDownload);
+      tbody.appendChild(tr);
+    }
+    dailyTable.appendChild(tbody);
+
+    dashboardContainer.appendChild(dailyTable);
+  });
+
+  // Attach event listeners after DOM update
+  attachEventListeners();
+}
+
+// Attach event listeners
+function attachEventListeners() {
+  // Info icon clicks
+  document.querySelectorAll('.info-icon').forEach(icon => {
+    icon.addEventListener('click', () => {
+      modal.style.display = 'block';
+    });
+  });
+
+  // Get Your Notes button clicks
+  document.querySelectorAll('.download-button').forEach(button => {
+    button.addEventListener('click', function() {
+      // Check if fortnight is complete
+      const isComplete = this.dataset.complete === 'true';
+
+      if (!isComplete) {
+        console.log('⚠️ Fortnight not complete yet - button disabled');
+        return; // Prevent download action
+      }
+
+      const fortnight = this.dataset.fortnight;
+      const month = this.dataset.month;
+      const year = this.dataset.year;
+      const fortnightLabel = fortnight === '0' ? '1st' : '2nd';
+
+      console.log(`📥 Download clicked: ${fortnightLabel} Fortnight of ${monthNames[month]} ${year}`);
+      alert(`Downloading ${fortnightLabel} Fortnight notes for ${monthNames[month]} ${year}\n\nThis will include all your:\n✅ Highlights\n✅ Summaries\n✅ Notes\n✅ Article attributes`);
+
+      // TODO: Trigger actual download
+      // window.location.href = `/api/download-fortnight?month=${month}&year=${year}&fortnight=${fortnight}`;
+    });
+  });
+
+  // Daily download clicks
+  document.querySelectorAll('.daily-row a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const date = this.dataset.date;
+      const month = this.dataset.month;
+      const year = this.dataset.year;
+
+      console.log(`📥 Daily download: ${date} ${monthNames[month]} ${year}`);
+      alert(`Downloading notes for ${date} ${monthNames[month]} ${year}\n\nThis will include:\n✅ Highlights\n✅ Your summary\n✅ Article data`);
+
+      // TODO: Trigger actual download
+      // window.location.href = `/api/download-daily?date=${date}&month=${month}&year=${year}`;
+    });
+  });
+}
+
+// Modal close
+closeModalBtn.addEventListener('click', () => {
+  modal.style.display = 'none';
+});
+
+window.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    modal.style.display = 'none';
+  }
+});
+
+// Month change
+monthSelect.addEventListener('change', generateDashboard);
+
+// Initial load
+generateDashboard();
+
+console.log('✅ Notes Dashboard loaded successfully!');
+console.log('📊 Default view: February 2024 (29 days - Leap Year)');
+console.log('🔄 Change month dropdown to see dynamic regeneration');
+console.log('');
+console.log('Available test months:');
+console.log('  • January 2024 (31 days)');
+console.log('  • February 2024 (29 days - LEAP YEAR) ← Currently selected');
+console.log('  • April 2024 (30 days)');
+console.log('  • October 2024 (31 days)');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samyak Gyan - Referral Popup</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: "Segoe UI", Roboto, Arial, sans-serif; background-color:#f3f4f6; color:#000; }
+
+  .popup-overlay {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:999;
+  }
+
+  .popup-box {
+    background:#fff; color:#000; width:90%; max-width:520px;
+    border-radius:1rem; box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    padding:1.8rem 2rem; text-align:center; animation:popupFadeIn 0.4s ease; position:relative;
+  }
+
+  /* Updated: Darker close button + "Skip" text */
+  .popup-close {
+    position:absolute; top:0.6rem; right:0.9rem;
+    background:transparent; border:none; font-size:1.5rem; font-weight:bold;
+    color:#333; cursor:pointer; transition: color 0.2s ease;
+    display: flex; align-items: center; gap: 0.3rem;
+  }
+  .popup-close:hover { color:#fc7306; }
+
+  .popup-close-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .popup-box h2 {
+    color:#fc7306; font-size:1.8rem; font-weight:800; margin-bottom:0.6rem;
+  }
+
+  .popup-box p { font-size:1.05rem; line-height:1.5; color:#111; margin-bottom:0.7rem; }
+  .popup-box p strong { font-weight:700; color:#000; }
+  .popup-box p em { font-style:italic; font-weight:500; color:#000; }
+
+  .popup-box .big-heart-line { font-size:1.25rem; font-weight:600; }
+  .red-trial { color:#dc3545; font-weight:700; font-size:1.2rem; }
+
+  /* Updated: Button text changed */
+  .popup-button {
+    background-color:#1877F2;
+    color:white; border:none; border-radius:0.5rem;
+    padding:0.7rem 1.5rem; font-size:1rem; font-weight:600; cursor:pointer;
+    transition: all 0.2s ease; margin-top:0.5rem;
+  }
+  .popup-button:hover { background-color:#155dbf; transform:scale(1.03); }
+
+  /* Updated: Changed red to orange (#fc7306) */
+  .popup-caption {
+    font-size:0.75rem; color:#333; font-style:italic; margin-top:0.4rem; line-height:1.3;
+  }
+  .popup-caption .sg-no-ads { color:#fc7306; font-style:italic; font-weight:400; }
+  .popup-caption .sg { font-style:italic; font-weight:600; }
+
+  @keyframes popupFadeIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
+
+  @media (max-width:480px) {
+    .popup-box { padding:1.4rem 1.5rem; }
+    .popup-box h2 { font-size:1.5rem; }
+    .popup-box p { font-size:1rem; line-height:1.4; }
+    .popup-box .big-heart-line { font-size:1.1rem; }
+    .red-trial { font-size:1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="popup-overlay" id="welcomePopup">
+  <div class="popup-box">
+    <!-- Updated: Darker × with "Skip" text -->
+    <button class="popup-close" onclick="closePopup()">
+      <span>×</span>
+      <span class="popup-close-text">Skip</span>
+    </button>
+
+    <h2>🎉 Welcome to <strong>Samyak Gyan!</strong></h2>
+
+    <p>✨ You've got a <strong>15-day free access</strong> to explore.</p>
+
+    <p>
+      🧠 Read Enriching Content <br>
+      ☝️ Create Notes in 1-Click !!
+    </p>
+
+    <p class="big-heart-line">❤️ Find the Platform useful ??</p>
+
+    <p style="margin-top:0.6rem;">
+      🔗 Refer it to <strong>all of your friends</strong> and help <strong><em>SG</em></strong> reach them!!
+    </p>
+
+    <p style="margin-top:0.6rem;">
+      👥 When <strong>3 of your friends</strong> join via your Link, you get<br>
+      <span class="red-trial">1 month free access !!</span>
+    </p>
+
+    <!-- Updated: Button text changed from "Get My Referral Link" to "📲 Send Link to My Telegram" -->
+    <button class="popup-button">📲 Send Link to My Telegram</button>
+
+    <!-- Updated: Changed red color to orange (#fc7306) -->
+    <p class="popup-caption">
+      <span class="sg-no-ads">Samyak Gyan is not spending on ads on Youtube-Instagram!!</span><br>
+      Help <span class="sg">SG</span> grow!! Do refer it to all your friends!!
+    </p>
+  </div>
+</div>
+
+<script>
+  function closePopup() { document.getElementById("welcomePopup").style.display = "none"; }
+</script>
+
+</body>
+</html>

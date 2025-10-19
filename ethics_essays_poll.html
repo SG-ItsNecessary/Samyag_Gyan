@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ethics & Essay - Samyak Gyan</title>
+
+<!--
+  ===== LOCAL TESTING INSTRUCTIONS =====
+  To test locally without login:
+  - Find "LOCAL_TESTING_MODE" in JavaScript (line ~448)
+  - Set to true: Poll works without login
+  - Set to false: Profile modal appears (production behavior)
+-->
+
+<!-- Include Header CSS -->
+<link rel="stylesheet" href="styles/header.css" />
+
+<!-- Include Article Styles -->
+<link rel="stylesheet" href="style.css" />
+<!-- OLD buttons.css removed - using standalone ethics_essays_buttons.js instead -->
+<!-- <link rel="stylesheet" href="styles/buttons.css" /> -->
+<link rel="stylesheet" href="styles/download_button.css" />
+
+<!-- TextHighlighter.js Library -->
+<script src="https://unpkg.com/text-highlighter/dist/text-highlighter.min.js"></script>
+
+<style>
+/* --- Base --- */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: #f9fafb;
+  margin: 0;
+  padding: 2rem;
+  line-height: 1.6;
+  color: #1e293b;
+}
+.main-app-wrapper { max-width: 900px; margin: auto; }
+h2 { text-align: center; margin-bottom: 1rem; }
+.intro-text {
+  margin-bottom: 2rem;
+  padding: 1rem 1.5rem;
+  background: #f0f4ff;
+  border-left: 5px solid #6366f1;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #1e293b;
+}
+
+/* --- Poll Card --- */
+.poll-card {
+  margin-bottom: 2rem;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding-bottom: 3rem; /* space for tip */
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+}
+.poll-header {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  background: #fff;
+  border-radius: 1.25rem 1.25rem 0 0;
+}
+.poll-content {
+  display: none;
+  padding: 1.5rem;
+  font-size: 0.95rem;
+  border-radius: 0 0 1.25rem 1.25rem;
+  background: linear-gradient(135deg, #FFEED9, #F7F8FA, #DFF2DD);
+  transition: all 0.3s ease;
+}
+.poll-content.open { display: block; }
+.mindset { margin-bottom: 1rem; color: #374151; }
+
+/* --- Options --- */
+.poll-options { display: flex; flex-direction: column; gap: 0.5rem; }
+.poll-options span {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding: 0.5rem 1rem 0.5rem 2rem;
+  border-radius: 0.5rem;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.poll-options span:hover { background: #f0f9ff; }
+.poll-options span.selected {
+  background: #d0e7ff;
+  border-color: #7fbfff;
+  font-weight: bold;
+}
+.poll-options span.selected::before {
+  content: "✔";
+  color: #1d4ed8;
+  font-weight: bold;
+  position: absolute;
+  left: 0.5rem;
+}
+
+/* --- Result inside option --- */
+.result-inline {
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.4rem;
+  margin-left: 0.5rem;
+}
+
+/* --- Click to open tip --- */
+.poll-toggle-tip {
+  font-size: 0.75rem; /* slightly smaller */
+  text-align: center;
+  color: #111; /* darker text */
+  font-weight: normal; /* normal weight */
+  font-style: italic;
+  position: absolute;
+  bottom: 0.6rem; /* close to bottom edge */
+  width: 100%;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+.poll-toggle-tip::before { content: "* "; }
+.poll-content.open + .poll-toggle-tip { opacity: 0; height:0; margin:0; padding:0; }
+
+/* --- Submit Button --- */
+.submit-btn {
+  display: block;
+  margin: 2rem auto 0;
+  padding: 0.85rem 2rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  color: white;
+  background: #6366f1;
+  border: none;
+  cursor: not-allowed;
+  opacity: 0.6;
+  position: relative;
+}
+.submit-btn.enabled { cursor: pointer; opacity: 1; }
+.submit-btn[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  color: #fff;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.25rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* --- Loading Spinner --- */
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* --- Welcome Popup (Shows First) --- */
+.welcome-popup-overlay {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+.welcome-popup-overlay.fade-out {
+  opacity: 0;
+}
+.welcome-popup-box {
+  background: #ffffff;
+  padding: 25px 35px;
+  border-radius: 15px;
+  border: 3px solid #007BFF;
+  text-align: left;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+}
+.welcome-popup-box p {
+  margin: 15px 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: #008000;
+}
+.welcome-popup-box .highlight {
+  color: #fc7306;
+  font-weight: 800;
+}
+.welcome-vote-btn {
+  background: #FFDC80;
+  color: #8134af;
+  font-weight: bold;
+  font-size: 18px;
+  border: none;
+  padding: 14px 30px;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-top: auto;
+  align-self: center;
+  transition: 0.2s;
+}
+.welcome-vote-btn:hover {
+  background: #FFD700;
+}
+.welcome-temp-msg {
+  text-align: center;
+  display: none;
+  margin-top: 10px;
+}
+.welcome-temp-msg p {
+  margin: 10px 0;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+.welcome-vote-msg {
+  color: #008000;
+}
+.welcome-thank-msg {
+  background: #FFDC80;
+  color: #8134af;
+  font-weight: 700;
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 25px;
+}
+
+/* --- Profile Modal --- */
+.profile-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+.profile-modal-overlay.show {
+  display: flex;
+}
+.profile-modal {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+  text-align: center;
+}
+.profile-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+}
+.profile-modal-close:hover {
+  color: #1f2937;
+}
+.profile-modal h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #1e293b;
+}
+.profile-modal p {
+  margin-bottom: 1.5rem;
+  color: #475569;
+  font-size: 0.95rem;
+}
+.profile-modal-btn {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+.profile-modal-btn:hover {
+  background: #4f46e5;
+}
+
+/* --- Error Message --- */
+.error-message {
+  display: none;
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  text-align: center;
+  border: 1px solid #fecaca;
+}
+.error-message.show {
+  display: block;
+}
+</style>
+</head>
+<body>
+
+<!-- Unified Header Component (Banner + Navigation) -->
+<div id="header-placeholder"></div>
+
+<!-- Welcome Popup (Shows First) -->
+<div class="welcome-popup-overlay" id="welcomePopup">
+  <div class="welcome-popup-box">
+    <p>This section yearns for your opinion to build better posts on Ethics & Essay.</p>
+    <p>Your votes help <span class="highlight">Samyak Gyan</span> publish according to UPSC needs.</p>
+    <p>After submitting your opinion, you can read all articles.</p>
+
+    <button class="welcome-vote-btn" id="welcomeVoteBtn">Will Vote!</button>
+
+    <div class="welcome-temp-msg" id="welcomeMsgBox">
+      <p class="welcome-vote-msg">🙏 Please do vote!</p>
+      <p class="welcome-thank-msg">Thanks for your time</p>
+    </div>
+  </div>
+</div>
+
+<!-- TODO: BACKEND - Profile Check Modal -->
+<!-- Modal appears when non-logged-in user tries to vote -->
+<div class="profile-modal-overlay" id="profileModal">
+  <div class="profile-modal">
+    <button class="profile-modal-close" onclick="closeProfileModal()">&times;</button>
+    <h3>Create Your Profile to Participate</h3>
+    <p>You need to create a profile to participate in this poll and help shape our Ethics & Essay content.</p>
+    <a href="/profile.html">
+      <button class="profile-modal-btn">Create Profile</button>
+    </a>
+  </div>
+</div>
+
+<div class="main-app-wrapper">
+<h2>Essay & Ethics Polls</h2>
+
+<div class="intro-text">
+<strong>Shape the Future of Ethics & Essay Prep!</strong><br><br>
+While building our Ethics and Essay program, we analyzed previous UPSC questions and how aspirants actually prepare. What we discovered was striking: what UPSC expects and how aspirants approach Ethics and Essay are often out of sync.<br><br>
+That's why we need your voice. Your opinions will help us craft content that is not only closer to your needs but also fully aligned with UPSC expectations. By participating, you're helping us create nuanced, high-quality Ethics and Essay articles while giving the community a clear picture of collective insights.<br><br>
+Choose your options, submit, and then dive back into our Ethics and Essay resources—together, we can make preparation smarter, sharper, and more impactful.
+</div>
+
+<!-- Polls Q1-Q4 -->
+<!-- TODO: TEMPORARY FEATURE - This poll page is for marketing/onboarding (first 2-3 months).
+     After 2-3 months, remove this page and redirect /upsc-ethics-essays/ directly to latest content. -->
+
+<div class="poll-card" data-qid="q1">
+  <div class="poll-header">"Since UPSC often picks real public events, tweaks them, and tests your ethical stand to map your persona — do you feel you've read those stories but never paused to reflect, and only in the exam realized it was a missed chance?"</div>
+  <div class="poll-content">
+    <p class="mindset">"UPSC often frames Ethics questions around real public events, tweaking them to test your ethical stand and map your persona. Many aspirants read these events — administrative lapses, political decisions, corporate controversies, or citizen actions — but don't pause to reflect or note ethical points. Later, when similar cases appear in exams or mocks, it's a missed opportunity to showcase your depth and reasoning."</p>
+    <div class="poll-options">
+      <span data-opt="Yes, I have felt this!!">Yes, I have felt this!!</span>
+      <span data-opt="No, I have not felt this!!">No, I have not felt this!!</span>
+      <span data-opt="Not appeared in mains, but felt this in Mock Tests!!">Not appeared in mains, but felt this in Mock Tests!!</span>
+    </div>
+  </div>
+  <div class="poll-toggle-tip">Click to open</div>
+</div>
+
+<div class="poll-card" data-qid="q2">
+  <div class="poll-header">"When ethics prep gets pushed till after prelims, do your answers end up as half-forgotten definitions — without real examples or a clear stand — making them feel more like textbook imitations than what UPSC actually wants to judge?"</div>
+  <div class="poll-content">
+    <p class="mindset">"When Ethics preparation is delayed until after prelims, memorized definitions like honesty, integrity, and accountability often fade. Answers may end up theory-heavy, lacking real examples or personal viewpoints. UPSC evaluates your ability to apply principles, take a stand, and show judgment as a responsible administrator. Without applied reasoning, ethics answers can feel hollow and static."</p>
+    <div class="poll-options">
+      <span data-opt="Yes, I have felt that I have potential but feel unprepared!!">Yes, I have felt that I have potential but feel unprepared!!</span>
+      <span data-opt="No, I remember the basics and my answers show my true potential!!">No, I remember the basics and my answers show my true potential!!</span>
+    </div>
+  </div>
+  <div class="poll-toggle-tip">Click to open</div>
+</div>
+
+<div class="poll-card" data-qid="q3">
+  <div class="poll-header">"Do you agree that regularly reflecting on real-world events not only sharpens ethics prep, but also builds the exact mindset needed for essays?"</div>
+  <div class="poll-content">
+    <p class="mindset">"Essay and Ethics papers are like co-joined twins. While they test slightly different skills — essays allow broad exploration of a topic and Ethics focuses on today's events — both rely on the same core mindset: reflective, analytical, and able to connect real-world events with ethical reasoning. Engaging with news through an ethical lens builds a reservoir of examples, sharpens reasoning, and strengthens your ability to write authentic answers in both papers. Together, these papers are worth 500 marks and often decide final ranks."</p>
+    <div class="poll-options">
+      <span data-opt="Yes, I know this but there is paucity of time to ponder, and prepare accordingly!!">Yes, I know this but there is paucity of time to ponder, and prepare accordingly!!</span>
+      <span data-opt="No, I feel Essay & Ethics Orientation are separated!!">No, I feel Essay & Ethics Orientation are separated!!</span>
+    </div>
+  </div>
+  <div class="poll-toggle-tip">Click to open</div>
+</div>
+
+<div class="poll-card" data-qid="q4">
+  <div class="poll-header">"For a weekly digest of real-world events explained with ethical perspectives, what number of articles and weekly time commitment would be sufficient for you?"</div>
+  <div class="poll-content">
+    <p class="mindset">"Essay and Ethics reward answers that are authentic, and grounded in reality. Excelling in both requires a mindset that is analytical and emotionally intelligent, capable of connecting philosophical principles with real-world events. By reflecting on these curated news items, you can build a bank of examples, strengthen reasoning, and develop the thinking habits needed to write better answers — without adding extra burden to your GS preparation."</p>
+    <div class="poll-options">
+      <span data-opt="~2 articles per week (~30 min)">~2 articles per week (~30 min)</span>
+      <span data-opt="~5 articles per week + short essays (~1 hour)">~5 articles per week + short essays (~1 hour)</span>
+    </div>
+  </div>
+  <div class="poll-toggle-tip">Click to open</div>
+</div>
+
+<!-- Error Message -->
+<div class="error-message" id="errorMessage">
+  Couldn't save your vote. Please try again.
+</div>
+
+<button class="submit-btn" id="submitBtn" data-tooltip="Mark your choices in each question">Submit Poll</button>
+</div>
+
+<!-- ==================== ETHICS & ESSAY ARTICLES SECTION ==================== -->
+<div id="articlesSection" style="display: none;">
+  <div class="main-app-wrapper">
+    <h2 style="text-align: center; margin: 2rem 0 1rem 0; color: #1e293b;">Ethics & Essay Articles</h2>
+
+    <main id="articles-container">
+      <!-- Articles will be rendered here dynamically -->
+    </main>
+
+    <!-- Download Notes Button (appears in document flow, not fixed) -->
+    <div class="download-button-container">
+      <button id="downloadNotesBtn" class="download-button">
+        <span class="button-text"><span class="initial">G</span>et <span class="initial">Y</span>our <span class="initial">N</span>otes</span>
+        <span class="reg-symbol">&reg;</span>
+        <span class="tooltip">Highlights and Summaries from this week</span>
+      </button>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: #6b7280; font-size: 0.9rem;">
+      &copy; 2025 Samyak Gyan. All rights reserved.
+    </footer>
+  </div>
+</div>
+
+<script>
+(function () {
+  const submitBtn = document.getElementById('submitBtn');
+  const profileModal = document.getElementById('profileModal');
+  const errorMessage = document.getElementById('errorMessage');
+
+  // TODO: BACKEND - Check user authentication status on page load
+  // API endpoint: GET /api/user/auth-status
+  // Expected response: { isLoggedIn: true/false, userId: 123, username: "..." }
+
+  // ===== LOCAL TESTING MODE =====
+  // Set to true for local testing (bypasses profile requirement)
+  // Set to false for production (enforces login)
+  const LOCAL_TESTING_MODE = true;
+
+  let userIsLoggedIn = LOCAL_TESTING_MODE ? true : false;
+  let userId = LOCAL_TESTING_MODE ? 999 : null; // Mock user ID for testing
+
+  // Toggle poll content
+  document.querySelectorAll('.poll-header').forEach(header => {
+    header.addEventListener('click', () => {
+      header.nextElementSibling.classList.toggle('open');
+    });
+  });
+  document.querySelectorAll('.poll-toggle-tip').forEach(tip => {
+    tip.addEventListener('click', () => {
+      const content = tip.previousElementSibling;
+      content.classList.toggle('open');
+    });
+  });
+
+  // Profile modal functions
+  window.closeProfileModal = function() {
+    profileModal.classList.remove('show');
+  };
+
+  function showProfileModal() {
+    profileModal.classList.add('show');
+  }
+
+  // Option selection & submit button enable logic
+  const pollOptions = document.querySelectorAll('.poll-options span');
+  pollOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      // Check if user is logged in before allowing selection
+      if (!userIsLoggedIn) {
+        showProfileModal();
+        return; // Block selection
+      }
+
+      const siblings = option.parentElement.querySelectorAll('span');
+      siblings.forEach(s => s.classList.remove('selected'));
+      option.classList.add('selected');
+
+      const allAnswered = Array.from(document.querySelectorAll('.poll-card'))
+        .every(card => card.querySelector('.poll-options .selected'));
+
+      if (allAnswered) {
+        submitBtn.classList.add('enabled');
+        submitBtn.removeAttribute('data-tooltip');
+      } else {
+        submitBtn.classList.remove('enabled');
+        submitBtn.setAttribute('data-tooltip', 'Mark your choices in each question');
+      }
+    });
+  });
+
+  // Demo votes (will be replaced with real backend data)
+  const communityVotes = [
+    [10,3,7],
+    [5,15],
+    [12,8],
+    [4,10]
+  ];
+
+  // Submit logic
+  submitBtn.addEventListener('click', async () => {
+    if (!submitBtn.classList.contains('enabled')) return;
+
+    // Check authentication again before submit
+    if (!userIsLoggedIn) {
+      showProfileModal();
+      return;
+    }
+
+    // Disable button and show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span>Submitting...';
+    errorMessage.classList.remove('show');
+
+    // Collect user responses
+    const responses = [];
+    document.querySelectorAll('.poll-card').forEach(card => {
+      const qid = card.getAttribute('data-qid');
+      const selected = card.querySelector('.poll-options .selected');
+      if (selected) {
+        responses.push({
+          questionId: qid,
+          optionText: selected.getAttribute('data-opt')
+        });
+      }
+    });
+
+    // TODO: BACKEND - Submit poll responses to server
+    // API endpoint: POST /api/polls/submit
+    // Request body: { userId: userId, responses: responses }
+    // Expected success response: { success: true, voteCounts: [[10,3,7], [5,15], [12,8], [4,10]] }
+    // Expected error response: { success: false, error: "Error message" }
+
+    try {
+      // Simulate backend API call (remove this in production)
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
+
+      // Mock successful response (replace with real API call)
+      const mockResponse = {
+        success: true,
+        voteCounts: communityVotes
+      };
+
+      // Simulate random failure for testing (remove in production)
+      // if (Math.random() < 0.3) throw new Error('Network error');
+
+      if (mockResponse.success) {
+        // Show results
+        document.querySelectorAll('.poll-card').forEach((card, cardIndex) => {
+          const options = Array.from(card.querySelectorAll('.poll-options span'));
+          const votes = mockResponse.voteCounts[cardIndex] || options.map(()=>0);
+          const maxVotes = Math.max(...votes);
+
+          options.forEach((opt, idx) => {
+            if (opt.querySelector('.result-inline')) return;
+
+            const count = votes[idx];
+            const total = votes.reduce((a,b)=>a+b,0)||1;
+            const pct = ((count/total)*100).toFixed(1);
+
+            const res = document.createElement('span');
+            res.className = 'result-inline';
+
+            if (count === maxVotes) {
+              res.textContent = `★ ${count} votes (${pct}%)`;
+              res.style.backgroundColor = 'green';
+              res.style.color = 'white';
+            } else {
+              res.textContent = `${count} votes (${pct}%)`;
+              res.style.backgroundColor = 'red';
+              res.style.color = 'white';
+            }
+
+            opt.appendChild(res);
+          });
+        });
+
+        // Scroll to first poll question to show results (not to top)
+        const firstPollCard = document.querySelector('.poll-card');
+        if (firstPollCard) {
+          firstPollCard.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+
+        // Change button text
+        submitBtn.textContent = 'Go to Ethics & Essay';
+        submitBtn.disabled = false;
+
+        // Add click handler to show articles section
+        submitBtn.onclick = showArticlesSection;
+
+      } else {
+        throw new Error(mockResponse.error || 'Submission failed');
+      }
+
+    } catch (error) {
+      // Show error message
+      console.error('Poll submission error:', error);
+      errorMessage.textContent = 'Couldn\'t save your vote. Please try again.';
+      errorMessage.classList.add('show');
+
+      // Re-enable submit button
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Poll';
+      submitBtn.classList.add('enabled');
+    }
+  });
+
+  // TODO: BACKEND - On page load, check if user has already submitted this poll
+  // If yes, show results immediately (skip voting interface)
+  // API endpoint: GET /api/polls/user-response?userId=123
+  // Expected response: { hasVoted: true/false, previousResponses: [...], voteCounts: [...] }
+
+})();
+
+// ==================== SHOW/HIDE SECTIONS LOGIC ====================
+function showArticlesSection() {
+  // Hide poll section
+  document.querySelector('.main-app-wrapper').style.display = 'none';
+  document.getElementById('welcomePopup').style.display = 'none';
+
+  // Show articles section
+  document.getElementById('articlesSection').style.display = 'block';
+
+  // Render articles
+  renderEthicsEssayArticles();
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showPollSection() {
+  // Show poll section
+  document.querySelector('.main-app-wrapper').style.display = 'block';
+
+  // Hide articles section
+  document.getElementById('articlesSection').style.display = 'none';
+}
+
+// Check if user has already voted on page load
+async function checkUserVotingStatus() {
+  // TODO: BACKEND - Check if user has already submitted poll
+  // API endpoint: GET /api/polls/user-response?userId=123
+  // Expected response: { hasVoted: true/false, previousResponses: [...], voteCounts: [...] }
+
+  // Mock for testing - set to true to simulate "already voted" state
+  const hasAlreadyVoted = false; // Change to true to test returning user flow
+
+  if (hasAlreadyVoted) {
+    // User already voted - skip poll, go straight to articles
+    document.getElementById('welcomePopup').style.display = 'none';
+    showArticlesSection();
+  } else {
+    // User has not voted - show poll normally
+    showPollSection();
+  }
+}
+
+// ==================== WELCOME POPUP LOGIC ====================
+(function() {
+  const welcomePopup = document.getElementById('welcomePopup');
+  const welcomeVoteBtn = document.getElementById('welcomeVoteBtn');
+  const welcomeMsgBox = document.getElementById('welcomeMsgBox');
+
+  welcomeVoteBtn.addEventListener('click', () => {
+    // Hide button
+    welcomeVoteBtn.style.display = 'none';
+
+    // Show thank you message
+    welcomeMsgBox.style.display = 'block';
+
+    // After 1.5 seconds, fade out the whole popup
+    setTimeout(() => {
+      welcomePopup.classList.add('fade-out');
+      setTimeout(() => {
+        welcomePopup.style.display = 'none';
+      }, 600); // wait for fade transition to complete
+    }, 1500); // Changed from 3000ms to 1500ms (1.5 seconds)
+  });
+})();
+</script>
+
+<!-- Authentication Script (must be loaded first) -->
+<script src="scripts/auth.js"></script>
+
+<!-- Orientation Detection Script (load before header so functions are available) -->
+<script src="scripts/orientation-detection.js"></script>
+
+<!-- Load Unified Header Component -->
+<script>
+  fetch('components/header.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+
+      // Trigger orientation check after header is loaded
+      if (typeof checkOrientation === 'function') {
+        checkOrientation();
+      }
+
+      // Setup "Got it" handler after header is loaded
+      if (typeof setupGotItHandler === 'function') {
+        setupGotItHandler();
+      }
+
+      // Check user voting status after header loads
+      checkUserVotingStatus();
+    });
+</script>
+
+<!-- Article Rendering Script (copied from script.js, modified to remove Mindmaps and Prelims) -->
+<script src="scripts/ethics_essays_articles.js"></script>
+
+<!-- Button Functionality Scripts (Summary + Share - NO conditionality) -->
+<script src="scripts/ethics_essays_buttons.js"></script>
+<script src="scripts/download_button.js"></script>
+
+</body>
+</html>

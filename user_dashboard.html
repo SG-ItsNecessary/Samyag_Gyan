@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Journal - Samyak Gyan</title>
+<link rel="stylesheet" href="styles/header.css" />
+<link rel="stylesheet" href="styles/user_dashboard.css" />
+</head>
+<body>
+
+<!-- Unified Header Component (Banner + Navigation) -->
+<div id="header-placeholder"></div>
+
+<!-- Load Header Component -->
+<script>
+  fetch('components/header.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+
+      // Trigger orientation check after header is loaded
+      if (typeof checkOrientation === 'function') {
+        checkOrientation();
+      }
+
+      // Setup "Got it" handler after header is loaded
+      if (typeof setupGotItHandler === 'function') {
+        setupGotItHandler();
+      }
+    });
+</script>
+
+<!-- Orientation Detection Script -->
+<script src="scripts/orientation-detection.js"></script>
+
+<div class="main-app-wrapper">
+
+  <!-- My Stats & Compilations (TOP LEFT) -->
+  <div class="right-block">
+    <h3 id="stats-header">My Stats & Compilations</h3>
+    <div class="stats-buttons">
+      <!-- Each button updates the dynamic panel header -->
+      <button class="stat-btn active" data-target="reading">Reading Insight</button>
+      <button class="stat-btn" data-target="voting">Voting Pattern</button>
+      <button class="stat-btn" data-target="notes">Notes Dashboard</button>
+      <button class="stat-btn" data-target="time">Time Spent</button>
+      <button class="stat-btn" data-target="bookmarked">Bookmarked Articles</button>
+    </div>
+  </div>
+
+  <!-- Personal & Account Info (TOP RIGHT, stacked vertically) -->
+  <div class="left-block">
+    <!-- Personal Info (Name editable, Language selectable) -->
+    <div class="info-box">
+      <h3>Personal Info</h3>
+      <div class="info-row">
+        <span class="label">Name:</span>
+        <input type="text" id="user-name" value="Deepanshu Anand" disabled>
+      </div>
+      <div class="info-row">
+        <span class="label">Language:</span>
+        <select id="user-language" disabled>
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+        </select>
+      </div>
+      <button id="edit-info">Edit / Save</button>
+      <!-- Note: Bhashini API triggers if Hindi is selected -->
+    </div>
+
+    <!-- Account Info (ID, Date Joined, Subscription & Topic Access) -->
+    <div class="info-box">
+      <h3>Account Info</h3>
+      <div class="subscription-section">
+        <div class="subscription-row">
+          <span class="subscription-label">Subscription:</span>
+          <!-- Active = transparent, Inactive = red -->
+          <button class="subscription-btn subscription-active">Active</button>
+          <button class="subscription-btn subscription-inactive">Inactive</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:0.3rem; margin-top:0.5rem;">
+          <!-- Topics: Current Affairs & Ethics -->
+          <button class="topic-chip current-affairs">Current Affairs</button>
+          <button class="topic-chip ethics-essay inactive" title="Subscription ended. Click to subscribe.">Ethics & Essay</button>
+          <!-- Logic: Transparent = active, Red = inactive -->
+          <!-- Determines access to navigation pages & homepage content -->
+        </div>
+      </div>
+      <div class="info-row">
+        <span class="label">User ID:</span>
+        <span class="value" id="user-id">TG_123456</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Date Joined:</span>
+        <span class="value" id="date-joined">10 Oct 2025</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DYNAMIC PANEL -->
+<div id="dynamic-content" class="dynamic-panel">
+  <!-- Dynamic header chip reflects currently selected My Stats button -->
+  <div id="dynamic-chip">Reading Insight</div>
+
+  <div class="analytics-panel">
+    <div class="analytics-chips">
+      <!-- Month dropdown -->
+      <div class="month-dropdown">
+        <select id="month-select">
+          <option value="" selected>Month</option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+      </div>
+
+      <!-- Fortnight selectors (only one active at a time) -->
+      <div class="fortnight-chip active" id="first-fortnight" data-fortnight="1">1st Fortnight</div>
+      <div class="fortnight-chip" id="second-fortnight" data-fortnight="2">2nd Fortnight</div>
+    </div>
+
+    <!-- Placeholder for charts/statistics based on user selections -->
+    <div class="chart-placeholder">
+      Chart / Stats will appear here based on selected month & fortnight
+    </div>
+  </div>
+</div>
+
+<script>
+// --- Dynamic panel header updates based on My Stats button selection ---
+const statBtns = document.querySelectorAll(".stat-btn");
+const dynamicChip = document.getElementById("dynamic-chip");
+statBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    statBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    dynamicChip.textContent = btn.textContent;
+  });
+});
+
+// --- Fortnight chips toggle (only one active at a time) ---
+const fortnightChips = document.querySelectorAll(".fortnight-chip");
+fortnightChips.forEach(chip => {
+  chip.addEventListener("click", () => {
+    fortnightChips.forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+  });
+});
+
+// --- Personal Info Editing & Language Selection ---
+const editBtn = document.getElementById("edit-info");
+const nameInput = document.getElementById("user-name");
+const langSelect = document.getElementById("user-language");
+let isEditing = false;
+
+editBtn.addEventListener("click", () => {
+  if (!isEditing) {
+    nameInput.disabled = false;
+    langSelect.disabled = false;
+    editBtn.textContent = "Save";
+    editBtn.style.backgroundColor = "#2ecc71";
+    isEditing = true;
+  } else {
+    nameInput.disabled = true;
+    langSelect.disabled = true;
+    editBtn.textContent = "Edit / Save";
+    editBtn.style.backgroundColor = "#fc7306";
+    isEditing = false;
+    console.log("Profile saved:", nameInput.value, langSelect.value);
+    // TODO: Save to backend
+  }
+});
+
+// --- Subscription Logic ---
+// TODO: Fetch subscription status from user database / Telegram data
+// TODO: Apply CSS classes: subscription-active or subscription-inactive
+// TODO: For topic access, toggle .inactive class based on subscription
+// TODO: For inactive subscription, show tooltip with "Click to subscribe"
+</script>
+
+</body>
+</html>

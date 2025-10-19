@@ -292,3 +292,337 @@ button:active {
     transform: scale(1.07);
     box-shadow: 0 0 8px rgba(196, 181, 253, 0.5);
 }
+
+/* --- Home Icon (Inside Nav Ribbon) --- */
+.home-icon {
+    font-size: 1.7rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.home-icon:hover {
+    transform: scale(1.1);
+}
+
+/* --- Banner Styles --- */
+.banner-container {
+    width: 100%;
+    height: 100px;
+        background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-bottom: 1rem;
+    border-radius: 0.85rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+
+
+.banner-container:hover {
+    opacity: 0.9;
+}
+
+/* Responsive banner sizing */
+@media (max-width: 768px) {
+    .banner-container {
+        height: 120px;
+        border-radius: 0.5rem;
+        background-size: contain;
+    }
+}
+
+/* Tablet breakpoint */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .banner-container {
+        height: 180px;
+        background-size: contain;
+    }
+}
+
+/* --- Hamburger Menu Button (Mobile Only, inside nav) --- */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    margin-left: auto;
+}
+
+.hamburger-line {
+    width: 25px;
+    height: 3px;
+    background-color: #1f2937;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Mobile container adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        border-radius: 1rem;
+    }
+}
+
+/* --- Titles & Dividers --- */
+h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    text-align: center;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+.divider { width:100%; height:2px; background:#9f9c96; }
+.section-title { font-family:'Georgia', serif; font-size:2rem; font-weight:300; text-align:center; color:#1f2937; margin:0.5rem 0; letter-spacing:0.5px; }
+
+/* Responsive title sizing */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    .section-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* --- Recent Upload Buttons: Circular/rounded borders --- */
+.recent-btn {
+    border-radius:50px;
+}
+.btn-saffron { background:white; border:2px solid #FF671F; color:#FF671F; font-weight:700; }
+.btn-white { background:white; border:2px solid #6366f1; color:#2563eb; font-weight:700; }
+.btn-green { background:white; border:2px solid #046a38; color:#046a38; font-weight:700; }
+
+/* --- Latest Upload: Clean white background, circular/rounded --- */
+.btn-latest {
+    font-size:1.5rem;
+    font-weight:700;
+    padding:1.5rem 3rem;
+    border-radius:50px;
+    min-width:280px;
+    text-align:center;
+    display:block;
+    margin:1rem auto;
+    color:#004aad !important;
+    background: none !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    border: 2px solid #004aad !important;
+}
+
+/* Override tricolor gradient for latest upload button */
+.btn-latest.btn-tri-color {
+    background: none !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    border: 2px solid #004aad !important;
+    color: #004aad !important;
+}
+
+/* Responsive latest button */
+@media (max-width: 768px) {
+    .btn-latest {
+        font-size: clamp(0.9rem, 3vw, 1.25rem) !important;
+        padding: 1rem 1.5rem !important;
+        min-width: auto !important;
+        width: 100% !important;
+        max-width: 300px !important;
+        display: block !important;
+        visibility: visible !important;
+        margin: 0.75rem auto !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-latest {
+        font-size: clamp(0.8rem, 3vw, 1.1rem) !important;
+        padding: 0.85rem 1.25rem !important;
+        width: 100% !important;
+        max-width: 280px !important;
+        margin: 0.5rem auto !important;
+    }
+}
+
+/* --- Mobile Date Selector (Portrait only) --- */
+.mobile-date-selector {
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    gap: 1.5rem;
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    width: 100%;
+}
+
+.mobile-date-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mobile-date-input-group label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.mobile-date-input {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    color: #1f2937;
+    cursor: pointer;
+}
+
+.mobile-date-input:focus {
+    outline: none;
+    border-color: #004aad;
+}
+
+.selected-date-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.date-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #004aad, #0066ff);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 74, 173, 0.3);
+}
+
+.date-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.date-month {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+}
+
+/* --- Calendar (Full grid for desktop/landscape) --- */
+.calendar {
+    margin-top:0.3rem;
+    background:#f9fafb;
+    padding:1.5rem;
+    border-radius:1rem;
+    box-shadow:inset 0 2px 5px rgba(0,0,0,0.05);
+}
+.calendar-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:1rem;
+}
+.month-title {
+    font-size:1.25rem;
+    font-weight:600;
+    color:#374151;
+    flex: 1;
+    text-align: center;
+}
+#prev-month, #next-month {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 1.5rem;
+    visibility: visible !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #374151;
+    font-weight: bold;
+}
+.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:0.5rem; text-align:center; font-size:0.875rem; }
+.weekday { font-weight:500; color:#6b7280; }
+.day-cell { padding:0.5rem; border-radius:0.75rem; cursor:pointer; color:#4b5563; }
+.day-active { background:#c7d2fe; color:#4338ca; font-weight:600; }
+.day-cell:hover { background:#e0e7ff; }
+
+/* === MOBILE PORTRAIT: Show mobile date picker, hide full calendar === */
+@media (max-width: 768px) and (orientation: portrait) {
+    .mobile-date-selector {
+        display: flex !important;
+    }
+    .calendar-full {
+        display: none !important;
+    }
+}
+
+/* === DESKTOP, TABLET, MOBILE LANDSCAPE: Show full calendar, hide picker === */
+@media (min-width: 769px), (max-width: 768px) and (orientation: landscape) {
+    .mobile-date-selector {
+        display: none !important;
+    }
+    .calendar-full {
+        display: block !important;
+    }
+}
+
+/* Mobile calendar adjustments */
+@media (max-width: 768px) {
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    #prev-month, #next-month {
+        min-width: 32px;
+        min-height: 32px;
+        font-size: 1.3rem;
+        visibility: visible !important;
+        display: flex !important;
+        flex-shrink: 0;
+    }
+    .month-title {
+        font-size: clamp(0.9rem, 3vw, 1.1rem);
+        flex: 1;
+        text-align: center;
+    }
+    .calendar-grid {
+        gap: 0.3rem;
+        font-size: 0.75rem;
+    }
+    .day-cell {
+        padding: 0.2rem;
+        font-size: 0.6rem;
+    }
+}

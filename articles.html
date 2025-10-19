@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samyak Gyan</title>
+  <link rel="stylesheet" href="styles/header.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="styles/buttons.css" />
+  <link rel="stylesheet" href="styles/download_button.css" />
+
+  <!-- TextHighlighter.js Library -->
+  <script src="https://unpkg.com/text-highlighter/dist/text-highlighter.min.js"></script>
+</head>
+<body>
+  <div class="main-app-wrapper">
+    <div id="article-meta" data-article-id="AUG06-ECON-INDIA" style="display: none;"></div>
+
+    <!-- Unified Header Component (Banner + Navigation) -->
+    <div id="header-placeholder"></div>
+
+  <div id="tile-overlay" class="tile-overlay"></div>
+
+  <!-- Tooltip for Homepage Tiles -->
+  <!-- <div id="tile-tooltip" class="tile-tooltip">
+    💡
+    <ul>
+      <li>Every Feature Can Be Used On Mobile.</li>
+      <li>For 10/10 Experience, Use On Tablets And Laptops.</li>
+      <li>The Website Is Content And Feature Rich.</li>
+      <li>Usage Is Best Suited For Larger Screens.</li>
+    </ul>
+    <!-- Tool Tip Edit Later --> 
+
+  </div>  <main id="articles-container">
+    <!-- TILE TEMPLATE (collapsed structure only) -->
+    <div class="article-tile" data-expanded="false">
+      <div class="ribbon-top-left source-ribbon">SOURCE</div>
+      <div class="ribbon-right-top section-ribbon">SECTION</div>
+      <div class="ribbon-right-below usability-ribbon">USABILITY</div><div class="article-title">TITLE</div>
+  <div class="tags">#TAG1 #TAG2 #TAG3</div>
+
+  <!-- Placeholder for dynamic content to be injected by JS -->
+  <div class="dynamic-article-content" style="display: none;"></div>
+    
+  <div class="arrow-container">
+    <button class="main-arrow-btn">
+      <div class="css-arrow"></div>
+    </button>
+  </div>
+</div>
+<!--More tiles as inject dynamically -->
+
+  </main>
+
+  <!-- Download Notes Button (Fixed at Bottom Center) -->
+  <div class="download-button-container">
+    <button id="downloadNotesBtn" class="download-button">
+      <span class="button-text"><span class="initial">G</span>et <span class="initial">Y</span>our <span class="initial">N</span>otes</span>
+      <span class="reg-symbol">&reg;</span>
+      <span class="tooltip">Highlights and Summaries from Today</span>
+    </button>
+  </div>
+
+  <footer>
+    &copy; 2025 Samyak Gyan. All rights reserved.
+  </footer>  <div id="floating-image-viewer" class="floating-viewer hidden">
+    <div class="floating-image-header">
+      <span class="floating-image-title">Mindmap</span>
+      <button id="close-floating-image" class="floating-image-close">×</button>
+    </div>
+    <div class="floating-image-content">
+      <img id="floating-image" src="" alt="Mindmap Preview" />
+    </div>
+  </div>
+
+  <!-- Authentication Script (must be loaded first) -->
+  <script src="scripts/auth.js"></script>
+
+  <!-- Orientation Detection Script (load before header so functions are available) -->
+  <script src="scripts/orientation-detection.js"></script>
+
+  <!-- Load Unified Header Component -->
+  <script>
+    fetch('components/header.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('header-placeholder').innerHTML = html;
+
+        // Trigger orientation check after header is loaded
+        if (typeof checkOrientation === 'function') {
+          checkOrientation();
+        }
+
+        // Setup "Got it" handler after header is loaded
+        if (typeof setupGotItHandler === 'function') {
+          setupGotItHandler();
+        }
+      });
+  </script>
+
+  <!-- Main Article Script -->
+  <script src="script.js"></script>
+
+  <!-- Button Interaction Script -->
+  <script src="scripts/buttons.js"></script>
+
+  <!-- Download Notes Button Script -->
+  <script src="scripts/download_button.js"></script>
+
+  <!-- Auth Protection & User Display -->
+  <script>
+    // Require authentication for this page
+    requireAuth();
+
+    // Display user info in header
+    displayUserInfo('user-info');
+
+    // Check trial status
+    showTrialWarningIfNeeded();
+  </script>
+  </div>
+
+  <!-- Dialog Overlay and Modals -->
+  <div class="dialog-overlay" id="dialogOverlay"></div>
+
+  <!-- Read Dialog -->
+  <div class="sg-dialog" id="dialog-read" role="dialog" aria-modal="true" aria-labelledby="dialog-read-title">
+    <h2 id="dialog-read-title">Action Needed: Click <strong class="button-like">Read?</strong></h2>
+    <p>
+      <span class="arrow-bullet">Samyak Gyan needs this click as your official <span class="bold-italic-underline">"I read this"</span> signal.</span>
+      <span class="arrow-bullet">Once you confirm, Samyak Gyan unlocks every tool — <span class="bold-italic-underline">Bookmark</span>, <span class="bold-italic-underline">Summary</span>, and <span class="bold-italic-underline">Vote</span>.</span>
+      <span class="arrow-bullet">Then begins your personal article count.</span>
+      <span class="arrow-bullet">That's how Samyak Gyan tracks your <span class="bold-italic-underline">reading</span>.</span>
+    </p>
+    <button class="btn primary" data-close>Got it</button>
+  </div>
+
+  <!-- Vote Dialog -->
+  <div class="sg-dialog" id="dialog-vote" role="dialog" aria-modal="true" aria-labelledby="dialog-vote-title">
+    <h2 id="dialog-vote-title">Action Needed: Click <strong class="button-like">Vote</strong></h2>
+    <p>
+      <span class="arrow-bullet">Samyak Gyan takes the liberty of (<span class="bold-italic-underline">Website</span>) to explain issues for <span class="bold-italic-underline">deeper understanding</span>.</span>
+      <span class="arrow-bullet">If you believe an article is important, Samyak Gyan asks you to <span class="bold-italic-underline">vote</span> for it!</span>
+<span class="arrow-bullet">
+    <span class="all-caps-bold">TOP 5 VOTED</span> articles each day will be included in the 
+    <span class="bold-italic">Mains-Ready Magazine</span>.
+</span>
+      <span class="arrow-bullet">Editorials will always be part of the magazine, so you don't need to vote for them.</span>
+      <span class="arrow-bullet">Read Here → Download Your Own Notes Daily → Read /Revise from Magazine  & Done.</span>
+      <span class="arrow-bullet"><span class="all-caps-bold">NO HAND WRITTEN NOTES NEEDED !!</span></span>
+    </p>
+    <button class="btn primary" data-close>Got it</button>
+  </div>
+
+  <!-- Bookmark Dialog -->
+  <div class="sg-dialog" id="dialog-bookmark" role="dialog" aria-modal="true" aria-labelledby="dialog-bookmark-title">
+    <h2 id="dialog-bookmark-title">Click <strong class="button-like">Bookmark</strong></h2>
+    <p>
+      <span class="arrow-bullet">If you find an article revision-worthy, Samyak Gyan suggests you <span class="bold-italic-underline">bookmark</span> it for later.</span>
+      <span class="arrow-bullet">This saves the article directly to your <span class="bold-italic">Journal</span>, always ready whenever you need to revise.</span>
+    </p>
+    <button class="btn primary" data-close>Got it</button>
+  </div>
+
+  <!-- Summary Dialog -->
+  <div class="sg-dialog" id="dialog-summary" role="dialog" aria-modal="true" aria-labelledby="dialog-summary-title">
+    <h2 id="dialog-summary-title">Use this button as your Notepad <strong class="button-like" style="background:#d93025;">Summary</strong></h2>
+    <p>
+      <span class="arrow-bullet">Jot down notes in any way you like — informal or rough — whatever helps you understand and revise.</span>
+      <span class="arrow-bullet">Anything you write here becomes part of your daily downloaded notes.</span>
+      <span class="arrow-bullet">Your downloaded notes will include:</span>
+    </p>
+    <p style="padding-left: 1.5rem;">
+      • Article title<br>
+      • Source<br>
+      • Why you should read it?? (Prelude)<br>
+      • Key attributes of the article (Dates etc.)<br>
+      • Important content, including:
+    </p>
+    <p style="padding-left: 3rem;">
+      • Header Questions<br>
+      • Text you've highlighted<br>
+      • Summary box content
+    </p>
+    <button class="btn primary" data-close>Got it</button>
+  </div>
+
+  <!-- Read First Dialog (shown when trying to use features without reading) -->
+  <div class="sg-dialog" id="dialog-read-first" role="dialog" aria-modal="true" aria-labelledby="dialog-read-first-title">
+    <h2 id="dialog-read-first-title">Please Click <strong class="button-like">Read??</strong> Button</h2>
+    <p>
+      <span class="arrow-bullet">You must click the <span class="bold-italic-underline">Read??</span> button first before using other features.</span>
+      <span class="arrow-bullet">This confirms you've read the article and unlocks <span class="bold-italic-underline">Vote</span>, <span class="bold-italic-underline">Bookmark</span>, and <span class="bold-italic-underline">Summary</span> buttons.</span>
+      <span class="arrow-bullet">Look for the <span class="bold-italic-underline">Read??</span> button at the top of the article's button row.</span>
+    </p>
+    <button class="btn primary" data-close>Got it</button>
+  </div>
+
+  <!-- Dialog JavaScript -->
+  <script>
+    const sgDialogs = document.querySelectorAll('.sg-dialog');
+    const dialogOverlay = document.getElementById('dialogOverlay');
+    const closeDialogButtons = document.querySelectorAll('[data-close]');
+
+    function showDialog(dialogId){
+      dialogOverlay.classList.add('show');
+      document.getElementById(dialogId).classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAllDialogs(){
+      sgDialogs.forEach(d => d.classList.remove('show'));
+      dialogOverlay.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    closeDialogButtons.forEach(btn => btn.addEventListener('click', closeAllDialogs));
+    dialogOverlay.addEventListener('click', closeAllDialogs);
+
+    // Export to global scope for info icons
+    window.showDialog = showDialog;
+    window.closeAllDialogs = closeAllDialogs;
+  </script>
+</body>
+</html>

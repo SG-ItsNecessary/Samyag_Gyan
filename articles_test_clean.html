@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samyak Gyan - TextHighlighter Test (Clean)</title>
+  <link rel="stylesheet" href="styles/header.css" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- TextHighlighter.js Library -->
+  <script src="https://unpkg.com/text-highlighter/dist/text-highlighter.min.js"></script>
+</head>
+<body>
+  <div class="main-app-wrapper">
+    <div id="article-meta" data-article-id="TEST-ARTICLE-001" style="display: none;"></div>
+
+    <!-- Unified Header Component (Banner + Navigation) -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Articles Container -->
+    <main id="articles-container">
+
+      <!-- ARTICLE TILE 1 -->
+      <div class="article-tile expanded" data-expanded="true">
+        <div class="ribbon-top-left source-ribbon" style="background-color: #009688;">The Hindu</div>
+        <div class="ribbon-right-below usability-ribbon">GS2 + Essay</div>
+
+        <div class="article-title">Digital Public Infrastructure in India</div>
+        <div class="tags">#Governance #DigitalIndia #CurrentAffairs</div>
+
+        <div class="article-date" style="display: block;">18 July 2025</div>
+
+        <!-- Prelude Section -->
+        <div class="prelude-section" style="display: block;">
+          <span class="prelude-title">Why should I read it?</span>
+          <span class="prelude-body">It ties digital India with delivery on the ground. You'll see governance come alive in numbers. Also, it's a gem for GS2 introductions.</span>
+        </div>
+
+        <!-- MAIN CONTENT AREA - HIGHLIGHT ZONE -->
+        <div class="content-area highlight-zone" style="display: block;">
+
+          <span class="question" data-main_question_id="101" data-article_id="1" data-language="en">
+            ✦ What is Digital Public Infrastructure (DPI)?
+          </span>
+
+          <p class="answer" data-main_answer_id="201" data-main_question_id="101" data-article_id="1" data-language="en">
+            DPI refers to foundational systems like Aadhaar, UPI, DigiLocker and more that create a base for scalable public digital services. These systems enable identity, payments, and document verification at scale. Together, they make service delivery faster, cheaper, and more inclusive. This public-facing technology stack is built on open standards, promoting a shared ecosystem for innovation.
+          </p>
+
+          <span class="question" data-main_question_id="102" data-article_id="1" data-language="en">
+            ✦ How is DPI transforming governance?
+          </span>
+
+          <p class="answer" data-main_answer_id="202" data-main_question_id="102" data-article_id="1" data-language="en">
+            Government schemes use Aadhaar-based DBT to directly transfer benefits, avoiding middlemen and leakages. DigiLocker digitizes records like driving licenses and academic certificates. UPI allows anyone with a phone and bank account to send or receive payments instantly, without transaction fees. This direct transfer model has revolutionized welfare distribution, ensuring that subsidies reach the intended beneficiaries efficiently.
+          </p>
+
+          <span class="question" data-main_question_id="103" data-article_id="1" data-language="en">
+            ✦ Why is India's model globally praised?
+          </span>
+
+          <p class="answer" data-main_answer_id="203" data-main_question_id="103" data-article_id="1" data-language="en">
+            India's DPI stack is open, low-cost, scalable, and sovereign. It's being adapted by countries in Africa, Latin America, and Southeast Asia. The absence of corporate dependencies (like GAFA) makes it attractive for nations seeking self-reliance in digital governance. This approach provides a viable alternative to proprietary, corporate-driven models, which often come with high costs and data control issues.
+          </p>
+
+        </div>
+        <!-- END CONTENT AREA -->
+
+      </div>
+      <!-- END ARTICLE TILE 1 -->
+
+      <!-- ARTICLE TILE 2 -->
+      <div class="article-tile expanded" data-expanded="true" style="margin-top: 2rem;">
+        <div class="ribbon-top-left source-ribbon" style="background-color: #8BC34A;">Indian Express</div>
+        <div class="ribbon-right-below usability-ribbon">GS3 Case Study + SDG</div>
+
+        <div class="article-title">India's Renewable Energy Transition</div>
+        <div class="tags">#Environment #Energy #GS3</div>
+
+        <div class="article-date" style="display: block;">18 July 2025</div>
+
+        <!-- Prelude Section -->
+        <div class="prelude-section" style="display: block;">
+          <span class="prelude-title">Why should I read it?</span>
+          <span class="prelude-body">This ties India's green push to global promises. Makes SDGs, solar parks and hydrogen efforts easy to cite. Every sentence can become a pointer in notes.</span>
+        </div>
+
+        <!-- MAIN CONTENT AREA - HIGHLIGHT ZONE -->
+        <div class="content-area highlight-zone" style="display: block;">
+
+          <span class="question" data-main_question_id="104" data-article_id="2" data-language="en">
+            ✦ Why renewable energy for India?
+          </span>
+
+          <p class="answer" data-main_answer_id="204" data-main_question_id="104" data-article_id="2" data-language="en">
+            India has rising energy needs, a large rural population, and global climate commitments. Renewable sources like solar and wind offer sustainable, decentralized alternatives to coal-based energy. Clean energy reduces pollution and dependency on imported oil. Shifting to renewables also enhances the country's energy security, protecting it from volatile international fuel markets.
+          </p>
+
+          <span class="question" data-main_question_id="105" data-article_id="2" data-language="en">
+            ✦ What major steps has India taken?
+          </span>
+
+          <p class="answer" data-main_answer_id="205" data-main_question_id="105" data-article_id="2" data-language="en">
+            The National Solar Mission has scaled solar parks across states. New incentives encourage green hydrogen and battery storage. India aims to install 500 GW of non-fossil capacity by 2030, supporting SDG 7 (Affordable & Clean Energy). The government has implemented a Production Linked Incentive (PLI) scheme to boost domestic manufacturing of solar PV modules and advanced chemistry cells.
+          </p>
+
+          <span class="question" data-main_question_id="106" data-article_id="2" data-language="en">
+            ✦ What challenges remain?
+          </span>
+
+          <p class="answer" data-main_answer_id="206" data-main_question_id="106" data-article_id="2" data-language="en">
+            Energy storage tech is still evolving. Land acquisition delays big projects. Transmission infrastructure needs investment. The intermittent nature of solar and wind power requires sophisticated grid management and large-scale battery storage solutions. Social challenges include the potential for job displacement in the traditional coal industry and the need for reskilling the workforce.
+          </p>
+
+        </div>
+        <!-- END CONTENT AREA -->
+
+      </div>
+      <!-- END ARTICLE TILE 2 -->
+
+    </main>
+
+    <footer>
+      &copy; 2025 Samyak Gyan. All rights reserved.
+    </footer>
+
+  </div>
+
+  <!-- Load Unified Header Component -->
+  <script>
+    fetch('components/header.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('header-placeholder').innerHTML = html;
+      })
+      .catch(err => console.log('Header load skipped:', err));
+  </script>
+
+  <!-- PURE LIBRARY TEST SCRIPT -->
+  <script src="script_test_clean.js"></script>
+
+  <!-- Orientation Detection Script -->
+  <script src="scripts/orientation-detection.js"></script>
+
+</body>
+</html>

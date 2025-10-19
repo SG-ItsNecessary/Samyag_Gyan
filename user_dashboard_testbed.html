@@ -1,0 +1,2653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Journal - Testbed - Samyak Gyan</title>
+<link rel="stylesheet" href="styles/header.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: system-ui, sans-serif; background-color:#f3f4f6; color:#1f2937; padding:1rem; }
+
+/* Layout - HORIZONTAL SIDE-BY-SIDE */
+.main-app-wrapper {
+  max-width:1200px; margin:1rem auto 0 auto; display:flex; flex-direction:row;
+  gap:1.5rem; flex-wrap:nowrap; align-items:stretch;
+}
+
+/* Left Block - Compact */
+.left-block {
+  flex:1 1 50%; background-color: rgba(255,255,255,0.1); padding:0.8rem 1rem;
+  border-radius:0.5rem; border:2px solid #888; box-shadow:0 3px 8px rgba(0,0,0,0.08);
+  display:flex; flex-direction:column;
+}
+#stats-header { text-align:center; margin-bottom:0.6rem; font-weight:bold; font-size:1rem; }
+.stats-buttons { display:flex; flex-direction:column; gap:0.4rem; width:100%; }
+.stat-btn {
+  padding:0.3rem 0.6rem; border-radius:1.5rem; border:1px solid #ccc; background-color:white;
+  cursor:pointer; text-align:center; font-size:0.8rem; font-weight:600; transition: all 0.2s ease;
+}
+.stat-btn:hover { transform: scale(1.02); box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+.stat-btn.active { background-color:#ff8775; border-color:#ccc; }
+
+/* Right Block - Compact */
+.right-block {
+  flex:1 1 50%; background-color: rgba(255,255,255,0.1); padding:0.8rem 1rem;
+  border-radius:0.5rem; border:2px solid #888; box-shadow:0 3px 8px rgba(0,0,0,0.08);
+  display:flex; flex-direction:column;
+}
+.info-box { position:relative; width:100%; }
+
+/* User ID & Date - Compact */
+.user-id-row { display:flex; justify-content:space-between; margin-bottom:0.4rem; font-weight:bold; font-size:0.85rem; }
+
+/* Name & Language - Compact */
+.info-row { display:flex; align-items:center; margin-bottom:0.25rem; }
+.info-row label { font-weight:600; margin-right:4px; flex-shrink:0; font-size:0.85rem; }
+.info-row input[type="text"], .info-row select { padding:0.2rem 0.3rem; font-size:0.85rem; flex-shrink:0; width:auto; }
+
+/* Edit Button - Compact */
+#edit-info { padding:0.2rem 0.5rem; font-size:0.75rem; border:none; border-radius:0.3rem; background-color:#fc7306; color:white; cursor:pointer; margin-left:auto; }
+
+/* Divider - Compact */
+hr { margin:4px 0; border:1px solid #ccc; }
+
+/* Subscriptions Section - Compact */
+.subscriptions-section { text-align:center; margin-top:0.15rem; display:flex; flex-direction:column; gap:0.25rem; }
+.subscriptions-title { font-weight:bold; font-size:1rem; text-align:center; margin-bottom:1px; }
+
+/* Trial & Extend Trial - Compact */
+.trial-extend-container { display:flex; justify-content:space-between; align-items:center; gap:0.4rem; margin-bottom:3px; }
+#trial-end { background-color:white; color:green; border:1px solid green; padding:0.2rem 0.4rem; border-radius:0.3rem; font-weight:bold; font-size:0.8rem; flex-shrink:0; }
+#extend-trial { background-color:white; color:#FF0000; border:2px solid #FF0000; border-radius:0.3rem; padding:0.25rem 0.55rem; cursor:pointer; font-weight:200; font-size:0.8rem; flex-shrink:0; animation: blink 1.2s infinite; }
+@keyframes blink { 0%,50%,100% { border-color:#FF0000; } 25%,75% { border-color:transparent; } }
+
+/* Topic Chips - Compact + State Management */
+.topic-container { display:flex; justify-content:flex-start; gap:8px; margin-top:2px; align-items:center; flex-wrap:wrap; }
+.topic-chip { padding:0.2rem 0.5rem; border-radius:1.2rem; border:2px solid black; font-size:0.8rem; font-weight:700; cursor:pointer; text-align:center; min-width:100px; transition: all 0.3s ease; }
+
+/* Active subscription: transparent background */
+.topic-chip.active { background-color:transparent; color:#333; }
+
+/* Inactive subscription: red background */
+.topic-chip.inactive { background-color:#FF0000; color:white; border-color:#FF0000; }
+
+/* Subscript note - Compact */
+.subscribe-note { font-size:0.65rem; text-align:right; margin-top:1px; font-style:italic; color:#333; }
+
+/* Dynamic Panel */
+.dynamic-panel { margin-top:2rem; padding:2rem 1.5rem; background-color:white; border-radius:0.5rem; border:2px solid #888; box-shadow:0 3px 8px rgba(0,0,0,0.08); width:100%; text-align:center; }
+#dynamic-chip { display:inline-block; padding:1rem 2rem; border-radius:2rem; border:1px solid #ccc; background-color:#ff8775; font-weight:700; font-size:1.4rem; margin-bottom:2rem; }
+.analytics-panel { display:flex; flex-direction:column; align-items:center; gap:1.5rem; }
+.analytics-chips { display:flex; justify-content:center; align-items:center; gap:2.5rem; flex-wrap:wrap; }
+.month-dropdown { position:relative; display:inline-flex; align-items:center; justify-content:center; background-color:white; border:1px solid #ccc; border-radius:2rem; padding:0.5rem 1.2rem; font-weight:600; cursor:pointer; }
+.month-dropdown select { border:none; background:transparent; font:inherit; padding-right:1rem; cursor:pointer; outline:none; }
+.month-dropdown::after { content:""; }
+.fortnight-chip { padding:0.45rem 1rem; border-radius:2rem; border:1px solid #ccc; background-color:white; cursor:pointer; font-size:0.9rem; font-weight:600; transition:all 0.2s ease; }
+.fortnight-chip.active { background-color:#ff8775; border-color:#ccc; }
+.chart-placeholder { margin-top:1.5rem; width:90%; max-width:800px; height:220px; border:2px dashed #9abaf3; border-radius:0.5rem; display:flex; align-items:center; justify-content:center; color:#555; font-weight:600; }
+
+/* Referral Popup Overlay */
+.popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center; }
+.popup-overlay.show { display:flex; }
+.popup-box { background:#fff; color:#000; width:90%; max-width:520px; border-radius:1rem; box-shadow:0 6px 20px rgba(0,0,0,0.25); padding:1.8rem 2rem; text-align:center; animation:popupFadeIn 0.4s ease; position:relative; }
+
+/* Darker close button + "Skip" text */
+.popup-close { position:absolute; top:0.6rem; right:0.9rem; background:transparent; border:none; font-size:1.5rem; font-weight:bold; color:#333; cursor:pointer; transition: color 0.2s ease; display: flex; align-items: center; gap: 0.3rem; }
+.popup-close:hover { color:#fc7306; }
+.popup-close-text { font-size: 0.9rem; font-weight: 600; }
+
+.popup-box h2 { color:#fc7306; font-size:1.8rem; font-weight:800; margin-bottom:0.6rem; }
+.popup-box p { font-size:1.05rem; line-height:1.5; color:#111; margin-bottom:0.7rem; }
+.popup-box p strong { font-weight:700; color:#000; }
+.popup-box p em { font-style:italic; font-weight:500; color:#000; }
+.popup-box .big-heart-line { font-size:1.25rem; font-weight:600; }
+.red-trial { color:#dc3545; font-weight:700; font-size:1.2rem; }
+
+.popup-button { background-color:#1877F2; color:white; border:none; border-radius:0.5rem; padding:0.7rem 1.5rem; font-size:1rem; font-weight:600; cursor:pointer; transition: all 0.2s ease; margin-top:0.5rem; width:100%; }
+.popup-button:hover { background-color:#155dbf; transform:scale(1.03); }
+
+.popup-caption { font-size:0.75rem; color:#333; font-style:italic; margin-top:0.4rem; line-height:1.3; }
+.popup-caption .sg-no-ads { color:#fc7306; font-style:italic; font-weight:600; }
+.popup-caption .sg { font-style:italic; font-weight:600; }
+
+@keyframes popupFadeIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
+
+/* ===== SUBSCRIPTION POPUP (When user clicks inactive date) ===== */
+.subscription-popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10001; justify-content:center; align-items:center; }
+.subscription-popup-overlay.show { display:flex; }
+.subscription-popup-box { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; width:90%; max-width:450px; border-radius:1.2rem; box-shadow:0 10px 30px rgba(0,0,0,0.4); padding:2rem 2rem 2.5rem 2rem; text-align:center; animation:popupFadeIn 0.4s ease; position:relative; }
+
+.subscription-popup-close { position:absolute; top:0.8rem; right:1rem; background:rgba(255,255,255,0.2); border:none; font-size:1.8rem; font-weight:bold; color:white; cursor:pointer; transition: all 0.2s ease; width:2rem; height:2rem; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.subscription-popup-close:hover { background:rgba(255,255,255,0.4); transform:rotate(90deg); }
+
+.subscription-popup-icon { font-size:3rem; margin-bottom:1rem; }
+.subscription-popup-title { font-size:1.8rem; font-weight:700; margin-bottom:0.8rem; color:white; line-height:1.3; }
+.subscription-popup-message { font-size:1.1rem; margin-bottom:1.8rem; color:rgba(255,255,255,0.95); line-height:1.5; }
+
+.subscription-popup-btn { background:linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%); color:white; border:none; border-radius:0.6rem; padding:0.9rem 2rem; font-size:1.1rem; font-weight:600; cursor:pointer; transition: all 0.3s ease; box-shadow:0 4px 15px rgba(0,0,0,0.2); width:100%; }
+.subscription-popup-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.3); }
+
+/* ===== GLOW PULSE ANIMATION (Redirect Flow) ===== */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); transform: scale(1); }
+  50% { box-shadow: 0 0 40px rgba(255, 0, 0, 1); transform: scale(1.05); }
+}
+
+.topic-chip.glow-pulse {
+  animation: glowPulse 1.5s ease-in-out infinite;
+  z-index: 1000;
+}
+
+/* ===== SUBSCRIPTION OVERLAY MESSAGE ===== */
+.subscription-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.88);
+  color: white;
+  padding: 1.2rem 2.5rem;
+  border-radius: 0.8rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  z-index: 10001;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.5px;
+}
+
+.subscription-overlay.show {
+  opacity: 1;
+}
+
+/* ===== SIMULATED DATE BUTTONS (For Testing Redirect) ===== */
+.test-section {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 0.5rem;
+  border: 2px dashed #fc7306;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.test-section h3 {
+  color: #fc7306;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.test-section p {
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.test-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.test-date-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  border: 2px solid #888;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.test-date-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.test-date-btn.sunday {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+@media(max-width:768px){
+  .main-app-wrapper{ flex-direction:column; flex-wrap:wrap; }
+  .left-block, .right-block { flex:1 1 100%; }
+  .analytics-chips { flex-direction:column; gap:1rem; }
+  .trial-extend-container { flex-direction:column; align-items:flex-start; gap:4px; }
+  .topic-container { flex-direction:column; gap:4px; padding:0; }
+}
+
+/* Reading Insights - Blinking Border Animation */
+@keyframes blink-border {
+  0%, 100% { border-color: #ef4444; } /* Red */
+  50% { border-color: transparent; }
+}
+
+.blink-border {
+  animation: blink-border 1.5s infinite;
+}
+
+/* Chart container - increased size to accommodate external labels */
+.chart-wrapper {
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto 2rem auto;
+  position: relative;
+}
+
+.chart-wrapper canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* ========================================
+   MOBILE RESPONSIVENESS FOR READING INSIGHTS
+   ======================================== */
+
+/* Tablet and below (≤768px) */
+@media screen and (max-width: 768px) {
+  /* Reduce panel padding for mobile */
+  .reading-insights-panel {
+    padding: 1rem !important;
+  }
+
+  /* Make chart smaller on mobile */
+  .chart-wrapper {
+    max-width: 300px !important;
+  }
+
+  /* Reduce stats card font sizes */
+  .reading-insights-stats-main {
+    font-size: 1.2rem !important;
+  }
+
+  .reading-insights-stats-sub {
+    font-size: 0.95rem !important;
+  }
+
+  /* Reduce gap between panels */
+  .reading-insights-container {
+    gap: 1rem !important;
+  }
+
+  /* Reduce article list max-height for mobile */
+  .reading-insights-article-panel {
+    max-height: 500px !important;
+  }
+
+  /* Stack header text on mobile */
+  .reading-insights-header {
+    font-size: 1.3rem !important;
+  }
+}
+
+/* Mobile only (≤480px) */
+@media screen and (max-width: 480px) {
+  /* Further reduce chart size */
+  .chart-wrapper {
+    max-width: 260px !important;
+  }
+
+  /* Smaller panel padding */
+  .reading-insights-panel {
+    padding: 0.75rem !important;
+  }
+
+  /* Even smaller text */
+  .reading-insights-stats-main {
+    font-size: 1rem !important;
+  }
+
+  .reading-insights-stats-sub {
+    font-size: 0.85rem !important;
+  }
+
+  /* Remove min-width constraint on mobile */
+  .reading-insights-left-section,
+  .reading-insights-article-panel {
+    min-width: 100% !important;
+  }
+
+  /* Reduce article list height further */
+  .reading-insights-article-panel {
+    max-height: 400px !important;
+  }
+
+  /* Smaller header */
+  .reading-insights-header {
+    font-size: 1.1rem !important;
+  }
+
+  /* Reduce table padding */
+  .reading-insights-article-panel table td {
+    padding: 0.6rem !important;
+    font-size: 0.9rem !important;
+  }
+}
+</style>
+
+<!-- Chart.js Library for Donut Charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Chart.js Datalabels Plugin for In-Chart Labels -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+</head>
+<body>
+
+<!-- Mobile Rotate Message -->
+<div id="rotate-message" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0, 74, 173, 0.95); color:#ffffff; text-align:center; padding:2rem 1.5rem; font-weight:600; font-size:1.1rem; z-index:9999; box-shadow:0 8px 24px rgba(0,0,0,0.3); border-radius:16px; max-width:90%; backdrop-filter:blur(10px);">
+    <div style="font-size:3rem; margin-bottom:0.5rem;">📱</div>
+    <div style="margin-bottom:0.5rem;">For Better Experience</div>
+    <div style="font-size:1.3rem; font-weight:700;">Please Rotate Your Phone</div>
+</div>
+
+<!-- Banner -->
+<div class="banner-container" onclick="window.location.href='homepage.html'" role="button" tabindex="0" aria-label="Go to Homepage">
+    <span class="banner-text-hindi">सम्यक् ज्ञान</span>
+    <span class="banner-text-english">Samyak Gyan</span>
+</div>
+
+<!-- Navigation Ribbon -->
+<nav class="nav-container" id="main-nav">
+    <span class="home-icon" onclick="window.location.href='homepage.html'" title="Home">🏠</span>
+    <button class="nav-btn btn-main">How to Use?</button>
+    <!-- TODO: Ethics & Essay button checks subscription before allowing access -->
+    <!-- TODO: If subscription inactive, redirect to dashboard with highlight -->
+    <button class="nav-btn btn-ethics" id="nav-ethics-btn">Ethics & Essay</button>
+    <button class="nav-btn btn-beginner">Beginners Corner</button>
+    <button class="nav-btn btn-tri-color">Mission & Vision</button>
+    <button class="nav-btn btn-journal" onclick="window.location.href='user_dashboard.html'">Your Journal</button>
+</nav>
+
+<!-- ===== TESTBED: SIMULATED DATE CLICK BUTTONS ===== -->
+<div class="test-section">
+  <h3>🧪 TESTBED: Simulate Homepage Date Clicks</h3>
+  <p>Click these buttons to test the redirect + glow + overlay flow when subscription is inactive</p>
+  <div class="test-buttons">
+    <!-- Simulate weekday date click (Current Affairs) -->
+    <button class="test-date-btn" id="test-weekday-btn">15 Oct (Weekday) - Test CA Redirect</button>
+
+    <!-- Simulate Sunday date click (Ethics & Essay) -->
+    <button class="test-date-btn sunday" id="test-sunday-btn">19 Oct (Sunday) - Test E&E Redirect</button>
+  </div>
+</div>
+
+<div class="main-app-wrapper">
+
+  <!-- Left Block: My Stats & Compilations -->
+  <div class="left-block">
+    <h3 id="stats-header">My Stats & Compilations</h3>
+    <div class="stats-buttons">
+      <!-- TODO: Each button triggers different analytics panel below -->
+      <!-- TODO: Backend API endpoint per button type (reading, voting, notes, time, bookmarked) -->
+      <button class="stat-btn active" data-target="reading">Reading Insight</button>
+      <button class="stat-btn" data-target="voting">Voting Pattern</button>
+      <button class="stat-btn" data-target="notes">Notes Dashboard</button>
+      <button class="stat-btn" data-target="time">Time Spent</button>
+      <button class="stat-btn" data-target="bookmarked">Bookmarked Articles</button>
+    </div>
+  </div>
+
+  <!-- Right Block: Personal Info + Subscriptions -->
+  <div class="right-block">
+    <div class="info-box">
+      <!-- User ID & Date -->
+      <div class="user-id-row">
+        <!-- TODO: Replace hardcoded User ID with Telegram user ID from backend -->
+        <!-- TODO: Backend: GET /api/users/:userId - returns telegram_id -->
+        <span><strong>User ID:</strong> <span id="user-id-display">*****345</span></span>
+
+        <!-- TODO: Calculate trial end date based on join date (join date + 15 days) -->
+        <!-- TODO: Backend: users.date_of_joining + 15 days = initial trial_end_date -->
+        <!-- TODO: Update trial end date automatically if referral conditions are met (3 referrals = +15 days) -->
+        <span><strong>Date Joined:</strong> <span id="date-joined">10 Oct 2025</span></span>
+      </div>
+
+      <!-- Name & Language -->
+      <div class="info-row">
+        <label>Name:</label>
+        <!-- TODO: Backend: GET /api/users/:userId - returns user.name -->
+        <!-- TODO: Backend: PUT /api/users/:userId/profile - updates user.name on Save -->
+        <input type="text" id="user-name" value="Deepanshu Anand" disabled>
+        <button id="edit-info">Edit</button>
+      </div>
+      <div class="info-row">
+        <label>Language:</label>
+        <!-- TODO: Backend: GET /api/users/:userId - returns user.preferred_language -->
+        <!-- TODO: Backend: PUT /api/users/:userId/profile - updates preferred_language on Save -->
+        <select id="user-language" disabled>
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+        </select>
+      </div>
+
+      <hr>
+
+      <!-- Subscriptions Section -->
+      <div class="subscriptions-section">
+        <div class="subscriptions-title">Subscriptions</div>
+
+        <!-- Trial Extension Section -->
+        <div class="trial-extend-container">
+          <!-- TODO: Display trial_end_date from users table -->
+          <!-- TODO: If trial expired, hide this entire trial-extend-container -->
+          <div id="trial-end">Your Trial Ends: <span id="trial-end-date">Oct 25, 2025</span></div>
+
+          <!-- TODO: Button disabled if trial already extended (users.trial_extended = true) -->
+          <!-- TODO: Button hidden if trial fully expired -->
+          <!-- TODO: On click, open referral popup with Telegram bot integration -->
+          <button id="extend-trial">Help Us Grow !!</button>
+        </div>
+
+        <!-- Subscription Topic Chips -->
+        <div class="topic-container">
+          <!-- TODO: Active subscription = .active class (transparent background) -->
+          <!-- TODO: Inactive subscription = .inactive class (red background) -->
+          <!-- TODO: Backend: GET /api/users/:userId/subscriptions - returns array of subscriptions -->
+          <!-- TODO: Check subscriptions.status for "Current Affairs" and "Ethics & Essay" -->
+          <!-- TODO: If inactive and clicked, scroll to this subscription block and highlight button -->
+          <!-- TODO: If active and clicked, do nothing (prevent accidental clicks) -->
+          <button class="topic-chip current-affairs active" data-topic="current-affairs">Current Affairs</button>
+          <button class="topic-chip ethics-essay inactive" data-topic="ethics-essay">Ethics & Essay</button>
+          <span class="subscribe-note">* Click on (Button) to Subscribe</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Subscription Popup (When user clicks inactive date) -->
+<div class="subscription-popup-overlay" id="subscription-popup">
+  <div class="subscription-popup-box">
+    <button class="subscription-popup-close" id="close-subscription-popup">×</button>
+
+    <div class="subscription-popup-icon">🔒</div>
+    <div class="subscription-popup-title" id="subscription-popup-title">Subscribe to Read</div>
+    <div class="subscription-popup-message" id="subscription-popup-message">
+      Get unlimited access to enriching content and create notes with 1-click!
+    </div>
+
+    <!-- This button will dynamically change based on which subscription is needed -->
+    <button class="subscription-popup-btn" id="subscription-popup-btn" data-topic="">
+      Subscribe Now
+    </button>
+  </div>
+</div>
+
+<!-- Referral Popup (Hidden by default) -->
+<div class="popup-overlay" id="referral-popup">
+  <div class="popup-box">
+    <!-- Darker × with "Skip" text -->
+    <button class="popup-close" id="close-popup">
+      <span>×</span>
+      <span class="popup-close-text">Skip</span>
+    </button>
+
+    <h2>🎉 Welcome to <strong>Samyak Gyan!</strong></h2>
+
+    <p>✨ You've got a <strong>15-day free access</strong> to explore.</p>
+
+    <p>
+      🧠 Read Enriching Content <br>
+      ☝️ Create Notes in 1-Click !!
+    </p>
+
+    <p class="big-heart-line">❤️ Find the Platform useful ??</p>
+
+    <p style="margin-top:0.6rem;">
+      🔗 Refer it to <strong>all of your friends</strong> and help <strong><em>SG</em></strong> reach them!!
+    </p>
+
+    <p style="margin-top:0.6rem;">
+      👥 When <strong>3 of your friends</strong> join via your Link, you get<br>
+      <span class="red-trial">1 month free access !!</span>
+    </p>
+
+    <!-- TODO: Clicking this button triggers Telegram bot API to send referral link -->
+    <!-- TODO: Backend: POST /api/telegram/send-referral-link -->
+    <!-- TODO: Telegram bot sends message with user's referral_code from users table -->
+    <button class="popup-button" id="get-referral-link">📲 Send Link to My Telegram</button>
+
+    <p class="popup-caption">
+      <span class="sg-no-ads">Samyak Gyan is not spending on ads on Youtube-Instagram!!</span><br>
+      Help <span class="sg">SG</span> grow!! Do refer it to all your friends!!
+    </p>
+  </div>
+</div>
+
+<!-- Dynamic Panel -->
+<div id="dynamic-content" class="dynamic-panel">
+  <!-- TODO: Dynamic chip text changes based on selected stat button -->
+  <div id="dynamic-chip">My Reading Insight</div>
+
+  <div class="analytics-panel">
+    <div class="analytics-chips">
+      <!-- TODO: Month dropdown populated with last 12 months dynamically -->
+      <!-- TODO: Backend: Calculate from current date backwards 12 months -->
+      <!-- TODO: Format: "Month 'YY" (e.g., "Oct '25", "Feb '26") -->
+      <!-- TODO: Add "(Ongoing)" badge to current month to indicate incomplete data -->
+      <div class="month-dropdown">
+        <select id="month-select">
+          <option value="" selected>Month</option>
+          <option value="2025-10">Oct '25 (Ongoing)</option>
+          <option value="2025-09">Sep '25</option>
+          <option value="2025-08">Aug '25</option>
+          <option value="2025-07">Jul '25</option>
+          <option value="2025-06">Jun '25</option>
+          <option value="2025-05">May '25</option>
+          <option value="2025-04">Apr '25</option>
+          <option value="2025-03">Mar '25</option>
+          <option value="2025-02">Feb '25</option>
+          <option value="2025-01">Jan '25</option>
+          <option value="2024-12">Dec '24</option>
+          <option value="2024-11">Nov '24</option>
+          <!-- TODO: In production, generate dynamically:
+               1. Get current date
+               2. Generate last 12 months array
+               3. Format as "Mon 'YY"
+               4. Add "(Ongoing)" to current month
+               5. Populate dropdown options
+          -->
+        </select>
+      </div>
+
+      <!-- TODO: Fortnight selection (1st: days 1-15, 2nd: days 16-end) -->
+      <!-- TODO: Backend: Filter data based on selected fortnight range -->
+      <div class="fortnight-chip active" id="first-fortnight" data-fortnight="1">1st Fortnight</div>
+      <div class="fortnight-chip" id="second-fortnight" data-fortnight="2">2nd Fortnight</div>
+    </div>
+
+    <!-- TODO: Chart/stats rendered here based on selected analytics type -->
+    <!-- TODO: Different data structure for each analytics type:
+         - Reading Insight: Total articles vs Read articles (donut chart)
+         - Voting Pattern: Community ranking + user's votes
+         - Notes Dashboard: User's highlights and summaries list
+         - Time Spent: Session duration analytics
+         - Bookmarked Articles: List of bookmarked articles with filters
+    -->
+    <div class="chart-placeholder" id="chart-container">
+      Chart / Stats will appear here based on selected month & fortnight
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================================================
+   SAMYAK GYAN - USER DASHBOARD (YOUR JOURNAL)
+   COMPLETE WORKFLOW & BACKEND INTEGRATION GUIDE
+   ============================================================================================
+
+   📋 OVERVIEW:
+   This dashboard manages user profiles, trial periods, subscriptions, referrals, and analytics.
+   It integrates with Telegram auth, Razorpay payments, and Bhashini translation API.
+
+   ============================================================================================
+   1️⃣ TELEGRAM AUTHENTICATION FLOW
+   ============================================================================================
+
+   WHEN USER LOGS IN VIA TELEGRAM:
+   -------------------------
+   Data Received from Telegram Bot:
+   - username: @D2313 (Telegram username)
+   - id: 681522234 (9-20 digits, Telegram user ID)
+   - first: "Deepanshu" (First name)
+   - last: "Anand" (Last name)
+   - lang: "en" (Language preference)
+
+   Profile Creation Logic:
+   -------------------------
+   1. Display Name: Combine first + last → "Deepanshu Anand"
+   2. User ID Display: Show last 8 digits, mask first 5 → "*****234"
+      - Database stores FULL ID: 681522234
+      - UI shows masked: "*****234"
+   3. Date Joined: Auto-captured from Telegram auth timestamp
+   4. Language: Default to Telegram lang, user can change (EN/HI)
+
+   Backend Endpoints:
+   -------------------------
+   POST /api/auth/telegram
+   Body: { telegram_id, username, first_name, last_name, language_code }
+   Response: { user_id, token, profile_data }
+
+   ============================================================================================
+   2️⃣ TRIAL & REFERRAL SYSTEM
+   ============================================================================================
+
+   Trial Calculation:
+   -------------------------
+   - Initial Trial: date_of_joining + 15 days
+   - Trial End Date Format: "25 October 2025" (Indian DD Month YYYY format)
+   - Display: Green button "Your Trial Ends: 25 October 2025"
+
+   Extend Trial Flow:
+   -------------------------
+   1. User clicks "Help Us Grow !!" (red blinking button)
+   2. Popup appears with referral instructions
+   3. User clicks "Get Your Referral Link"
+   4. Telegram bot sends referral link: https://samyakgyan.com/ref/USER_REF_CODE
+   5. When 3 friends join via link:
+      - Database: trial_end_date += 15 days
+      - Button: Disabled or removed
+      - users.trial_extended = true
+
+   Backend Endpoints:
+   -------------------------
+   POST /api/telegram/send-referral-link
+   Body: { user_id, referral_code }
+   Response: { success: true, message: "Link sent to Telegram" }
+
+   GET /api/users/:userId/referrals
+   Response: { total_referrals: 2, completed_referrals: 1, remaining: 2 }
+
+   Database Trigger:
+   -------------------------
+   -- Auto-extend trial when 3 referrals completed
+   CREATE TRIGGER extend_trial_on_referral
+   AFTER UPDATE ON referrals
+   WHEN (SELECT COUNT(*) FROM referrals WHERE referrer_user_id = NEW.referrer_user_id AND status = 'completed') >= 3
+   BEGIN
+     UPDATE users
+     SET trial_end_date = trial_end_date + INTERVAL '15 days',
+         trial_extended = TRUE
+     WHERE user_id = NEW.referrer_user_id;
+   END;
+
+   ============================================================================================
+   3️⃣ SUBSCRIPTION STATE MANAGEMENT
+   ============================================================================================
+
+   Two Independent Subscriptions:
+   -------------------------
+   1. Current Affairs (CA) - Weekday/Saturday dates
+   2. Ethics & Essay (E&E) - Sunday updates only
+
+   Subscription States:
+   -------------------------
+   | State      | Visual      | Click Action              |
+   |------------|-------------|---------------------------|
+   | Active     | Transparent | Do nothing (already active) |
+   | Inactive   | Red BG      | Scroll + Glow + Overlay   |
+
+   Trial Active Display Logic:
+   -------------------------
+   IF trial_active:
+     Button: "Your Trial Ends: 25 October 2025" (Green)
+     CA: Transparent
+     E&E: Transparent
+
+   Trial Expired Display Logic:
+   -------------------------
+   IF both_subscriptions_active:
+     Button: "Active" (Green)
+   ELSE IF only_CA_active:
+     Button: "Active: Current Affairs" (Green)
+   ELSE IF only_EE_active:
+     Button: "Active: Ethics & Essay" (Green)
+   ELSE IF both_inactive:
+     Button: Hidden or "Subscribe to access"
+
+   Backend Endpoints:
+   -------------------------
+   GET /api/users/:userId/subscriptions
+   Response: {
+     subscriptions: [
+       { topic: 'current-affairs', status: 'active', start_date, end_date },
+       { topic: 'ethics-essay', status: 'inactive', start_date: null, end_date: null }
+     ]
+   }
+
+   POST /api/subscriptions/:userId/subscribe
+   Body: { topic: 'current-affairs' OR 'ethics-essay', razorpay_payment_id }
+   Response: { success: true, subscription_id, active_until }
+
+   ============================================================================================
+   4️⃣ ACCESS CONTROL & REDIRECT FLOW
+   ============================================================================================
+
+   User Clicks Date (Weekday/Saturday):
+   -------------------------
+   1. Check: CA subscription status
+   2. IF inactive:
+      - Redirect: user_dashboard.html?highlight=current-affairs
+      - Auto-scroll to subscription block
+      - CA button: Glow animation (red pulse)
+      - Overlay: "Subscribe to Read" (2 seconds)
+   3. IF active:
+      - Navigate: /articles/YYYY-MM-DD
+
+   User Clicks Date (Sunday):
+   -------------------------
+   1. Check: E&E subscription status + Day of week
+   2. IF inactive OR not_sunday:
+      - Redirect: user_dashboard.html?highlight=ethics-essay
+      - Auto-scroll to subscription block
+      - E&E button: Glow animation (red pulse)
+      - Overlay: "Subscribe to Read" (2 seconds)
+   3. IF active AND sunday:
+      - Navigate: /ethics-essay
+
+   User Clicks "Ethics & Essay" Nav Button:
+   -------------------------
+   1. Check: E&E subscription status
+   2. Same redirect flow as Sunday date click
+
+   Backend Endpoints:
+   -------------------------
+   GET /api/users/:userId/check-access
+   Query: ?topic=current-affairs OR ethics-essay
+   Response: { has_access: true/false, redirect_url: null OR '/user_dashboard.html' }
+
+   ============================================================================================
+   5️⃣ ROLLING 12-MONTH ANALYTICS WINDOW
+   ============================================================================================
+
+   Month Dropdown Logic:
+   -------------------------
+   - Show: Last 12 months from current date
+   - Format: "Oct '25", "Sep '25", "Aug '25" (Month 'YY)
+   - Current Month: "Oct '25 (Ongoing)" - indicates incomplete data
+   - Auto-Prune: Oldest month drops when 13th month arrives
+
+   Example:
+   - Join Date: Oct 2024
+   - Current Date: Feb 2026
+   - Dropdown Shows: Feb '26 (Ongoing), Jan '26, Dec '25... Mar '25 (12 months)
+   - Hidden: Feb '25, Jan '25, Dec '24, Nov '24, Oct '24
+
+   Backend Endpoints:
+   -------------------------
+   GET /api/users/:userId/analytics/available-months
+   Response: {
+     months: [
+       { value: "2026-02", label: "Feb '26 (Ongoing)" },
+       { value: "2026-01", label: "Jan '26" },
+       ...
+     ],
+     oldest_month: "2025-03",
+     newest_month: "2026-02"
+   }
+
+   ============================================================================================
+   6️⃣ LANGUAGE SWITCHING (BHASHINI API)
+   ============================================================================================
+
+   When User Changes Language:
+   -------------------------
+   1. User clicks "Edit" → Changes language to "Hindi" → Clicks "Save"
+   2. Frontend: PUT /api/users/:userId/profile { preferred_language: 'hi' }
+   3. Backend: Updates users.preferred_language = 'hi'
+   4. Bhashini API: Triggered to translate all content to Hindi
+   5. Page reload: Content displayed in Hindi
+
+   Backend Endpoints:
+   -------------------------
+   PUT /api/users/:userId/profile
+   Body: { name: "Updated Name", preferred_language: "hi" }
+   Response: { success: true, updated_fields: ['name', 'preferred_language'] }
+
+   POST /api/translate/content
+   Body: { text: "Article content", source_lang: "en", target_lang: "hi" }
+   Response: { translated_text: "अनुवादित सामग्री" }
+
+   ============================================================================================ */
+
+// ==================== DEMO DATA (Replace with API calls) ====================
+const DEMO_USER = {
+  telegram_id: '*****345',
+  name: 'Deepanshu Anand',
+  preferred_language: 'en',
+  date_of_joining: '2025-10-10',
+  trial_end_date: '2025-10-25',
+  trial_extended: false, // If true, "Extend Trial" button becomes disabled
+  referral_code: 'DEMO_REF_123',
+  subscriptions: [
+    // TESTBED: Both set to INACTIVE to test redirect flow
+    { topic: 'current-affairs', status: 'inactive' },
+    { topic: 'ethics-essay', status: 'inactive' }
+  ]
+};
+
+// ==================== INITIALIZE USER DATA ====================
+function initializeUserData() {
+  // TODO: Replace with actual API call: GET /api/users/:userId
+  document.getElementById('user-id-display').textContent = DEMO_USER.telegram_id;
+  document.getElementById('date-joined').textContent = formatDate(DEMO_USER.date_of_joining);
+  document.getElementById('user-name').value = DEMO_USER.name;
+  document.getElementById('user-language').value = DEMO_USER.preferred_language;
+  document.getElementById('trial-end-date').textContent = formatDate(DEMO_USER.trial_end_date);
+
+  // Update subscription button states
+  DEMO_USER.subscriptions.forEach(sub => {
+    const btn = document.querySelector(`.topic-chip[data-topic="${sub.topic}"]`);
+    if (btn) {
+      btn.classList.remove('active', 'inactive');
+      btn.classList.add(sub.status === 'active' ? 'active' : 'inactive');
+    }
+  });
+
+  // Disable "Extend Trial" button if already extended
+  if (DEMO_USER.trial_extended) {
+    const extendBtn = document.getElementById('extend-trial');
+    extendBtn.disabled = true;
+    extendBtn.style.opacity = '0.5';
+    extendBtn.style.cursor = 'not-allowed';
+    extendBtn.style.animation = 'none';
+  }
+}
+
+function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ==================== STATS BUTTON NAVIGATION ====================
+const statBtns = document.querySelectorAll(".stat-btn");
+const dynamicChip = document.getElementById("dynamic-chip");
+
+statBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    statBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    dynamicChip.textContent = "My " + btn.textContent;
+
+    const target = btn.dataset.target;
+
+    // Handle Notes Dashboard
+    if (target === 'notes') {
+      renderNotesDashboard();
+    } else if (target === 'bookmarked') {
+      renderBookmarkedArticles();
+    } else if (target === 'reading') {
+      renderReadingInsights();
+    } else {
+      // Reset chart container to default styling
+      resetChartContainer();
+
+      // TODO: Load different analytics data based on selected button
+      // TODO: Backend API endpoints:
+      // - Reading Insight: GET /api/users/:userId/analytics/reading?month=X&fortnight=Y
+      // - Voting Pattern: GET /api/users/:userId/analytics/voting?month=X&fortnight=Y
+      // - Time Spent: GET /api/users/:userId/analytics/time?month=X&fortnight=Y
+
+      console.log(`TODO: Load ${target} analytics data`);
+    }
+  });
+});
+
+// Reset chart container to default placeholder state
+function resetChartContainer() {
+  const chartContainer = document.getElementById('chart-container');
+  chartContainer.innerHTML = 'Chart / Stats will appear here based on selected month & fortnight';
+  chartContainer.style.border = '2px dashed #9abaf3';
+  chartContainer.style.background = '';
+  chartContainer.style.height = '220px';
+  chartContainer.style.maxWidth = '800px';
+  chartContainer.style.width = '90%';
+}
+
+// ==================== FORTNIGHT TOGGLE ====================
+const fortnightChips = document.querySelectorAll(".fortnight-chip");
+fortnightChips.forEach(chip => {
+  chip.addEventListener("click", () => {
+    fortnightChips.forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+
+    // TODO: Reload analytics data with new fortnight filter
+    console.log(`TODO: Reload data for fortnight ${chip.dataset.fortnight}`);
+  });
+});
+
+// ==================== EDIT/SAVE PROFILE ====================
+const editBtn = document.getElementById("edit-info");
+const nameInput = document.getElementById("user-name");
+const langSelect = document.getElementById("user-language");
+let isEditing = false;
+
+editBtn.addEventListener("click", () => {
+  isEditing = !isEditing;
+  nameInput.disabled = !isEditing;
+  langSelect.disabled = !isEditing;
+  editBtn.textContent = isEditing ? "Save" : "Edit";
+
+  if (!isEditing) {
+    // TODO: Save to backend
+    // TODO: Backend: PUT /api/users/:userId/profile
+    // TODO: Body: { name: nameInput.value, preferred_language: langSelect.value }
+    console.log('TODO: Save profile data', {
+      name: nameInput.value,
+      language: langSelect.value
+    });
+  }
+});
+
+// ==================== REFERRAL POPUP ====================
+const extendTrialBtn = document.getElementById('extend-trial');
+const referralPopup = document.getElementById('referral-popup');
+const closePopupBtn = document.getElementById('close-popup');
+const getReferralLinkBtn = document.getElementById('get-referral-link');
+
+extendTrialBtn.addEventListener('click', () => {
+  referralPopup.classList.add('show');
+});
+
+closePopupBtn.addEventListener('click', () => {
+  referralPopup.classList.remove('show');
+});
+
+// Close popup when clicking outside
+referralPopup.addEventListener('click', (e) => {
+  if (e.target === referralPopup) {
+    referralPopup.classList.remove('show');
+  }
+});
+
+getReferralLinkBtn.addEventListener('click', () => {
+  // TODO: Backend: POST /api/telegram/send-referral-link
+  // TODO: Telegram bot sends message with referral link to user
+  // TODO: Referral link format: https://samyakgyan.com/ref/DEMO_REF_123
+  console.log('TODO: Trigger Telegram bot to send referral link:', DEMO_USER.referral_code);
+
+  // Temporary feedback
+  getReferralLinkBtn.textContent = '✅ Link Sent to Telegram';
+  getReferralLinkBtn.style.backgroundColor = '#2ecc71';
+  setTimeout(() => {
+    referralPopup.classList.remove('show');
+    getReferralLinkBtn.textContent = '📲 Send Link to My Telegram';
+    getReferralLinkBtn.style.backgroundColor = '#1877F2';
+  }, 2000);
+});
+
+// ==================== SUBSCRIPTION BUTTON CLICK ====================
+const topicChips = document.querySelectorAll('.topic-chip');
+topicChips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    const isActive = chip.classList.contains('active');
+
+    if (!isActive) {
+      // TODO: If inactive, scroll to subscription block and highlight
+      // TODO: Show message: "Subscribe please"
+      chip.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      chip.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.6)';
+      setTimeout(() => {
+        chip.style.boxShadow = '';
+      }, 2000);
+
+      console.log(`TODO: Redirect to subscription page for ${chip.dataset.topic}`);
+      // TODO: Backend: POST /api/subscriptions/:userId/subscribe
+      // TODO: Body: { topic: chip.dataset.topic, action: 'subscribe' }
+    } else {
+      // TODO: If active, do nothing (prevent accidental clicks)
+      console.log(`${chip.dataset.topic} is already active`);
+    }
+  });
+});
+
+// ==================== MONTH DROPDOWN ====================
+const monthSelect = document.getElementById('month-select');
+monthSelect.addEventListener('change', () => {
+  // TODO: Reload analytics data with new month filter
+  console.log(`TODO: Reload data for month ${monthSelect.value}`);
+});
+
+// ==================== SUBSCRIPTION POPUP ====================
+
+/**
+ * Shows subscription popup with the appropriate topic button
+ * Also triggers background glow effect on the dashboard button
+ * @param {string} topic - 'current-affairs' or 'ethics-essay'
+ */
+function showSubscriptionPopup(topic) {
+  const popup = document.getElementById('subscription-popup');
+  const popupBtn = document.getElementById('subscription-popup-btn');
+  const popupTitle = document.getElementById('subscription-popup-title');
+  const popupMessage = document.getElementById('subscription-popup-message');
+  const dashboardButton = document.querySelector(`.topic-chip[data-topic="${topic}"]`);
+
+  // Set popup content based on topic
+  if (topic === 'current-affairs') {
+    popupTitle.textContent = 'Subscribe to Current Affairs';
+    popupMessage.textContent = 'Get daily updates on current affairs and create notes with 1-click!';
+    popupBtn.textContent = 'Subscribe to Current Affairs';
+  } else if (topic === 'ethics-essay') {
+    popupTitle.textContent = 'Subscribe to Ethics & Essay';
+    popupMessage.textContent = 'Get weekly ethics & essay content every Sunday and enhance your preparation!';
+    popupBtn.textContent = 'Subscribe to Ethics & Essay';
+  }
+
+  popupBtn.dataset.topic = topic;
+
+  // Show popup
+  popup.classList.add('show');
+
+  // Also trigger glow effect on dashboard button in background
+  if (dashboardButton) {
+    setTimeout(() => {
+      dashboardButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+
+    setTimeout(() => {
+      dashboardButton.classList.add('glow-pulse');
+    }, 800);
+  }
+
+  // Auto-close popup after 15 seconds
+  setTimeout(() => {
+    popup.classList.remove('show');
+    if (dashboardButton) {
+      dashboardButton.classList.remove('glow-pulse');
+    }
+  }, 15000); // 15 seconds
+}
+
+// Close subscription popup handlers
+const subscriptionPopup = document.getElementById('subscription-popup');
+const closeSubscriptionPopupBtn = document.getElementById('close-subscription-popup');
+
+closeSubscriptionPopupBtn.addEventListener('click', () => {
+  subscriptionPopup.classList.remove('show');
+  // Remove glow from dashboard buttons
+  document.querySelectorAll('.topic-chip.glow-pulse').forEach(btn => {
+    btn.classList.remove('glow-pulse');
+  });
+});
+
+// Close when clicking outside
+subscriptionPopup.addEventListener('click', (e) => {
+  if (e.target === subscriptionPopup) {
+    subscriptionPopup.classList.remove('show');
+    document.querySelectorAll('.topic-chip.glow-pulse').forEach(btn => {
+      btn.classList.remove('glow-pulse');
+    });
+  }
+});
+
+// Handle subscription button click in popup
+document.getElementById('subscription-popup-btn').addEventListener('click', function() {
+  const topic = this.dataset.topic;
+  console.log(`TODO: Redirect to Razorpay payment for ${topic}`);
+  // TODO: Backend: POST /api/subscriptions/:userId/subscribe
+  // TODO: Integrate with Razorpay payment gateway
+
+  // Temporary feedback
+  this.textContent = '✓ Processing...';
+  this.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+});
+
+/**
+ * Legacy function for backward compatibility
+ * Scrolls to subscription block and adds glow to button
+ * @param {string} topic - 'current-affairs' or 'ethics-essay'
+ */
+function highlightSubscriptionButton(topic) {
+  // Now calls the new popup function instead
+  showSubscriptionPopup(topic);
+}
+
+// ==================== NOTES DASHBOARD ====================
+/*
+ * NOTES DASHBOARD - FORTNIGHT COMPILATION & DAILY DOWNLOADS
+ *
+ * PURPOSE:
+ * Allows users to download their notes (highlights, summaries, article metadata)
+ * either as a complete fortnight compilation or individual daily downloads.
+ *
+ * KEY FEATURES:
+ * - Rolling 12-month window (uses existing month dropdown)
+ * - Fortnight-based organization (1st: days 1-15, 2nd: days 16-end)
+ * - Smart availability logic (past = available, future = disabled)
+ * - Dynamic day calculation (handles 28/29/30/31 day months & leap years)
+ *
+ * USER EXPERIENCE:
+ * 1. User clicks "Notes Dashboard" button in left panel
+ * 2. Default view: Current month + Current fortnight
+ * 3. User can switch months using existing dropdown
+ * 4. User can switch fortnights using chips (1st/2nd)
+ * 5. "Get Your Notes®" button downloads entire fortnight (if complete)
+ * 6. Individual "Download" links download single day notes
+ * 7. Info icon (i) shows helpful message for mobile users
+ *
+ * FRONTEND STATUS: ✅ COMPLETE
+ * - All UI/UX implemented
+ * - All date logic working
+ * - Disabled states correct
+ * - Info modal functional
+ * - Button styling matches articles.html
+ *
+ * BACKEND STATUS: ⚠️ TODO
+ * - API endpoints need implementation (see detailed TODOs below)
+ * - Database queries documented
+ * - PDF/DOCX generation required
+ * - Authentication/authorization needed
+ * - Rate limiting recommended
+ *
+ * BACKEND INTEGRATION POINTS:
+ * 1. GET /api/users/:userId/notes/fortnight - Download fortnight compilation
+ * 2. GET /api/users/:userId/notes/daily - Download daily notes
+ *
+ * DATABASE TABLES NEEDED:
+ * - user_highlights (user_id, article_id, highlight_text, created_at)
+ * - user_summaries (user_id, article_id, summary_text, created_at)
+ * - user_notes (user_id, article_id, note_text, created_at)
+ * - articles (article_id, title, date, source, section, tags)
+ *
+ * AUTHENTICATION:
+ * - User must be logged in (check session/token)
+ * - Can only download their own notes (verify user_id)
+ *
+ * TESTING CHECKLIST FOR BACKEND DEVELOPER:
+ * ✓ Test fortnight download for completed fortnight (past month)
+ * ✓ Test fortnight download for incomplete fortnight (should fail gracefully)
+ * ✓ Test daily download for past day (should work)
+ * ✓ Test daily download for future day (should fail with 403)
+ * ✓ Test with user who has no notes (empty PDF with message)
+ * ✓ Test with different month lengths (28/29/30/31 days)
+ * ✓ Test leap year February (29 days)
+ * ✓ Test rate limiting (exceed limit, verify 429 response)
+ * ✓ Test authentication (no token = 401, wrong user = 403)
+ * ✓ Verify PDF/DOCX format includes all data correctly
+ * ✓ Verify filename format matches specification
+ */
+
+// TODO: PRODUCTION - Change to: const CURRENT_DATE = new Date();
+const CURRENT_DATE = new Date('2025-10-17'); // Today's date for testing
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+
+/**
+ * Renders the Notes Dashboard with fortnight compilations
+ * Uses existing month dropdown and replaces chart container with tables
+ *
+ * FLOW:
+ * 1. Get currently selected month (default: current month)
+ * 2. Determine current fortnight based on today's date
+ * 3. Set active fortnight chip
+ * 4. Generate content for that specific fortnight
+ * 5. Attach event listeners for month/fortnight changes
+ *
+ * BACKEND TODO: None (pure frontend rendering)
+ */
+function renderNotesDashboard() {
+  const chartContainer = document.getElementById('chart-container');
+  const monthSelect = document.getElementById('month-select');
+  const fortnightChips = document.querySelectorAll('.fortnight-chip');
+
+  // Get currently selected month from existing dropdown
+  let selectedValue = monthSelect.value;
+
+  // If no month selected, default to current month (October 2025)
+  if (!selectedValue) {
+    selectedValue = '2025-10';
+    monthSelect.value = selectedValue;
+  }
+
+  // Determine current fortnight (1st or 2nd) based on today's date
+  const currentDay = CURRENT_DATE.getDate();
+  const currentFortnightIndex = currentDay <= 15 ? 0 : 1;
+
+  // Set active fortnight chip
+  fortnightChips.forEach((chip, idx) => {
+    chip.classList.remove('active');
+    if (idx === currentFortnightIndex) {
+      chip.classList.add('active');
+    }
+  });
+
+  // Generate the notes dashboard content for current fortnight
+  generateNotesDashboardContent(selectedValue, currentFortnightIndex);
+
+  // Listen for month changes
+  monthSelect.removeEventListener('change', handleMonthChangeForNotes);
+  monthSelect.addEventListener('change', handleMonthChangeForNotes);
+
+  // Listen for fortnight chip clicks
+  fortnightChips.forEach((chip, idx) => {
+    chip.removeEventListener('click', chip._notesFortnightHandler);
+    chip._notesFortnightHandler = () => {
+      fortnightChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      generateNotesDashboardContent(monthSelect.value, idx);
+    };
+    chip.addEventListener('click', chip._notesFortnightHandler);
+  });
+}
+
+/**
+ * Handles month dropdown changes for Notes Dashboard
+ */
+function handleMonthChangeForNotes() {
+  const monthSelect = document.getElementById('month-select');
+  const fortnightChips = document.querySelectorAll('.fortnight-chip');
+
+  // Get currently active fortnight
+  let activeFortnightIndex = 0;
+  fortnightChips.forEach((chip, idx) => {
+    if (chip.classList.contains('active')) {
+      activeFortnightIndex = idx;
+    }
+  });
+
+  generateNotesDashboardContent(monthSelect.value, activeFortnightIndex);
+}
+
+/**
+ * Generates the fortnight tables based on selected month and fortnight
+ * @param {string} monthValue - Format: "YYYY-MM" (e.g., "2025-10")
+ * @param {number} fortnightIndex - 0 for 1st fortnight, 1 for 2nd fortnight
+ *
+ * LOGIC:
+ * 1. Parse month/year from dropdown value
+ * 2. Calculate days in month (handles leap years)
+ * 3. Define fortnights (1st: 1-15, 2nd: 16-end)
+ * 4. Compare with current date to determine availability
+ * 5. Generate HTML for:
+ *    - Compilation table (with "Get Your Notes" button)
+ *    - Daily downloads table (individual day links)
+ * 6. Apply disabled states where needed
+ *
+ * AVAILABILITY LOGIC:
+ * - Past month → Everything enabled
+ * - Current month → Check if day/fortnight has passed
+ * - Future month → Everything disabled
+ *
+ * BACKEND TODO: None (pure frontend rendering, backend called on button/link clicks)
+ */
+function generateNotesDashboardContent(monthValue, fortnightIndex) {
+  const chartContainer = document.getElementById('chart-container');
+
+  if (!monthValue) {
+    chartContainer.innerHTML = '<div style="text-align:center; padding:2rem;">Please select a month to view notes</div>';
+    return;
+  }
+
+  // Parse selected month
+  const [yearStr, monthStr] = monthValue.split('-');
+  const selectedYear = parseInt(yearStr);
+  const selectedMonth = parseInt(monthStr) - 1; // Convert to 0-indexed
+  const monthName = monthNames[selectedMonth];
+
+  // Calculate days in selected month
+  const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+
+  // Define fortnights
+  const fortnights = [
+    { start: 1, end: 15, label: '1st Fortnight' },
+    { start: 16, end: daysInMonth, label: '2nd Fortnight' }
+  ];
+
+  // Get the selected fortnight
+  const fortnight = fortnights[fortnightIndex];
+
+  // Current date info
+  const currentYear = CURRENT_DATE.getFullYear();
+  const currentMonth = CURRENT_DATE.getMonth();
+  const currentDay = CURRENT_DATE.getDate();
+
+  let html = '<div style="width: 100%; max-width: 900px; margin: 0 auto;">';
+  html += '<h3 style="text-align: center; font-size: 1.3rem; font-weight: 700; color: #1f2937; margin-bottom: 1.5rem;">Download your Notes (Fortnight Compilation)</h3>';
+
+  // Add info modal
+  html += `
+    <div id="notesInfoModal" class="notes-modal" style="display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.5);">
+      <div class="notes-modal-content" style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 12px; width: 80%; max-width: 400px; text-align: center; font-size: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+        <p style="margin-bottom: 15px; line-height: 1.6;">Download all your notes of the Fortnight</p>
+        <button class="notes-modal-button" style="margin-top: 15px; padding: 10px 20px; border-radius: 9999px; border: none; background-color: #3498db; color: #fff; font-weight: bold; cursor: pointer; transition: all 0.3s;">Got it</button>
+      </div>
+    </div>
+  `;
+
+  // Generate table for the selected fortnight ONLY
+    // Determine if fortnight is complete
+    let isFortnightComplete = false;
+    let availableDate = '';
+
+    if (selectedYear < currentYear || (selectedYear === currentYear && selectedMonth < currentMonth)) {
+      // Past month - fortnight complete
+      isFortnightComplete = true;
+    } else if (selectedYear === currentYear && selectedMonth === currentMonth) {
+      // Current month - check if fortnight end has passed
+      if (currentDay > fortnight.end) {
+        isFortnightComplete = true;
+      } else {
+        // Calculate available date (day after fortnight ends)
+        const nextDay = fortnight.end + 1;
+        if (nextDay <= daysInMonth) {
+          availableDate = `${nextDay} ${monthName} ${selectedYear}`;
+        } else {
+          // Next month
+          const nextMonth = selectedMonth + 1;
+          if (nextMonth <= 11) {
+            availableDate = `1 ${monthNames[nextMonth]} ${selectedYear}`;
+          } else {
+            availableDate = `1 ${monthNames[0]} ${selectedYear + 1}`;
+          }
+        }
+      }
+    } else {
+      // Future month - not available
+      availableDate = `1 ${monthName} ${selectedYear}`;
+    }
+
+    const disabledClass = isFortnightComplete ? '' : 'disabled';
+    const tooltipText = isFortnightComplete
+      ? 'Download all your notes of the Fortnight'
+      : `Available on ${availableDate}`;
+
+    // Compilation Table
+    html += `
+      <table style="width: 100%; max-width: 700px; margin: 0 auto 1rem auto; border-collapse: separate; border-spacing: 0; border: 2px solid #cce0ff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); background: white;">
+        <thead>
+          <tr>
+            <th style="background: #e0f2ff; color: #1f2937; font-size: 1.1rem; padding: 0.75rem 1rem; font-weight: 600; text-align: center;">
+              ${fortnight.label} - Compilation
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding: 1rem; text-align: center;">
+              <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 2rem;">
+                <span style="font-weight: 700; font-size: 1.1rem; color: #1f2937;">${fortnight.start} - ${fortnight.end} ${monthName}</span>
+                <button class="notes-download-btn ${disabledClass}"
+                        data-fortnight="${fortnightIndex}"
+                        data-month="${selectedMonth}"
+                        data-year="${selectedYear}"
+                        data-complete="${isFortnightComplete}"
+                        style="position: relative; padding: 12px 30px; border-radius: 9999px; border: 2px solid #fff; background-color: ${isFortnightComplete ? '#3498db' : '#b0bec5'}; color: #fff; cursor: ${isFortnightComplete ? 'pointer' : 'not-allowed'}; font-weight: 600; font-size: 1.1rem; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.5px; ${!isFortnightComplete ? 'opacity: 0.6;' : ''}">
+                  <span class="button-text" style="text-transform: capitalize; font-weight: 600; color: #fff;">
+                    <span class="initial" style="text-transform: uppercase;">G</span>et
+                    <span class="initial" style="text-transform: uppercase;">Y</span>our
+                    <span class="initial" style="text-transform: uppercase;">N</span>otes
+                  </span>
+                  <span class="reg-symbol" style="font-size: 0.6em; margin-left: 4px; position: relative; top: -3px; color: #fff; font-weight: 300;">&reg;</span>
+                  <span class="notes-tooltip" style="visibility: hidden; opacity: 0; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: linear-gradient(to right, #FFD4B5, #FFFFFF, #B4EDB4); color: #333; text-align: center; border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: normal; transition: opacity 0.3s, visibility 0.3s; border: 1px solid #ccc; white-space: nowrap; z-index: 100; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);">${tooltipText}</span>
+                </button>
+                <span class="notes-info-icon" style="display: inline-block; margin-left: 8px; cursor: pointer; width: 20px; height: 20px; border-radius: 50%; background-color: #333; color: white; font-size: 12px; font-weight: bold; line-height: 20px; text-align: center; transition: all 0.2s;">i</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+
+    // Daily Downloads Table
+    html += `
+      <table style="width: 100%; max-width: 700px; margin: 0 auto 2rem auto; border-collapse: separate; border-spacing: 0; border: 2px solid #cce0ff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+        <thead>
+          <tr>
+            <th style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; text-align: center; font-size: 1.2rem; font-weight: 700;">
+              ${fortnight.label} - Daily Downloads
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    // Generate rows for each day
+    for (let day = fortnight.start; day <= fortnight.end; day++) {
+      const dateStr = `${day} ${monthName} ${selectedYear}`;
+      const isoDate = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+      // Check if this day has passed
+      let isDayAvailable = false;
+      if (selectedYear < currentYear || (selectedYear === currentYear && selectedMonth < currentMonth)) {
+        isDayAvailable = true;
+      } else if (selectedYear === currentYear && selectedMonth === currentMonth && day <= currentDay) {
+        isDayAvailable = true;
+      }
+
+      const linkStyle = isDayAvailable
+        ? 'color: #3498db; text-decoration: none; font-weight: 600; cursor: pointer;'
+        : 'color: #b0bec5; text-decoration: none; font-weight: 600; cursor: not-allowed; opacity: 0.5;';
+
+      html += `
+        <tr>
+          <td style="padding: 1rem; background-color: white; border-bottom: 1px solid #e0e0e0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem;">
+              <span style="font-weight: 600; color: #1f2937;">${dateStr}</span>
+              <a href="#" class="notes-daily-link" data-date="${isoDate}" data-available="${isDayAvailable}" style="${linkStyle}">Download</a>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    html += `
+        </tbody>
+      </table>
+    `;
+
+  html += '</div>';
+
+  // Inject HTML and adjust styling for Notes Dashboard
+  chartContainer.innerHTML = html;
+  chartContainer.style.border = 'none';
+  chartContainer.style.background = 'transparent';
+  chartContainer.style.height = 'auto';
+  chartContainer.style.maxWidth = 'none';
+  chartContainer.style.width = '100%';
+
+  // Add hover effect for tooltips and button lift
+  document.querySelectorAll('.notes-download-btn').forEach(btn => {
+    btn.addEventListener('mouseenter', function() {
+      const isComplete = this.dataset.complete === 'true';
+      if (isComplete) {
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 6px 15px rgba(0, 0, 0, 0.25)';
+      }
+      const tooltip = this.querySelector('.notes-tooltip');
+      if (tooltip) {
+        tooltip.style.visibility = 'visible';
+        tooltip.style.opacity = '1';
+        tooltip.style.fontWeight = 'bold';
+      }
+    });
+    btn.addEventListener('mouseleave', function() {
+      this.style.transform = '';
+      this.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
+      const tooltip = this.querySelector('.notes-tooltip');
+      if (tooltip) {
+        tooltip.style.visibility = 'hidden';
+        tooltip.style.opacity = '0';
+        tooltip.style.fontWeight = 'normal';
+      }
+    });
+  });
+
+  // Attach event listeners
+  attachNotesDashboardListeners();
+
+  // Info icon click handler
+  document.querySelectorAll('.notes-info-icon').forEach(icon => {
+    icon.addEventListener('click', () => {
+      document.getElementById('notesInfoModal').style.display = 'block';
+    });
+    icon.addEventListener('mouseenter', function() {
+      this.style.backgroundColor = '#555';
+    });
+    icon.addEventListener('mouseleave', function() {
+      this.style.backgroundColor = '#333';
+    });
+  });
+
+  // Modal close button
+  const modalButton = document.querySelector('.notes-modal-button');
+  if (modalButton) {
+    modalButton.addEventListener('click', () => {
+      document.getElementById('notesInfoModal').style.display = 'none';
+    });
+    modalButton.addEventListener('mouseenter', function() {
+      this.style.backgroundColor = '#2176bd';
+    });
+    modalButton.addEventListener('mouseleave', function() {
+      this.style.backgroundColor = '#3498db';
+    });
+  }
+
+  // Close modal when clicking outside
+  document.getElementById('notesInfoModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'notesInfoModal') {
+      document.getElementById('notesInfoModal').style.display = 'none';
+    }
+  });
+}
+
+/**
+ * Attaches event listeners to download buttons and links
+ *
+ * HANDLES:
+ * 1. Fortnight compilation button clicks
+ * 2. Daily download link clicks
+ *
+ * BACKEND TODO: Implement download endpoints (see comments below)
+ */
+function attachNotesDashboardListeners() {
+  // Fortnight compilation buttons
+  document.querySelectorAll('.notes-download-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const isComplete = this.dataset.complete === 'true';
+
+      if (!isComplete) {
+        console.log('⚠️ Fortnight not complete yet - button disabled');
+        return;
+      }
+
+      const fortnight = this.dataset.fortnight;
+      const month = this.dataset.month;
+      const year = this.dataset.year;
+      const fortnightLabel = fortnight === '0' ? '1st' : '2nd';
+
+      console.log(`📥 Download clicked: ${fortnightLabel} Fortnight of ${monthNames[month]} ${year}`);
+      alert(`Downloading ${fortnightLabel} Fortnight notes for ${monthNames[month]} ${year}\n\nThis will include all your:\n✅ Highlights\n✅ Summaries\n✅ Notes\n✅ Article attributes`);
+
+      // TODO: BACKEND - Implement fortnight compilation download
+      // ENDPOINT: GET /api/users/:userId/notes/fortnight
+      // QUERY PARAMS: ?month=9&year=2025&fortnight=0
+      // AUTHENTICATION: Check user session/token
+      //
+      // DATABASE QUERY:
+      // 1. Calculate date range:
+      //    - fortnight=0 → days 1-15
+      //    - fortnight=1 → days 16-end
+      // 2. Query all tables:
+      //    SELECT h.*, s.*, a.*
+      //    FROM user_highlights h
+      //    LEFT JOIN user_summaries s ON h.article_id = s.article_id
+      //    LEFT JOIN articles a ON h.article_id = a.article_id
+      //    WHERE h.user_id = :userId
+      //    AND a.date BETWEEN :startDate AND :endDate
+      //    ORDER BY a.date ASC
+      //
+      // RESPONSE FORMAT:
+      // - Generate PDF/DOCX with:
+      //   - Header: "Your Notes - [Fortnight Label] [Month] [Year]"
+      //   - For each article:
+      //     - Article title, date, source
+      //     - User's highlights (with context)
+      //     - User's summaries
+      //     - Tags
+      // - Set headers: Content-Type: application/pdf
+      //                Content-Disposition: attachment; filename="notes_oct_2025_1st.pdf"
+      // - Stream file to browser
+      //
+      // SECURITY:
+      // - Verify user owns these notes (user_id match)
+      // - Rate limit: Max 10 downloads per hour per user
+      // - Log download activity (audit trail)
+      //
+      // window.location.href = `/api/users/:userId/notes/fortnight?month=${month}&year=${year}&fortnight=${fortnight}`;
+    });
+  });
+
+  // Daily download links
+  document.querySelectorAll('.notes-daily-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const isAvailable = this.dataset.available === 'true';
+      const date = this.dataset.date;
+
+      if (!isAvailable) {
+        console.log(`⚠️ Notes for ${date} not available yet`);
+        return;
+      }
+
+      console.log(`📥 Daily download clicked: ${date}`);
+      alert(`Downloading notes for ${date}\n\nThis will include:\n✅ Your highlights\n✅ Your summaries\n✅ Article metadata`);
+
+      // TODO: BACKEND - Implement daily notes download
+      // ENDPOINT: GET /api/users/:userId/notes/daily
+      // QUERY PARAMS: ?date=2025-10-15
+      // AUTHENTICATION: Check user session/token
+      //
+      // DATABASE QUERY:
+      // SELECT h.*, s.*, a.*
+      // FROM user_highlights h
+      // LEFT JOIN user_summaries s ON h.article_id = s.article_id AND s.user_id = :userId
+      // LEFT JOIN articles a ON h.article_id = a.article_id
+      // WHERE h.user_id = :userId
+      // AND a.date = :date
+      // ORDER BY a.title ASC
+      //
+      // RESPONSE FORMAT:
+      // - Generate PDF/DOCX with:
+      //   - Header: "Your Notes - [Date in DD Month YYYY format]"
+      //   - For each article read that day:
+      //     - Article title
+      //     - Source, Section, Tags
+      //     - User's highlights (with surrounding context)
+      //     - User's summaries
+      // - Set headers: Content-Type: application/pdf
+      //                Content-Disposition: attachment; filename="notes_2025-10-15.pdf"
+      // - Stream file to browser
+      //
+      // EDGE CASES:
+      // - If user has no notes for that day: Return empty PDF with message
+      // - If date is invalid: Return 400 Bad Request
+      // - If date is in future: Return 403 Forbidden
+      //
+      // SECURITY:
+      // - Verify user owns these notes (user_id match)
+      // - Rate limit: Max 20 downloads per hour per user
+      // - Log download activity (audit trail)
+      //
+      // window.location.href = `/api/users/:userId/notes/daily?date=${date}`;
+    });
+  });
+}
+
+// ==================== BOOKMARKED ARTICLES DASHBOARD ====================
+
+/**
+ * Renders the Bookmarked Articles Dashboard
+ * Shows user's bookmarked articles organized by fortnight
+ * Uses same visual template as Notes Dashboard but without compilation section
+ */
+function renderBookmarkedArticles() {
+  const chartContainer = document.getElementById('chart-container');
+  const monthSelect = document.getElementById('month-select');
+  const fortnightChips = document.querySelectorAll('.fortnight-chip');
+
+  // Get currently selected month from existing dropdown
+  let selectedValue = monthSelect.value;
+
+  // If no month selected, default to current month
+  if (!selectedValue) {
+    selectedValue = '2025-10';
+    monthSelect.value = selectedValue;
+  }
+
+  // Determine current fortnight based on today's date
+  const currentDay = CURRENT_DATE.getDate();
+  const currentFortnightIndex = currentDay <= 15 ? 0 : 1;
+
+  // Set active fortnight chip
+  fortnightChips.forEach((chip, idx) => {
+    chip.classList.remove('active');
+    if (idx === currentFortnightIndex) {
+      chip.classList.add('active');
+    }
+  });
+
+  // Generate bookmarked articles content
+  generateBookmarkedContent(selectedValue, currentFortnightIndex);
+
+  // Listen for month changes
+  monthSelect.removeEventListener('change', handleMonthChangeForBookmarks);
+  monthSelect.addEventListener('change', handleMonthChangeForBookmarks);
+
+  // Listen for fortnight chip clicks
+  fortnightChips.forEach((chip, idx) => {
+    chip.removeEventListener('click', chip._bookmarksFortnightHandler);
+    chip._bookmarksFortnightHandler = () => {
+      fortnightChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      generateBookmarkedContent(monthSelect.value, idx);
+    };
+    chip.addEventListener('click', chip._bookmarksFortnightHandler);
+  });
+}
+
+/**
+ * Handles month dropdown changes for Bookmarked Articles
+ */
+function handleMonthChangeForBookmarks() {
+  const monthSelect = document.getElementById('month-select');
+  const fortnightChips = document.querySelectorAll('.fortnight-chip');
+
+  // Get currently active fortnight
+  let activeFortnightIndex = 0;
+  fortnightChips.forEach((chip, idx) => {
+    if (chip.classList.contains('active')) {
+      activeFortnightIndex = idx;
+    }
+  });
+
+  generateBookmarkedContent(monthSelect.value, activeFortnightIndex);
+}
+
+/**
+ * Generates bookmarked articles table for selected month and fortnight
+ * @param {string} monthValue - Format: "YYYY-MM"
+ * @param {number} fortnightIndex - 0 for 1st, 1 for 2nd
+ */
+function generateBookmarkedContent(monthValue, fortnightIndex) {
+  const chartContainer = document.getElementById('chart-container');
+
+  if (!monthValue) {
+    chartContainer.innerHTML = '<div style="text-align:center; padding:2rem;">Please select a month to view bookmarks</div>';
+    return;
+  }
+
+  // Parse selected month
+  const [yearStr, monthStr] = monthValue.split('-');
+  const selectedYear = parseInt(yearStr);
+  const selectedMonth = parseInt(monthStr) - 1;
+  const monthName = monthNames[selectedMonth];
+
+  // Calculate days in selected month
+  const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+
+  // Define fortnights
+  const fortnights = [
+    { start: 1, end: 15, label: '1st Fortnight' },
+    { start: 16, end: daysInMonth, label: '2nd Fortnight' }
+  ];
+
+  const fortnight = fortnights[fortnightIndex];
+
+  // TODO: BACKEND - Fetch bookmarked articles for this fortnight
+  // ENDPOINT: GET /api/users/:userId/bookmarks?month=X&year=Y&fortnight=Z
+  // For now, using dummy data
+  const DUMMY_BOOKMARKS = [
+    { date: '2025-10-01', title: 'Economic Survey 2024-25: Key Highlights and Analysis', article_id: 'OCT01-ECON' },
+    { date: '2025-10-03', title: 'India-US Strategic Partnership: New Developments', article_id: 'OCT03-IR' },
+    { date: '2025-10-05', title: 'Climate Change and Monsoon Patterns in India', article_id: 'OCT05-ENV' },
+    { date: '2025-10-08', title: 'Digital Public Infrastructure: UPI Success Story', article_id: 'OCT08-TECH' },
+    { date: '2025-10-12', title: 'Women Reservation Bill: Implementation Roadmap', article_id: 'OCT12-POL' }
+  ];
+
+  let html = '<div style="width: 100%; max-width: 900px; margin: 0 auto;">';
+
+  // Single table showing bookmarked articles
+  html += `
+    <table style="width: 100%; max-width: 700px; margin: 0 auto 2rem auto; border-collapse: separate; border-spacing: 0; border: 2px solid #cce0ff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+      <thead>
+        <tr>
+          <th style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; text-align: center; font-size: 1.2rem; font-weight: 700;">
+            ${fortnight.label} - Bookmarked Articles
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  // Generate rows for each day in the fortnight
+  for (let day = fortnight.start; day <= fortnight.end; day++) {
+    const dateStr = `${day} ${monthName}`;
+    const fullDateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+    // Find bookmark for this date
+    const bookmark = DUMMY_BOOKMARKS.find(b => b.date === fullDateStr);
+
+    if (bookmark) {
+      html += `
+        <tr>
+          <td style="padding: 1rem; background-color: white; border-bottom: 1px solid #e0e0e0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; gap: 1rem;">
+              <span style="font-weight: 700; color: #1f2937; min-width: 80px;">${dateStr}</span>
+              <a href="/articles/${bookmark.article_id}"
+                 class="bookmark-article-link"
+                 data-article-id="${bookmark.article_id}"
+                 style="flex: 1; color: #3498db; text-decoration: none; font-weight: 600; cursor: pointer; text-align: left;"
+                 onmouseover="this.style.color='#fc7306'; this.style.textDecoration='underline';"
+                 onmouseout="this.style.color='#3498db'; this.style.textDecoration='none';">
+                ${bookmark.title}
+              </a>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+  }
+
+  // If no bookmarks found
+  if (!DUMMY_BOOKMARKS.some(b => {
+    const bookmarkDate = new Date(b.date);
+    return bookmarkDate.getFullYear() === selectedYear &&
+           bookmarkDate.getMonth() === selectedMonth &&
+           bookmarkDate.getDate() >= fortnight.start &&
+           bookmarkDate.getDate() <= fortnight.end;
+  })) {
+    html += `
+      <tr>
+        <td style="padding: 2rem; background-color: white; text-align: center; color: #6b7280; font-style: italic;">
+          No bookmarked articles in this fortnight
+        </td>
+      </tr>
+    `;
+  }
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  html += '</div>';
+
+  // Inject HTML
+  chartContainer.innerHTML = html;
+  chartContainer.style.border = 'none';
+  chartContainer.style.background = 'transparent';
+  chartContainer.style.height = 'auto';
+  chartContainer.style.maxWidth = 'none';
+  chartContainer.style.width = '100%';
+
+  // Attach event listeners for article links
+  document.querySelectorAll('.bookmark-article-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const articleId = this.dataset.articleId;
+      console.log(`📖 Opening bookmarked article: ${articleId}`);
+
+      // TODO: BACKEND - Navigate to article page
+      // window.location.href = `/articles/${articleId}`;
+      alert(`Opening article: ${this.textContent}`);
+    });
+  });
+}
+
+// ==================== READING INSIGHTS DASHBOARD ====================
+
+// Store chart instance globally to destroy/recreate
+let readingInsightsChart = null;
+
+/**
+ * READING INSIGHTS ANALYTICS DASHBOARD
+ *
+ * Renders reading progress visualization with donut chart, stats, and unread articles
+ *
+ * FRONTEND FEATURES:
+ * - Single ring donut chart: User's read (green) vs unread (red)
+ * - Larger segment: 3D raised effect, dotted arc border, external label
+ * - Smaller segment: label inside on arc
+ * - Dynamic border colors: Green (≥80%), Orange (50-79%), Red (<50% with blink)
+ * - Scrollable unread articles list (max-height: 700px)
+ * - Stats card positioned above chart
+ * - Three separate panels with borders and shadows
+ *
+ * BACKEND INTEGRATION POINTS:
+ * - API Endpoint: GET /api/users/:userId/reading-insights?year=YYYY&month=MM&fortnight=0|1
+ * - Response includes: total_published, total_read, completion_percentage, community_avg, unread_articles[]
+ * - Mark as Read: POST /api/users/:userId/articles/:articleId/mark-read (called when article clicked)
+ * - Article Links: /articles.html?id=XXX&autoScroll=true&autoExpand=true
+ *
+ * TODO (Backend Ready):
+ * 1. Replace DUMMY_DATA with fetch() call to API endpoint
+ * 2. Handle loading states and errors
+ * 3. Implement real mark-as-read on article click
+ * 4. Add authentication token to requests
+ */
+function renderReadingInsights() {
+  const chartContainer = document.getElementById('chart-container');
+  const monthSelect = document.getElementById('month-select');
+  const fortnightChips = document.querySelectorAll('.fortnight-chip');
+
+  // Get currently selected month from existing dropdown
+  let selectedValue = monthSelect.value;
+
+  // If no month selected, default to current month
+  if (!selectedValue) {
+    selectedValue = '2025-10';
+    monthSelect.value = selectedValue;
+  }
+
+  // Determine current fortnight based on today's date
+  const currentDay = CURRENT_DATE.getDate();
+  const currentFortnightIndex = currentDay <= 15 ? 0 : 1;
+
+  // Set active fortnight chip
+  fortnightChips.forEach((chip, idx) => {
+    chip.classList.remove('active');
+    if (idx === currentFortnightIndex) {
+      chip.classList.add('active');
+    }
+  });
+
+  // Generate reading insights content
+  generateReadingInsightsContent(selectedValue, currentFortnightIndex);
+
+  // Listen for month changes
+  monthSelect.removeEventListener('change', handleMonthChangeForReadingInsights);
+  monthSelect.addEventListener('change', handleMonthChangeForReadingInsights);
+
+  // Listen for fortnight chip clicks
+  fortnightChips.forEach((chip, idx) => {
+    chip.removeEventListener('click', chip._readingInsightsFortnightHandler);
+    chip._readingInsightsFortnightHandler = () => {
+      fortnightChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      generateReadingInsightsContent(monthSelect.value, idx);
+    };
+    chip.addEventListener('click', chip._readingInsightsFortnightHandler);
+  });
+}
+
+/**
+ * Handles month dropdown changes for Reading Insights
+ */
+function handleMonthChangeForReadingInsights() {
+  const monthSelect = document.getElementById('month-select');
+  const fortnightChips = document.querySelectorAll('.fortnight-chip');
+
+  // Get currently active fortnight
+  let activeFortnightIndex = 0;
+  fortnightChips.forEach((chip, idx) => {
+    if (chip.classList.contains('active')) {
+      activeFortnightIndex = idx;
+    }
+  });
+
+  generateReadingInsightsContent(monthSelect.value, activeFortnightIndex);
+}
+
+/**
+ * Generates reading insights content for selected month/fortnight
+ *
+ * BACKEND INTEGRATION:
+ * This function should fetch data from backend API instead of using DUMMY_DATA
+ *
+ * API Call: GET /api/users/:userId/reading-insights?year=YYYY&month=MM&fortnight=0|1
+ *
+ * Expected Response:
+ * {
+ *   total_published: 15,
+ *   total_read: 10,
+ *   completion_percentage: 67,
+ *   community_avg: 45,
+ *   unread_articles: [
+ *     { article_id: 123, title: "Article Title", publish_date: "2025-10-18" },
+ *     ...
+ *   ]
+ * }
+ *
+ * @param {string} monthValue - Format: "YYYY-MM"
+ * @param {number} fortnightIndex - 0 for 1st fortnight (1-15), 1 for 2nd fortnight (16-end)
+ */
+async function generateReadingInsightsContent(monthValue, fortnightIndex) {
+  const chartContainer = document.getElementById('chart-container');
+
+  if (!monthValue) {
+    chartContainer.innerHTML = '<div style="text-align:center; padding:2rem;">Please select a month to view reading insights</div>';
+    return;
+  }
+
+  // Parse selected month
+  const [yearStr, monthStr] = monthValue.split('-');
+  const selectedYear = parseInt(yearStr);
+  const selectedMonth = parseInt(monthStr) - 1;
+  const monthName = monthNames[selectedMonth];
+
+  // Calculate days in selected month
+  const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+
+  // Define fortnights
+  const fortnights = [
+    { start: 1, end: 15, label: '1st Fortnight' },
+    { start: 16, end: daysInMonth, label: '2nd Fortnight' }
+  ];
+
+  const fortnight = fortnights[fortnightIndex];
+
+  // 6 DIFFERENT DUMMY DATASETS (3 months × 2 fortnights)
+  const DUMMY_DATA = {
+    '2025-08-0': { // Aug 1st: ZERO READ - All 15 Unread (0%) - SCROLLING TEST
+      total_published: 15, total_read: 0, completion_percentage: 0, community_avg: 45,
+      unread_articles: [
+        { article_id: 801, title: "India's Maritime Security Strategy", publish_date: "2025-08-01" },
+        { article_id: 802, title: "Agricultural Reforms: Implementation Challenges", publish_date: "2025-08-02" },
+        { article_id: 803, title: "Healthcare Infrastructure Development", publish_date: "2025-08-03" },
+        { article_id: 804, title: "Digital India Mission: Progress Report", publish_date: "2025-08-04" },
+        { article_id: 805, title: "Environmental Policy Framework", publish_date: "2025-08-05" },
+        { article_id: 806, title: "Financial Sector Reforms and Banking", publish_date: "2025-08-06" },
+        { article_id: 807, title: "National Education Policy Implementation", publish_date: "2025-08-07" },
+        { article_id: 808, title: "Infrastructure Development: Road and Railways", publish_date: "2025-08-08" },
+        { article_id: 809, title: "Climate Change Mitigation Strategies", publish_date: "2025-08-09" },
+        { article_id: 810, title: "Foreign Policy: India-US Relations", publish_date: "2025-08-10" },
+        { article_id: 811, title: "Renewable Energy: Solar and Wind Power", publish_date: "2025-08-11" },
+        { article_id: 812, title: "Urban Housing and Slum Rehabilitation", publish_date: "2025-08-12" },
+        { article_id: 813, title: "Technology Transfer and Innovation", publish_date: "2025-08-13" },
+        { article_id: 814, title: "Water Conservation and Management", publish_date: "2025-08-14" },
+        { article_id: 815, title: "Defence Procurement and Modernization", publish_date: "2025-08-15" }
+      ]
+    },
+    '2025-08-1': { // Aug 2nd: Medium (55%)
+      total_published: 15, total_read: 8, completion_percentage: 55, community_avg: 45,
+      unread_articles: [
+        { article_id: 811, title: "Financial Inclusion Initiatives", publish_date: "2025-08-18" },
+        { article_id: 812, title: "Urban Planning and Smart Cities", publish_date: "2025-08-22" },
+        { article_id: 813, title: "Trade Policy Updates", publish_date: "2025-08-25" },
+        { article_id: 814, title: "Renewable Energy Transition", publish_date: "2025-08-28" }
+      ]
+    },
+    '2025-09-0': { // Sep 1st: High (82%)
+      total_published: 15, total_read: 12, completion_percentage: 82, community_avg: 45,
+      unread_articles: [
+        { article_id: 901, title: "Foreign Policy Developments", publish_date: "2025-09-05" },
+        { article_id: 902, title: "Education System Reforms", publish_date: "2025-09-11" },
+        { article_id: 903, title: "Industrial Policy Framework", publish_date: "2025-09-13" }
+      ]
+    },
+    '2025-09-1': { // Sep 2nd: Low (45%)
+      total_published: 15, total_read: 7, completion_percentage: 45, community_avg: 45,
+      unread_articles: [
+        { article_id: 911, title: "Infrastructure Development Plans", publish_date: "2025-09-17" },
+        { article_id: 912, title: "Social Welfare Schemes Analysis", publish_date: "2025-09-20" },
+        { article_id: 913, title: "Technology and Innovation Policy", publish_date: "2025-09-23" },
+        { article_id: 914, title: "Climate Action Framework", publish_date: "2025-09-26" },
+        { article_id: 915, title: "Defence Modernization Program", publish_date: "2025-09-29" }
+      ]
+    },
+    '2025-10-0': { // Oct 1st: Perfect (100%)
+      total_published: 15, total_read: 15, completion_percentage: 100, community_avg: 45,
+      unread_articles: [] // All caught up!
+    },
+    '2025-10-1': { // Oct 2nd: Medium (68%)
+      total_published: 15, total_read: 10, completion_percentage: 68, community_avg: 45,
+      unread_articles: [
+        { article_id: 1021, title: "India's Semiconductor Policy: Challenges Ahead", publish_date: "2025-10-18" },
+        { article_id: 1022, title: "Supreme Court Verdict on Article 370: Analysis", publish_date: "2025-10-22" },
+        { article_id: 1023, title: "Climate Financing at COP28: India's Position", publish_date: "2025-10-25" },
+        { article_id: 1024, title: "Digital Payment Systems: UPI Growth Story", publish_date: "2025-10-28" },
+        { article_id: 1025, title: "Space Policy and ISRO Achievements", publish_date: "2025-10-30" }
+      ]
+    }
+  };
+
+  // Get data for selected month-fortnight
+  const dataKey = `${yearStr}-${String(parseInt(monthStr)).padStart(2, '0')}-${fortnightIndex}`;
+  const data = DUMMY_DATA[dataKey] || DUMMY_DATA['2025-10-1']; // Default fallback
+
+  const { total_published, total_read, completion_percentage, community_avg, unread_articles } = data;
+
+  // Determine border color and animation for stats card
+  let borderColor, borderClass;
+  if (completion_percentage >= 80) {
+    borderColor = '#10b981'; // Green
+    borderClass = '';
+  } else if (completion_percentage >= 50) {
+    borderColor = '#fc7306'; // Orange (brand color)
+    borderClass = '';
+  } else {
+    borderColor = '#ef4444'; // Red
+    borderClass = 'blink-border';
+  }
+
+  // Check if this is current fortnight for disclaimer
+  const today = new Date();
+  const isCurrentFortnight = (
+    selectedYear === today.getFullYear() &&
+    selectedMonth === today.getMonth() &&
+    today.getDate() >= fortnight.start &&
+    today.getDate() <= fortnight.end
+  );
+
+  const todayFormatted = `${today.getDate()} ${monthNames[today.getMonth()]} ${today.getFullYear()}`;
+
+  let html = '<div style="width: 100%; max-width: 1200px; margin: 0 auto;">';
+
+  // Header with disclaimer
+  html += `
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <h3 class="reading-insights-header" style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">
+        ${fortnight.label} Reading Analytics
+      </h3>
+  `;
+
+  // Add disclaimer only for current fortnight
+  if (isCurrentFortnight) {
+    html += `
+      <p style="font-size: 0.9rem; color: #6b7280; font-style: italic;">
+        📅 Current fortnight - Data as of ${todayFormatted}
+      </p>
+    `;
+  }
+
+  html += `</div>`;
+
+  // THREE SEPARATE PANELS LAYOUT: Chart Panel + Stats Panel + Article List Panel
+  html += `
+    <div class="reading-insights-container" style="display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;">
+
+      <!-- LEFT SECTION: Stats + Chart (Reordered) -->
+      <div class="reading-insights-left-section" style="flex: 1; min-width: 400px; display: flex; flex-direction: column; gap: 1.5rem;">
+
+        <!-- Stats Card Panel (MOVED TO TOP) -->
+        <div class="${borderClass} reading-insights-panel" style="background: #fafaf9; border: 3px solid ${borderColor}; padding: 1.5rem; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); border-width: 2px;">
+          <div class="reading-insights-stats-main" style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem;">
+            ${total_read} / ${total_published} Articles Read (${completion_percentage}%)
+          </div>
+          <div class="reading-insights-stats-sub" style="font-size: 1.1rem; font-weight: 600; color: #6b7280;">
+            You: ${completion_percentage}% | Community Avg: ${community_avg}%
+          </div>
+        </div>
+
+        <!-- Chart Panel (MOVED TO BOTTOM) -->
+        <div class="reading-insights-panel" style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); overflow: visible; border: 2px solid #e5e7eb;">
+          <div class="chart-wrapper">
+            <canvas id="reading-insights-chart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT PANEL: Unread Articles List (Separate Card with Scrolling) -->
+      <div class="reading-insights-article-panel reading-insights-panel" style="flex: 1; min-width: 400px; background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); border: 2px solid #e5e7eb; max-height: 700px; overflow-y: auto; display: flex; flex-direction: column;">
+  `;
+
+  // Unread articles table (clean version - date + title only)
+  if (unread_articles.length > 0) {
+    html += `
+      <table style="width: 100%; max-width: 700px; margin: 0 auto 2rem auto; border-collapse: separate; border-spacing: 0; border: 2px solid #cce0ff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+        <thead>
+          <tr>
+            <th style="background: linear-gradient(135deg, #fc7306 0%, #e67e22 100%); color: white; padding: 1rem; text-align: center; font-size: 1.2rem; font-weight: 700;">
+              Unread Articles (${unread_articles.length})
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    unread_articles.forEach(article => {
+      const publishDate = new Date(article.publish_date);
+      const day = publishDate.getDate();
+      const month = monthNames[publishDate.getMonth()];
+
+      html += `
+        <tr>
+          <td style="padding: 1rem; background-color: white; border-bottom: 1px solid #e0e0e0;">
+            <div style="display: flex; align-items: baseline; gap: 1rem;">
+              <span style="color: #6b7280; font-size: 0.95rem; min-width: 80px; white-space: nowrap;">${day} ${month}</span>
+              <a href="/articles/${article.article_id}"
+                 class="reading-insights-article-link"
+                 data-article-id="${article.article_id}"
+                 style="color: #3498db; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 1.05rem; flex: 1;"
+                 onmouseover="this.style.color='#fc7306'; this.style.textDecoration='underline';"
+                 onmouseout="this.style.color='#3498db'; this.style.textDecoration='none';">
+                ${article.title}
+              </a>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `
+        </tbody>
+      </table>
+    `;
+  } else {
+    // All caught up message
+    html += `
+      <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 2rem; border-radius: 12px; text-align: center; font-size: 1.3rem; font-weight: 700; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);">
+        🎉 All caught up! You've read everything published this fortnight
+      </div>
+    `;
+  }
+
+  html += `
+      </div><!-- End right panel -->
+    </div><!-- End horizontal layout -->
+  </div><!-- End main container -->
+  `;
+
+  // Inject HTML
+  chartContainer.innerHTML = html;
+  chartContainer.style.border = 'none';
+  chartContainer.style.background = 'transparent';
+  chartContainer.style.height = 'auto';
+  chartContainer.style.maxWidth = 'none';
+  chartContainer.style.width = '100%';
+
+  // Create nested donut chart with new design
+  createNestedDonutChart(total_read, total_published, completion_percentage, community_avg);
+
+  // Attach event listeners for article links with backend integration
+  document.querySelectorAll('.reading-insights-article-link').forEach(link => {
+    link.addEventListener('click', async function(e) {
+      e.preventDefault();
+      const articleId = this.dataset.articleId;
+      const articleTitle = this.textContent;
+
+      console.log(`📖 Opening unread article: ${articleId}`);
+
+      // BACKEND INTEGRATION: Mark article as read when clicked
+      // This ensures reading progress is tracked immediately
+      try {
+        // TODO: Replace with real API call when backend is ready
+        // await markArticleAsRead(articleId);
+
+        // For now, show alert (remove when backend ready)
+        alert(`Opening article: ${articleTitle}\n\n✅ This article will be marked as READ when you open it`);
+
+        // NAVIGATION: Open article in new tab with auto-scroll and auto-expand
+        // The article page will:
+        // 1. Scroll to the specific article (if multiple on same day)
+        // 2. Auto-expand the article content (click arrow automatically)
+        // 3. Show article in reading mode
+
+        // TODO: Uncomment when articles.html supports these parameters
+        // window.open(`/articles.html?id=${articleId}&autoScroll=true&autoExpand=true`, '_blank');
+
+      } catch (error) {
+        console.error('Error marking article as read:', error);
+        alert('Failed to mark article as read. Please try again.');
+      }
+    });
+  });
+}
+
+/**
+ * BACKEND API INTEGRATION FUNCTION
+ * Marks an article as read for the current user
+ *
+ * ENDPOINT: POST /api/users/:userId/articles/:articleId/mark-read
+ *
+ * @param {number} articleId - The ID of the article to mark as read
+ * @returns {Promise<void>}
+ *
+ * TODO: Implement when backend is ready
+ * This function should:
+ * 1. Get user ID from session/localStorage
+ * 2. Send POST request with authentication token
+ * 3. Update local state if needed
+ * 4. Handle errors gracefully
+ */
+async function markArticleAsRead(articleId) {
+  // TODO: Get userId from session/authentication
+  const userId = getCurrentUserId(); // Implement this function
+
+  // TODO: Get auth token
+  const authToken = getAuthToken(); // Implement this function
+
+  const response = await fetch(`/api/users/${userId}/articles/${articleId}/mark-read`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`
+    },
+    body: JSON.stringify({
+      read_at: new Date().toISOString()
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to mark article as read: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  console.log('✅ Article marked as read:', data);
+  return data;
+}
+
+/**
+ * BACKEND API INTEGRATION FUNCTION
+ * Fetches reading insights data for a specific month/fortnight
+ *
+ * ENDPOINT: GET /api/users/:userId/reading-insights?year=YYYY&month=MM&fortnight=0|1
+ *
+ * @param {number} year - Full year (e.g., 2025)
+ * @param {number} month - Month (1-12)
+ * @param {number} fortnight - Fortnight index (0 for 1st, 1 for 2nd)
+ * @returns {Promise<Object>} Reading insights data
+ *
+ * TODO: Implement when backend is ready
+ * Replace DUMMY_DATA usage in generateReadingInsightsContent with this function
+ */
+async function fetchReadingInsights(year, month, fortnight) {
+  // TODO: Get userId from session/authentication
+  const userId = getCurrentUserId();
+
+  // TODO: Get auth token
+  const authToken = getAuthToken();
+
+  const response = await fetch(
+    `/api/users/${userId}/reading-insights?year=${year}&month=${month}&fortnight=${fortnight}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch reading insights: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+// TODO: Implement these helper functions based on your authentication system
+function getCurrentUserId() {
+  // Example: return localStorage.getItem('userId') || sessionStorage.getItem('userId');
+  return 'USER_ID_PLACEHOLDER';
+}
+
+function getAuthToken() {
+  // Example: return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+  return 'AUTH_TOKEN_PLACEHOLDER';
+}
+
+/**
+ * Creates SINGLE RING donut chart with Chart.js
+ * Features:
+ * - Single ring: Green (read) + Red (unread)
+ * - Dark grey dotted divider from inner radius (not center) to outer edge
+ * - Larger segment: 3D raised effect + dotted arc border on outer edge + label OUTSIDE
+ * - Smaller segment: label INSIDE on the arc
+ */
+function createNestedDonutChart(totalRead, totalPublished, userPercentage, communityAvg) {
+  const canvas = document.getElementById('reading-insights-chart');
+  if (!canvas) return;
+
+  // Destroy previous chart instance
+  if (readingInsightsChart) {
+    readingInsightsChart.destroy();
+  }
+
+  const ctx = canvas.getContext('2d');
+
+  // Calculate unread and percentages
+  const totalUnread = totalPublished - totalRead;
+  const readPercentage = userPercentage;
+  const unreadPercentage = 100 - userPercentage;
+
+  // Determine which segment is larger
+  const isReadLarger = totalRead > totalUnread;
+  const largerSegmentIndex = isReadLarger ? 0 : 1;
+  const largerPercentage = isReadLarger ? readPercentage : unreadPercentage;
+  const smallerPercentage = isReadLarger ? unreadPercentage : readPercentage;
+
+  readingInsightsChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      datasets: [
+        // SINGLE RING: User's reading (Green=read, Red=unread)
+        {
+          label: 'Your Reading',
+          data: [totalRead, totalUnread],
+          backgroundColor: [
+            '#10b981', // Green for read articles
+            '#ef4444'  // Red for unread articles
+          ],
+          borderWidth: 4,
+          borderColor: '#ffffff',
+          // Note: offset doesn't work for doughnuts, we'll simulate 3D with custom drawing
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 1,
+      layout: {
+        padding: {
+          top: 85,
+          bottom: 85,
+          left: 85,
+          right: 85
+        }
+      },
+      cutout: '65%', // Larger donut hole
+      spacing: 0,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            label: function(context) {
+              const value = context.parsed;
+              return context.dataIndex === 0
+                ? `✅ Read: ${value} articles (${readPercentage}%)`
+                : `📖 Unread: ${value} articles (${unreadPercentage}%)`;
+            }
+          }
+        },
+        datalabels: {
+          display: false
+        }
+      }
+    },
+    plugins: [{
+      id: 'customEffects',
+      // STEP 1: Draw 3D raised effect for larger segment BEFORE main chart
+      beforeDatasetsDraw: function(chart) {
+        const ctx = chart.ctx;
+        const meta = chart.getDatasetMeta(0);
+
+        if (meta.data.length === 2) {
+          const largerSegment = meta.data[largerSegmentIndex];
+
+          if (largerSegment) {
+            const centerX = chart.width / 2;
+            const centerY = chart.height / 2;
+            const innerRadius = meta.controller.innerRadius;
+            const outerRadius = meta.controller.outerRadius;
+
+            // Draw larger segment with increased outer radius for 3D raised effect
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(
+              centerX,
+              centerY,
+              outerRadius + 8, // Increase outer radius by 8px for raised effect
+              largerSegment.startAngle,
+              largerSegment.endAngle
+            );
+            ctx.arc(
+              centerX,
+              centerY,
+              innerRadius,
+              largerSegment.endAngle,
+              largerSegment.startAngle,
+              true
+            );
+            ctx.closePath();
+
+            // Fill with same color as segment
+            ctx.fillStyle = largerSegmentIndex === 0 ? '#10b981' : '#ef4444';
+            ctx.fill();
+
+            // Add white border
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+      },
+
+      // STEP 2: Draw custom elements AFTER chart
+      afterDatasetsDraw: function(chart) {
+        const ctx = chart.ctx;
+        const meta = chart.getDatasetMeta(0);
+
+        if (meta.data.length === 2) {
+          const segment1 = meta.data[0]; // Read (green)
+          const segment2 = meta.data[1]; // Unread (red)
+          const largerSegment = meta.data[largerSegmentIndex];
+          const smallerSegment = meta.data[largerSegmentIndex === 0 ? 1 : 0];
+
+          if (segment1 && segment2) {
+            const centerX = chart.width / 2;
+            const centerY = chart.height / 2;
+            const boundaryAngle = segment1.endAngle;
+            const innerRadius = meta.controller.innerRadius;
+            const outerRadius = meta.controller.outerRadius;
+            const raisedOuterRadius = outerRadius + 8; // Match raised effect
+
+            // === 1. DARK GREY DOTTED DIVIDER (inner radius to outer edge) ===
+            ctx.save();
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = '#4b5563'; // Dark grey
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            const dividerStartX = centerX + Math.cos(boundaryAngle) * innerRadius;
+            const dividerStartY = centerY + Math.sin(boundaryAngle) * innerRadius;
+            const dividerEndX = centerX + Math.cos(boundaryAngle) * raisedOuterRadius;
+            const dividerEndY = centerY + Math.sin(boundaryAngle) * raisedOuterRadius;
+
+            ctx.moveTo(dividerStartX, dividerStartY);
+            ctx.lineTo(dividerEndX, dividerEndY);
+            ctx.stroke();
+            ctx.restore();
+
+            // === 2. DOTTED ARC BORDER on OUTER edge of LARGER segment (with gap) ===
+            ctx.save();
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = '#4b5563'; // Dark grey
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            // Add 12px gap between segment edge and dotted arc for better contrast
+            ctx.arc(
+              centerX,
+              centerY,
+              raisedOuterRadius + 12,
+              largerSegment.startAngle,
+              largerSegment.endAngle
+            );
+            ctx.stroke();
+            ctx.restore();
+
+            // === 3. LABELS ===
+            ctx.save();
+            ctx.font = 'bold 20px Poppins, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // LARGER SEGMENT: Label OUTSIDE the dotted arc (account for 12px gap)
+            const largerMidAngle = largerSegment.startAngle + (largerSegment.endAngle - largerSegment.startAngle) / 2;
+            const outsideLabelRadius = raisedOuterRadius + 12 + 30; // Gap + extra space
+            const largerLabelX = centerX + Math.cos(largerMidAngle) * outsideLabelRadius;
+            const largerLabelY = centerY + Math.sin(largerMidAngle) * outsideLabelRadius;
+
+            ctx.fillStyle = '#1f2937'; // Dark text for visibility
+            ctx.font = 'bold 22px Poppins, sans-serif';
+            ctx.fillText(`${largerPercentage}%`, largerLabelX, largerLabelY);
+
+            // SMALLER SEGMENT: Label INSIDE on the arc (much smaller text)
+            const smallerMidAngle = smallerSegment.startAngle + (smallerSegment.endAngle - smallerSegment.startAngle) / 2;
+            const insideLabelRadius = (innerRadius + outerRadius) / 2;
+            const smallerLabelX = centerX + Math.cos(smallerMidAngle) * insideLabelRadius;
+            const smallerLabelY = centerY + Math.sin(smallerMidAngle) * insideLabelRadius;
+
+            ctx.fillStyle = '#ffffff'; // White text on colored background
+            ctx.font = 'bold 14px Poppins, sans-serif'; // Much smaller
+            ctx.fillText(`${smallerPercentage}%`, smallerLabelX, smallerLabelY);
+
+            ctx.restore();
+          }
+        }
+      },
+
+      // STEP 3: Center text showing article count
+      beforeDraw: function(chart) {
+        const width = chart.width;
+        const height = chart.height;
+        const ctx = chart.ctx;
+
+        ctx.restore();
+
+        // Draw article count in center - MUCH SMALLER
+        ctx.font = `bold ${(height / 180).toFixed(2)}em Poppins, sans-serif`; // Much smaller
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+
+        const text = `${totalRead}/${totalPublished}`;
+        const textX = width / 2;
+        const textY = height / 2 - (height / 40); // Move up slightly for spacing
+
+        // Text color based on performance
+        if (userPercentage >= 80) {
+          ctx.fillStyle = '#10b981'; // Green
+        } else if (userPercentage >= 50) {
+          ctx.fillStyle = '#fc7306'; // Orange (brand)
+        } else {
+          ctx.fillStyle = '#ef4444'; // Red
+        }
+
+        ctx.fillText(text, textX, textY);
+
+        // Small "Articles" label below with MORE SPACE
+        ctx.font = `600 ${(height / 250).toFixed(2)}em Poppins, sans-serif`; // Even smaller
+        ctx.fillStyle = '#6b7280';
+        ctx.fillText('Articles', textX, textY + (height / 15)); // More spacing
+
+        ctx.save();
+      }
+    }]
+  });
+}
+
+/**
+ * Checks subscription status and redirects if inactive
+ * @param {string} topic - 'current-affairs' or 'ethics-essay'
+ * @param {string} targetUrl - URL to redirect to if active
+ * @returns {boolean} - true if redirect occurred
+ */
+function checkSubscriptionAndRedirect(topic, targetUrl) {
+  // TODO: Backend: GET /api/users/:userId/subscriptions
+  const subscription = DEMO_USER.subscriptions.find(sub => sub.topic === topic);
+
+  if (!subscription || subscription.status !== 'active') {
+    // Subscription INACTIVE - Redirect to dashboard
+    console.log(`❌ ${topic} subscription inactive - Redirecting to dashboard`);
+
+    // Add highlight parameter to URL
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('highlight', topic);
+
+    // Reload page with highlight parameter
+    window.location.href = currentUrl.toString();
+    return true;
+  } else {
+    // Subscription ACTIVE - Allow access
+    console.log(`✅ ${topic} subscription active - Redirecting to content`);
+    window.location.href = targetUrl;
+    return false;
+  }
+}
+
+// ==================== CHECK FOR HIGHLIGHT PARAMETER ON PAGE LOAD ====================
+function checkHighlightParameter() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const highlightTopic = urlParams.get('highlight');
+
+  if (highlightTopic) {
+    console.log(`🎯 Highlight parameter detected: ${highlightTopic}`);
+    highlightSubscriptionButton(highlightTopic);
+
+    // Remove parameter from URL (clean up)
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.delete('highlight');
+    window.history.replaceState({}, '', newUrl.toString());
+  }
+}
+
+// ==================== TESTBED: SIMULATED DATE CLICK HANDLERS ====================
+
+// Simulate weekday date click (Current Affairs)
+document.getElementById('test-weekday-btn')?.addEventListener('click', () => {
+  console.log('🧪 TESTBED: Simulating weekday date click (15 Oct)');
+  // TODO: In production, this would be: window.location.href = '/articles/2025-10-15'
+  // For now, check subscription and redirect if inactive
+  checkSubscriptionAndRedirect('current-affairs', '/articles/2025-10-15');
+});
+
+// Simulate Sunday date click (Ethics & Essay)
+document.getElementById('test-sunday-btn')?.addEventListener('click', () => {
+  console.log('🧪 TESTBED: Simulating Sunday date click (19 Oct)');
+  // TODO: In production, this would be: window.location.href = '/ethics-essay'
+  // For now, check subscription and redirect if inactive
+  checkSubscriptionAndRedirect('ethics-essay', '/ethics-essay');
+});
+
+// ==================== NAV BUTTON: ETHICS & ESSAY SUBSCRIPTION CHECK ====================
+document.getElementById('nav-ethics-btn')?.addEventListener('click', (e) => {
+  e.preventDefault(); // Prevent default navigation
+  console.log('📍 Ethics & Essay nav button clicked');
+
+  // TODO: Backend: GET /api/users/:userId/subscriptions
+  // TODO: Check if ethics-essay subscription is active
+  checkSubscriptionAndRedirect('ethics-essay', '/ethics-essay');
+});
+
+// ==================== INITIALIZE ON PAGE LOAD ====================
+document.addEventListener('DOMContentLoaded', () => {
+  initializeUserData();
+  checkHighlightParameter(); // Check for redirect highlight
+  console.log('=== TESTBED MODE: Using demo data ===');
+  console.log('TODO: Replace all console.log with actual API calls');
+  console.log('📊 Current Subscriptions:', DEMO_USER.subscriptions);
+});
+</script>
+
+</body>
+</html>

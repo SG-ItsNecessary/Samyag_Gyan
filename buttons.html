@@ -10,40 +10,51 @@
 
 <div class="button-row">
 
-    <div class="mark-read-wrapper">
-        <button class="read-button" id="markReadBtn">
-            <svg class="read-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M18 6V4a2 2 0 1 0-4 0v2"/>
-                <path d="M20 15v6a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
-                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H10"/>
-                <rect x="12" y="6" width="8" height="5" rx="1"/>
-            </svg>
-            <span class="read-text">Mark as Read</span>
+    <!-- Mark as Read Button with Info Icon -->
+    <div class="button-with-info">
+        <div class="mark-read-wrapper">
+            <button class="read-button" id="markReadBtn">
+                <svg class="read-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M18 6V4a2 2 0 1 0-4 0v2"/>
+                    <path d="M20 15v6a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H10"/>
+                    <rect x="12" y="6" width="8" height="5" rx="1"/>
+                </svg>
+                <span class="read-text">Mark as Read</span>
+            </button>
+            <span class="ticks" id="readTicks">✓✓</span>
+        </div>
+        <button class="info-icon" data-info-target="read-info" aria-label="Learn more about Mark as Read">
+            ⓘ
         </button>
-        <span class="ticks" id="readTicks">✓✓</span>
     </div>
 
-    <button class="action-btn" id="voteBtn">
-        <svg viewBox="0 0 490.667 490.667" xml:space="preserve">
-            <path class="icon-path" d="M245.333,0C110.059,0,0,110.059,0,245.333s110.059,245.333,245.333,245.333s245.333-110.059,245.333-245.333 S380.608,0,245.333,0z M103.893,131.989C138.56,88.789,190.123,64,245.333,64s106.752,24.789,141.44,67.989 c3.691,4.587,2.944,11.307-1.643,14.997c-1.963,1.579-4.331,2.347-6.677,2.347c-3.115,0-6.229-1.365-8.341-3.989 c-30.613-38.144-76.075-60.011-124.8-60.011s-94.187,21.867-124.8,60.011c-3.691,4.608-10.389,5.333-14.997,1.643 C100.949,143.296,100.203,136.576,103.893,131.989z M256,213.333c-5.888,0-10.667-4.779-10.667-10.667S250.112,192,256,192h64 c5.888,0,10.667,4.779,10.667,10.667s-4.779,10.667-10.667,10.667h-21.333V288c0,5.888-4.779,10.667-10.667,10.667 s-10.667-4.779-10.667-10.667v-74.667H256z M234.667,224v42.667c0,17.643-14.357,32-32,32c-17.643,0-32-14.357-32-32V224 c0-17.643,14.357-32,32-32C220.309,192,234.667,206.357,234.667,224z M96.683,291.755l-32-85.333 c-2.069-5.525,0.725-11.669,6.229-13.739c5.525-2.027,11.669,0.725,13.739,6.229l22.016,58.709l22.016-58.709 c2.069-5.525,8.192-8.277,13.739-6.229c5.504,2.069,8.299,8.213,6.229,13.739l-32,85.333c-1.557,4.16-5.547,6.912-9.984,6.912 C102.229,298.667,98.24,295.915,96.683,291.755z M376.789,370.005c-34.667,36.523-81.344,56.661-131.456,56.661 s-96.811-20.117-131.456-56.661c-4.053-4.288-3.883-11.029,0.405-15.083c4.288-4.032,11.051-3.861,15.083,0.405 c30.592,32.256,71.787,50.005,115.989,50.005c44.203,0,85.397-17.771,115.989-50.005c4.053-4.267,10.816-4.437,15.083-0.405 C380.693,358.955,380.843,365.739,376.789,370.005z M373.333,234.667c5.888,0,10.667,4.779,10.667,10.667 S379.221,256,373.333,256h-10.667v21.333h32c5.888,0,10.667,4.779,10.667,10.667s-4.779,10.667-10.667,10.667H352 c-5.888,0-10.667-4.779-10.667-10.667v-85.333c0-5.888,4.779-10.667,10.667-10.667h42.667c5.888,0,10.667,4.779,10.667,10.667 s-4.779,10.667-10.667,10.667h-32v21.333H373.333z"/>
-            <path class="icon-path" d="M192,224v42.667c0,5.888,4.779,10.667,10.667,10.667s10.667-4.779,10.667-10.667V224c0-5.888-4.779-10.667-10.667-10.667 S192,218.112,192,224z"/>
-        </svg>
-        <span>Magazine Worthy??</span>
-        <span class="tooltip">
-            <span class="highlight-red">Your Vote</span> decides content for the next magazine.<br>
-            Articles here are for your in-depth understanding.<br>
-            Magazines will have <span class="highlight-red">Mains-ready</span> notes.
-        </span>
-    </button>
-    
-    <button class="action-btn" id="bookmarkBtn">
-        <svg viewBox="0 0 24 24">
-            <path class="icon-path" d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <span id="bookmarkText">Bookmark</span>
-        <span class="bookmark-tooltip initial"><span class="red-highlight">Bookmark</span> it to Revise (Mains)</span>
-        <span class="bookmark-tooltip saved">Bookmarked</span>
-    </button>
+    <!-- Vote Button with Info Icon -->
+    <div class="button-with-info">
+        <button class="action-btn" id="voteBtn" data-action="vote">
+            <svg viewBox="0 0 490.667 490.667" xml:space="preserve">
+                <path class="icon-path" d="M245.333,0C110.059,0,0,110.059,0,245.333s110.059,245.333,245.333,245.333s245.333-110.059,245.333-245.333 S380.608,0,245.333,0z M103.893,131.989C138.56,88.789,190.123,64,245.333,64s106.752,24.789,141.44,67.989 c3.691,4.587,2.944,11.307-1.643,14.997c-1.963,1.579-4.331,2.347-6.677,2.347c-3.115,0-6.229-1.365-8.341-3.989 c-30.613-38.144-76.075-60.011-124.8-60.011s-94.187,21.867-124.8,60.011c-3.691,4.608-10.389,5.333-14.997,1.643 C100.949,143.296,100.203,136.576,103.893,131.989z M256,213.333c-5.888,0-10.667-4.779-10.667-10.667S250.112,192,256,192h64 c5.888,0,10.667,4.779,10.667,10.667s-4.779,10.667-10.667,10.667h-21.333V288c0,5.888-4.779,10.667-10.667,10.667 s-10.667-4.779-10.667-10.667v-74.667H256z M234.667,224v42.667c0,17.643-14.357,32-32,32c-17.643,0-32-14.357-32-32V224 c0-17.643,14.357-32,32-32C220.309,192,234.667,206.357,234.667,224z M96.683,291.755l-32-85.333 c-2.069-5.525,0.725-11.669,6.229-13.739c5.525-2.027,11.669,0.725,13.739,6.229l22.016,58.709l22.016-58.709 c2.069-5.525,8.192-8.277,13.739-6.229c5.504,2.069,8.299,8.213,6.229,13.739l-32,85.333c-1.557,4.16-5.547,6.912-9.984,6.912 C102.229,298.667,98.24,295.915,96.683,291.755z M376.789,370.005c-34.667,36.523-81.344,56.661-131.456,56.661 s-96.811-20.117-131.456-56.661c-4.053-4.288-3.883-11.029,0.405-15.083c4.288-4.032,11.051-3.861,15.083,0.405 c30.592,32.256,71.787,50.005,115.989,50.005c44.203,0,85.397-17.771,115.989-50.005c4.053-4.267,10.816-4.437,15.083-0.405 C380.693,358.955,380.843,365.739,376.789,370.005z M373.333,234.667c5.888,0,10.667,4.779,10.667,10.667 S379.221,256,373.333,256h-10.667v21.333h32c5.888,0,10.667,4.779,10.667,10.667s-4.779,10.667-10.667,10.667H352 c-5.888,0-10.667-4.779-10.667-10.667v-85.333c0-5.888,4.779-10.667,10.667-10.667h42.667c5.888,0,10.667,4.779,10.667,10.667 s-4.779,10.667-10.667,10.667h-32v21.333H373.333z"/>
+                <path class="icon-path" d="M192,224v42.667c0,5.888,4.779,10.667,10.667,10.667s10.667-4.779,10.667-10.667V224c0-5.888-4.779-10.667-10.667-10.667 S192,218.112,192,224z"/>
+            </svg>
+            <span>Magazine Worthy??</span>
+        </button>
+        <button class="info-icon" data-info-target="vote-info" aria-label="Learn more about voting">
+            ⓘ
+        </button>
+    </div>
+
+    <!-- Bookmark Button with Info Icon -->
+    <div class="button-with-info">
+        <button class="action-btn" id="bookmarkBtn" data-action="bookmark">
+            <svg viewBox="0 0 24 24">
+                <path class="icon-path" d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span id="bookmarkText">Bookmark</span>
+        </button>
+        <button class="info-icon" data-info-target="bookmark-info" aria-label="Learn more about bookmarking">
+            ⓘ
+        </button>
+    </div>
 
     
 
@@ -115,6 +126,67 @@ Summarize your thoughts in your language. Every Bharatiya Script and every Langu
 Use Voice Typing and AI tools to save time to summarize.."
         spellcheck="false"
     ></textarea>
+</div>
+
+<!-- Info Modals (Hidden by default) -->
+<div class="info-modal" id="read-info">
+    <div class="info-modal-content">
+        <button class="info-modal-close">&times;</button>
+        <h3>📖 Mark as Read</h3>
+        <p>Click "Mark as Read" to unlock all interactive features for this article.</p>
+        <p><strong>This enables:</strong></p>
+        <ul>
+            <li>Voting for magazine inclusion</li>
+            <li>Bookmarking for later revision</li>
+            <li>Creating personal summary notes</li>
+        </ul>
+        <p>This ensures you've engaged with the content before interacting with it.</p>
+        <button class="info-close-btn">Got it!</button>
+    </div>
+</div>
+
+<div class="info-modal" id="vote-info">
+    <div class="info-modal-content">
+        <button class="info-modal-close">&times;</button>
+        <h3>🗳️ Magazine Worthy?</h3>
+        <p><strong>Your vote decides what goes into the SG Magazine!</strong></p>
+        <p>Top 5 community-voted articles from each fortnight will be:</p>
+        <ul>
+            <li>Condensed into Mains-ready notes</li>
+            <li>Included in the next SG Magazine</li>
+            <li>Available for quick revision</li>
+        </ul>
+        <p><em>Vote for articles you think deserve deeper analysis and condensed coverage.</em></p>
+        <button class="info-close-btn">Got it!</button>
+    </div>
+</div>
+
+<div class="info-modal" id="vote-editorial-disabled-info">
+    <div class="info-modal-content">
+        <button class="info-modal-close">&times;</button>
+        <h3>📰 Voting Disabled for Editorials</h3>
+        <p><strong>Why can't I vote on this article?</strong></p>
+        <p>This is an <strong>Editorial</strong> - curated, synthesized analysis that is always included in the SG Magazine.</p>
+        <p>Editorials don't require community voting because they're pre-selected for their comprehensive coverage of important topics.</p>
+        <p><em>Only news/current affairs articles are community-voted to help prioritize content.</em></p>
+        <button class="info-close-btn">Got it!</button>
+    </div>
+</div>
+
+<div class="info-modal" id="bookmark-info">
+    <div class="info-modal-content">
+        <button class="info-modal-close">&times;</button>
+        <h3>🔖 Bookmark</h3>
+        <p>Save this article for later revision during your Mains preparation.</p>
+        <p><strong>Access bookmarked articles:</strong></p>
+        <ul>
+            <li>Go to "Your Journal" from the navigation menu</li>
+            <li>Click on "Bookmarked Articles"</li>
+            <li>Find all your saved content in one place</li>
+        </ul>
+        <p><em>Perfect for building your personalized revision library!</em></p>
+        <button class="info-close-btn">Got it!</button>
+    </div>
 </div>
 
 <script src="scripts/buttons.js"></script>

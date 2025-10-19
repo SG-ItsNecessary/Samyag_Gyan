@@ -1,13 +1,12 @@
 const articles = [
   {
     "title": "Digital Public Infrastructure in India",
-    "article_type": "news", // ➡️ NEW: Article category (news, editorial, ethics, essay)
-    "hashtags": "#Governance #DigitalIndia #CurrentAffairs", //
+    "hashtags": "#Governance #DigitalIndia #CurrentAffairs", // 
     "source_ribbon": "the-hindu", // ➡️ Renamed property
     "secondary_ribbon": "Essay + GS2", // ➡️ Renamed property
     "publish_date": "18 July 2025", // ➡️ Renamed property
     "prelude_title": "Why should I read it?", // ➡️ Split into two properties
-    "prelude_body": "It ties digital India with delivery on the ground. You'll see governance come alive in numbers. Also, it's a gem for GS2 introductions.", // ➡️ Split into two properties
+    "prelude_body": "It ties digital India with delivery on the ground. You’ll see governance come alive in numbers. Also, it’s a gem for GS2 introductions.", // ➡️ Split into two properties
     "content": [
       {
         "main_question_id": 101, // Example ID for the database
@@ -73,8 +72,7 @@ const articles = [
     ]
   },
   {
-    "title": "India's Renewable Energy Transition",
-    "article_type": "editorial", // ➡️ NEW: Editorial article type
+    "title": "India’s Renewable Energy Transition",
     "hashtags": "#Environment #Energy #GS3",
     "source_ribbon": "indian-express",
     "secondary_ribbon": "GS3 Case Study + SDG Linkage",
@@ -155,13 +153,10 @@ function renderArticles() {
   const container = document.getElementById('articles-container'); 
   container.innerHTML = '';
 
-  articles.forEach((article) => {
-    const tile = document.createElement('div');
-    tile.classList.add('article-tile');
-    tile.classList.add('article-panel'); // For button logic selector
+  articles.forEach((article) => { 
+    const tile = document.createElement('div'); 
+    tile.classList.add('article-tile'); 
     tile.dataset.expanded = 'false';
-    tile.dataset.articleId = article.article_id || article.title; // For interaction logging
-    tile.dataset.userId = 'current-user'; // Will be replaced by actual userId from auth
 
     const leftRibbon = document.createElement('div');
     leftRibbon.className = 'source-ribbon';
@@ -284,19 +279,6 @@ function renderArticles() {
         if (t.querySelector('.read-button-wrapper')) {
           t.querySelector('.read-button-wrapper').style.display = 'none';
         }
-        // Hide button row when collapsing
-        if (t.querySelector('.button-row')) {
-          t.querySelector('.button-row').style.display = 'none';
-        }
-        // Hide archive button when collapsing
-        if (t.querySelector('.archive-btn-left')) {
-          t.querySelector('.archive-btn-left').style.display = 'none';
-        }
-        // Close any open summary modals when collapsing
-        const summaryModal = document.getElementById('summaryModal');
-        if (summaryModal) {
-          summaryModal.classList.remove('visible');
-        }
       });
 
       if (!isExpanded) {
@@ -307,15 +289,9 @@ function renderArticles() {
         preludeWrap.style.display = 'block';
         dateBlock.style.display = 'block';
         arrowBtn.classList.add('rotated');
-        updateURLForArticle(article.title, article.publish_date, article.article_type || 'news'); // ✅ Pass article type
+        updateURLForArticle(article.title, article.publish_date); // ✅ Correct property name
         readButtonWrapper.style.display = 'flex';
         showTileTooltip();
-        // Show button row when expanding
-        buttonRow.style.display = 'flex';
-        // Show archive button when expanding (if exists)
-        if (tile.querySelector('.archive-btn-left')) {
-          tile.querySelector('.archive-btn-left').style.display = 'block';
-        }
       }
     });
 
@@ -341,228 +317,152 @@ function renderArticles() {
     const separator = document.createElement('hr');
     separator.className = 'tile-separator';
     tile.appendChild(separator);
-
-    // ==================== BUTTON ROW INTEGRATION ====================
-    const buttonRow = document.createElement('div');
-    buttonRow.className = 'button-row';
-    buttonRow.style.display = 'none'; // Hidden by default
-    buttonRow.dataset.articleId = article.article_id || article.title; // Use article_id or title as unique identifier
-
-    // Determine if this article is voteable (first article is editorial - not voteable)
-    const isFirstArticle = articles.indexOf(article) === 0;
-    const voteableAttr = isFirstArticle ? 'data-is-voteable="false"' : '';
-
-    buttonRow.innerHTML = `
-      <!-- Mark as Read Button -->
-      <div class="button-wrapper">
-        <div class="mark-read-wrapper">
-          <button class="read-button" id="markReadBtn-${article.article_id || article.title}" title="Mark this article as read to unlock other actions">
-            <svg class="read-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M18 6V4a2 2 0 1 0-4 0v2"/>
-              <path d="M20 15v6a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H10"/>
-              <rect x="12" y="6" width="8" height="5" rx="1"/>
-            </svg>
-            <span class="read-text"> Read ??</span>
-          </button>
-          <span class="ticks" id="readTicks-${article.article_id || article.title}"></span>
-        </div>
-        <!-- Info Icon Component -->
-        <div class="info-container" data-target="read-info">
-          <div class="info-icon">i</div>
-          <div class="tooltip">
-            Click "Mark as Read" to unlock all interactive features for this article (voting, bookmarking, and summary notes).
-          </div>
-        </div>
-      </div>
-
-      <!-- Vote Button -->
-      <div class="button-wrapper">
-        <button class="action-btn" id="voteBtn-${article.article_id || article.title}" data-action="vote" ${voteableAttr} title="Vote for this article to be featured in the next magazine">
-          <svg viewBox="0 0 490.667 490.667" xml:space="preserve">
-            <path class="icon-path" d="M245.333,0C110.059,0,0,110.059,0,245.333s110.059,245.333,245.333,245.333s245.333-110.059,245.333-245.333 S380.608,0,245.333,0z M103.893,131.989C138.56,88.789,190.123,64,245.333,64s106.752,24.789,141.44,67.989 c3.691,4.587,2.944,11.307-1.643,14.997c-1.963,1.579-4.331,2.347-6.677,2.347c-3.115,0-6.229-1.365-8.341-3.989 c-30.613-38.144-76.075-60.011-124.8-60.011s-94.187,21.867-124.8,60.011c-3.691,4.608-10.389,5.333-14.997,1.643 C100.949,143.296,100.203,136.576,103.893,131.989z M256,213.333c-5.888,0-10.667-4.779-10.667-10.667S250.112,192,256,192h64 c5.888,0,10.667,4.779,10.667,10.667s-4.779,10.667-10.667,10.667h-21.333V288c0,5.888-4.779,10.667-10.667,10.667 s-10.667-4.779-10.667-10.667v-74.667H256z M234.667,224v42.667c0,17.643-14.357,32-32,32c-17.643,0-32-14.357-32-32V224 c0-17.643,14.357-32,32-32C220.309,192,234.667,206.357,234.667,224z M96.683,291.755l-32-85.333 c-2.069-5.525,0.725-11.669,6.229-13.739c5.525-2.027,11.669,0.725,13.739,6.229l22.016,58.709l22.016-58.709 c2.069-5.525,8.192-8.277,13.739-6.229c5.504,2.069,8.299,8.213,6.229,13.739l-32,85.333c-1.557,4.16-5.547,6.912-9.984,6.912 C102.229,298.667,98.24,295.915,96.683,291.755z M376.789,370.005c-34.667,36.523-81.344,56.661-131.456,56.661 s-96.811-20.117-131.456-56.661c-4.053-4.288-3.883-11.029,0.405-15.083c4.288-4.032,11.051-3.861,15.083,0.405 c30.592,32.256,71.787,50.005,115.989,50.005c44.203,0,85.397-17.771,115.989-50.005c4.053-4.267,10.816-4.437,15.083-0.405 C380.693,358.955,380.843,365.739,376.789,370.005z M373.333,234.667c5.888,0,10.667,4.779,10.667,10.667 S379.221,256,373.333,256h-10.667v21.333h32c5.888,0,10.667,4.779,10.667,10.667s-4.779,10.667-10.667,10.667H352 c-5.888,0-10.667-4.779-10.667-10.667v-85.333c0-5.888,4.779-10.667,10.667-10.667h42.667c5.888,0,10.667,4.779,10.667,10.667 s-4.779,10.667-10.667,10.667h-32v21.333H373.333z"/>
-            <path class="icon-path" d="M192,224v42.667c0,5.888,4.779,10.667,10.667,10.667s10.667-4.779,10.667-10.667V224c0-5.888-4.779-10.667-10.667-10.667 S192,218.112,192,224z"/>
-          </svg>
-          <span> Vote ?</span>
-        </button>
-        <!-- Info Icon Component (changes based on voteable status) -->
-        <div class="info-container" data-target="${isFirstArticle ? 'vote-editorial-disabled-info' : 'vote-info'}">
-          <div class="info-icon">i</div>
-          <div class="tooltip">
-            ${isFirstArticle
-              ? 'This is an Editorial article - always included in SG Magazine. Only news/current affairs can be community-voted.'
-              : 'Your vote decides what goes into the SG Magazine! Top 5 voted articles each fortnight will be condensed and included.'}
-          </div>
-        </div>
-      </div>
-
-      <!-- Summary Button -->
-      <div class="button-wrapper">
-        <button class="action-btn" id="summaryBtn-${article.article_id || article.title}" data-action="summary" title="Write your own summary notes for this article">
-          <svg viewBox="0 0 24 24">
-            <path class="icon-path" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <path class="icon-path" d="M14 2v6h6M8 15h8M8 11h8M8 19h8"/>
-          </svg>
-          <span>Summary</span>
-        </button>
-        <!-- Info Icon Component -->
-        <div class="info-container" data-target="summary-info">
-          <div class="info-icon">i</div>
-          <div class="tooltip">
-            Use this button as your notepad. Jot down notes in any way you like for revision.
-          </div>
-        </div>
-      </div>
-
-      <!-- Bookmark Button -->
-      <div class="button-wrapper">
-        <button class="action-btn" id="bookmarkBtn-${article.article_id || article.title}" data-action="bookmark" title="Bookmark this article for Mains revision">
-          <svg viewBox="0 0 24 24">
-            <path class="icon-path" d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-          </svg>
-          <span id="bookmarkText-${article.article_id || article.title}">Bookmark</span>
-        </button>
-        <!-- Info Icon Component -->
-        <div class="info-container" data-target="bookmark-info">
-          <div class="info-icon">i</div>
-          <div class="tooltip">
-            Save this article for later revision. Access your bookmarked articles from "Your Journal" in the navigation menu.
-          </div>
-        </div>
-      </div>
-
-      <div class="share-btn-wrapper">
-        <button class="share-btn" id="shareBtn-${article.article_id || article.title}" data-action="share" title="Share this article on Telegram with your peers">
-          <svg class="telegram-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-            viewBox="0 0 512 512" xml:space="preserve">
-            <circle style="fill:#47B0D3;" cx="256" cy="256" r="256"/>
-            <path style="fill:#3298BA;" d="M34.133,256c0-135.648,105.508-246.636,238.933-255.421C267.424,0.208,261.737,0,256,0
-              C114.615,0,0,114.615,0,256s114.615,256,256,256c5.737,0,11.424-0.208,17.067-0.579C139.642,502.636,34.133,391.648,34.133,256z"/>
-            <path style="fill:#E5E5E5;" d="M380.263,109.054c-2.486-1.69-5.676-1.946-8.399-0.679L96.777,236.433
-              c-4.833,2.251-7.887,7.172-7.766,12.501c0.117,5.226,3.28,9.92,8.065,12.015l253.613,110.457c8.468,3.849,18.439-2.21,18.983-11.453
-              l14.314-243.341C384.161,113.614,382.748,110.742,380.263,109.054z"/>
-            <polygon style="fill:#CCCCCC;" points="171.631,293.421 188.772,408 379.168,108.432 "/>
-            <path style="fill:#FFFFFF;" d="M371.866,108.375L96.777,236.433c-4.737,2.205-7.826,7.121-7.769,12.345
-              c0.058,5.233,3.276,10.074,8.067,12.171l74.557,32.471l207.536-184.988C376.882,107.33,374.203,107.287,371.866,108.375z"/>
-            <polygon style="fill:#E5E5E5;" points="211.418,310.749 188.772,408 379.168,108.432 "/>
-            <path style="fill:#FFFFFF;" d="M380.263,109.054c-0.351-0.239-0.72-0.442-1.095-0.622l-167.75,202.317l139.27,60.657
-              c8.468,3.849,18.439-2.21,18.983-11.453l14.314-243.341C384.161,113.614,382.748,110.742,380.263,109.054z"/>
-          </svg>
-          <span class="share-text">Share</span>
-        </button>
-      </div>
-    `;
-
-    tile.appendChild(buttonRow);
-
-    // ==================== DYNAMIC ARCHIVE BUTTON + ARROW ROW ====================
-    // Create wrapper that holds archive button (left) and arrow (right)
-    const topControlsRow = document.createElement('div');
-    topControlsRow.className = 'top-controls-row';
-    topControlsRow.style.cssText = `
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-    `;
-
-    // Add archive button based on article type (left side)
-    const articleType = article.article_type || 'news';
-    const archiveBtnLeft = document.createElement('div');
-    archiveBtnLeft.className = 'archive-btn-left';
-    archiveBtnLeft.style.display = 'none'; // Hidden by default, shown when expanded
-
-    if (articleType === 'editorial') {
-      archiveBtnLeft.innerHTML = `
-        <a href="/upsc-current-affairs/editorial/"
-           class="chip-btn"
-           style="
-             background-color: #fc7306;
-             color: #ffffff;
-             border: 2px solid #fcd7b6;
-             border-radius: 9999px;
-             padding: 5px 14px;
-             font-size: 9px;
-             font-weight: 700;
-             cursor: pointer;
-             text-decoration: none;
-             display: inline-block;
-             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-             transition: all 0.25s ease;
-           "
-           onmouseover="this.style.backgroundColor='#ff8b33'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.15)';"
-           onmouseout="this.style.backgroundColor='#fc7306'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.08)';"
-           onmousedown="this.style.backgroundColor='#e45e00';"
-           onmouseup="this.style.backgroundColor='#ff8b33';">
-          All Editorial on SG
-        </a>
-      `;
-    } else if (articleType === 'ethics') {
-      archiveBtnLeft.innerHTML = `
-        <a href="/upsc-ethics-case-study/"
-           class="chip-btn"
-           style="
-             background-color: #fc7306;
-             color: #ffffff;
-             border: 2px solid #fcd7b6;
-             border-radius: 9999px;
-             padding: 5px 14px;
-             font-size: 9px;
-             font-weight: 700;
-             cursor: pointer;
-             text-decoration: none;
-             display: inline-block;
-             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-             transition: all 0.25s ease;
-           "
-           onmouseover="this.style.backgroundColor='#ff8b33'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.15)';"
-           onmouseout="this.style.backgroundColor='#fc7306'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.08)';"
-           onmousedown="this.style.backgroundColor='#e45e00';"
-           onmouseup="this.style.backgroundColor='#ff8b33';">
-          All Ethics on SG
-        </a>
-      `;
-    } else if (articleType === 'essay') {
-      archiveBtnLeft.innerHTML = `
-        <a href="/upsc-essay/"
-           class="chip-btn"
-           style="
-             background-color: #fc7306;
-             color: #ffffff;
-             border: 2px solid #fcd7b6;
-             border-radius: 9999px;
-             padding: 5px 14px;
-             font-size: 9px;
-             font-weight: 700;
-             cursor: pointer;
-             text-decoration: none;
-             display: inline-block;
-             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-             transition: all 0.25s ease;
-           "
-           onmouseover="this.style.backgroundColor='#ff8b33'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.15)';"
-           onmouseout="this.style.backgroundColor='#fc7306'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.08)';"
-           onmousedown="this.style.backgroundColor='#e45e00';"
-           onmouseup="this.style.backgroundColor='#ff8b33';">
-          All Essays on SG
-        </a>
-      `;
-    }
-    // News articles: NO archive button (default current affairs view)
-
-    // Assemble the row: archive button (left) + arrow container (right)
-    if (articleType !== 'news') {
-      topControlsRow.appendChild(archiveBtnLeft);
-    }
-    topControlsRow.appendChild(arrowContainer);
-
-    tile.appendChild(topControlsRow);
+    tile.appendChild(arrowContainer);
 
     container.appendChild(tile);
   });
-} // End of renderArticles() function
 
-// DUPLICATE CODE REMOVED - Lines 402-574 were orphaned code causing "article is not defined" error
+
+
+  const endRibbonZone = document.createElement('div');
+    endRibbonZone.className = 'end-content-ribbons';
+  endRibbonZone.style.display = 'none';
+
+  const subContentBox = document.createElement('div');
+  subContentBox.className = 'sub-tile';
+  subContentBox.style.display = 'none';
+
+
+article.endRibbons.forEach((r, ribbonIndex) => {
+  const ribbon = document.createElement('div');
+  ribbon.className = 'end-content-ribbon-item';
+  ribbon.textContent = r.label;
+  ribbon.style.backgroundColor = r.color;
+
+  ribbon.addEventListener('click', () => {
+    subContentBox.innerHTML = '';
+
+    if (r.type === 'mindmap') {
+      openFloatingViewer(r.src);
+    } else if (r.type === 'prelims') {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'prelims-content-wrapper';
+
+      // ==================== PRELIMS CONTENT Q&A ====================
+      r.content.forEach((qna) => {
+      const q = document.createElement('div');
+    q.className = 'prelims-question';
+
+    q.dataset.prelims_question_id = qna.prelims_question_id; // prelims_questions table
+    q.dataset.article_id          = qna.article_id;          // articles table
+    q.dataset.language            = qna.language || 'en';
+
+    q.textContent = qna.q;
+
+    const a = document.createElement('div');
+    a.className = 'prelims-answer';
+
+    a.dataset.prelims_answer_id   = qna.prelims_answer_id;  // prelims_answers table
+    a.dataset.prelims_question_id = qna.prelims_question_id;
+    a.dataset.article_id          = qna.article_id;
+    a.dataset.language            = qna.language || 'en';
+
+    a.textContent = qna.a;
+
+    wrapper.appendChild(q);
+    wrapper.appendChild(a);
+});
+
+      subContentBox.appendChild(wrapper);
+      subContentBox.style.display = 'block';
+    }
+  });
+
+  endRibbonZone.appendChild(ribbon);
+});
+
+
+const arrowContainer = document.createElement('div');
+const arrowBtn = document.createElement('button');
+arrowBtn.className = 'main-arrow-btn';
+arrowBtn.innerHTML = '<div class="css-arrow"></div>';
+
+
+arrowBtn.addEventListener('click', () => {
+  const isExpanded = tile.classList.contains('expanded');
+
+
+  document.querySelectorAll('.article-tile').forEach((t) => {
+    t.classList.remove('expanded');
+    t.dataset.expanded = 'false';
+    t.querySelector('.content-area').style.display = 'none';
+    t.querySelector('.sub-tile').style.display = 'none';
+    t.querySelector('.end-content-ribbons').style.display = 'none';
+    t.querySelector('.prelude-section').style.display = 'none';
+    t.querySelector('.article-date').style.display = 'none';
+    t.querySelector('.main-arrow-btn').classList.remove('rotated');
+    if (t.querySelector('.read-button-wrapper')) {
+  t.querySelector('.read-button-wrapper').style.display = 'none';
+}
+  });
+
+
+ if (!isExpanded) {
+  tile.classList.add('expanded');
+  tile.dataset.expanded = 'true';
+  contentArea.style.display = 'block';
+  endRibbonZone.style.display = 'flex';
+  preludeWrap.style.display = 'block';
+  dateBlock.style.display = 'block';
+  arrowBtn.classList.add('rotated');
+  updateURLForArticle(article.title);
+  readButtonWrapper.style.display = 'flex';
+
+  showTileTooltip(); // ✅ Add this line
+}
+});
+
+arrowContainer.className = 'arrow-container';
+arrowContainer.appendChild(arrowBtn);
+
+tile.appendChild(leftRibbon);
+tile.appendChild(usabilityRibbon);
+tile.appendChild(title);
+tile.appendChild(tags);
+tile.appendChild(dateBlock);
+tile.appendChild(preludeWrap);
+tile.appendChild(contentArea);
+tile.appendChild(endRibbonZone);
+tile.appendChild(subContentBox);
+// Insert Read button codes  Part 1
+// --- INSERT THIS START ---
+const readButtonWrapper = document.createElement('div');
+readButtonWrapper.className = 'read-button-wrapper';
+readButtonWrapper.innerHTML = `
+   
+`;
+readButtonWrapper.style.display = 'none'; // Intitially hidden
+tile.appendChild(readButtonWrapper);
+
+const separator = document.createElement('hr');  // Separator line just above the arrow
+separator.className = 'tile-separator';
+tile.appendChild(separator);
+tile.appendChild(arrowContainer);
+
+tile.appendChild(arrowContainer); // arrowContainer defined Pehle hi
+
+container.appendChild(tile); // Container and tile are defined earlier
+
+const markBtn = readButtonWrapper.querySelector('.read-button');
+const markText = readButtonWrapper.querySelector('.read-text');
+const tick = readButtonWrapper.querySelector('.ticks');
+const bookIcon = readButtonWrapper.querySelector('.read-icon'); // The SVG element itself
+
+let isRead = false; // Initial state
+
+// PARTS (for the Button)
+
+}
 
 // -----------------------------
 // Clean URL: convert title to slug
@@ -574,50 +474,12 @@ function slugifyTitle(title) {
 }
 
 // -----------------------------
-// Convert human-readable date to ISO format (YYYY-MM-DD)
-// -----------------------------
-function convertDateToISO(dateString) {
-  // Converts "18 July 2025" → "2025-07-18"
-  const months = {
-    'january': '01', 'february': '02', 'march': '03', 'april': '04',
-    'may': '05', 'june': '06', 'july': '07', 'august': '08',
-    'september': '09', 'october': '10', 'november': '11', 'december': '12'
-  };
-
-  const parts = dateString.trim().split(' ');
-  const day = parts[0].padStart(2, '0');
-  const month = months[parts[1].toLowerCase()];
-  const year = parts[2];
-
-  return `${year}-${month}-${day}`;
-}
-
-// -----------------------------
 // Update URL when a tile/article is opened
 // -----------------------------
-function updateURLForArticle(title, publishDate, articleType = 'news') {
+function updateURLForArticle(title, publishDate) {
   const slug = slugifyTitle(title);
-  // Convert "18 July 2025" to "2025-07-18" for clean, SEO-friendly URLs
-  const isoDate = convertDateToISO(publishDate);
-
-  // SEO-optimized URL structure based on article type
-  let newPath;
-  switch(articleType) {
-    case 'editorial':
-      newPath = `/upsc-current-affairs/editorial/${isoDate}/${slug}`;
-      break;
-    case 'ethics':
-      newPath = `/upsc-ethics-case-study/${isoDate}/${slug}`;
-      break;
-    case 'essay':
-      newPath = `/upsc-essay/${isoDate}/${slug}`;
-      break;
-    case 'news':
-    default:
-      newPath = `/upsc-current-affairs/${isoDate}/${slug}`;
-      break;
-  }
-
+  // publishDate should be in YYYY-MM-DD format (Sorted for reader and SEO useful)
+  const newPath = `/${publishDate}/${slug}`;
   history.replaceState(null, "", newPath);
 }
 
@@ -625,52 +487,13 @@ function updateURLForArticle(title, publishDate, articleType = 'news') {
 // Get publish Date and slug from URL
 // -----------------------------
 function getArticleDataFromURL() {
-  // Example pathnames:
-  // "/upsc-current-affairs/2025-08-25" → all articles for date
-  // "/upsc-current-affairs/2025-08-25/article-slug" → specific news article
-  // "/upsc-current-affairs/editorial/2025-08-25/article-slug" → specific editorial
-  // "/upsc-ethics-case-study/2025-08-25/article-slug" → specific ethics case study
-  // "/upsc-essay/2025-08-25/article-slug" → specific essay
-
+  // Example pathname: "/2025-08-13/my-article-title"
   const pathParts = window.location.pathname.split("/").filter(Boolean);
-
-  // Handle Current Affairs (News & Editorial)
-  if (pathParts[0] === 'upsc-current-affairs') {
-    if (pathParts[1] === 'editorial') {
-      // Editorial article
-      if (pathParts.length === 3) {
-        return { articleType: 'editorial', publishDate: pathParts[2], slug: null };
-      } else if (pathParts.length >= 4) {
-        return { articleType: 'editorial', publishDate: pathParts[2], slug: pathParts[3] };
-      }
-    } else {
-      // Regular news article
-      if (pathParts.length === 2) {
-        return { articleType: 'news', publishDate: pathParts[1], slug: null };
-      } else if (pathParts.length >= 3) {
-        return { articleType: 'news', publishDate: pathParts[1], slug: pathParts[2] };
-      }
-    }
+  if (pathParts.length >= 2) {
+    const publishDate = pathParts[0]; // "YYYY-MM-DD"
+    const slug = pathParts[1];        // "article-title"
+    return { publishDate, slug };
   }
-
-  // Handle Ethics Case Studies
-  if (pathParts[0] === 'upsc-ethics-case-study') {
-    if (pathParts.length === 2) {
-      return { articleType: 'ethics', publishDate: pathParts[1], slug: null };
-    } else if (pathParts.length >= 3) {
-      return { articleType: 'ethics', publishDate: pathParts[1], slug: pathParts[2] };
-    }
-  }
-
-  // Handle Essays
-  if (pathParts[0] === 'upsc-essay') {
-    if (pathParts.length === 2) {
-      return { articleType: 'essay', publishDate: pathParts[1], slug: null };
-    } else if (pathParts.length >= 3) {
-      return { articleType: 'essay', publishDate: pathParts[1], slug: pathParts[2] };
-    }
-  }
-
   return null;
 }
 
@@ -685,22 +508,47 @@ if (articleData) {
 
 
 window.onload = function () {
-  // ================================
-  // DATE-BASED URL HANDLING
-  // ================================
-  // Check if coming from homepage with date parameter (legacy fallback)
-  const urlParams = new URLSearchParams(window.location.search);
-  const dateParam = urlParams.get('date'); // e.g., "2025-08-25"
-
-  if (dateParam) {
-    // Update URL to SEO-optimized structure (remove query param)
-    history.replaceState(null, '', `/upsc-current-affairs/${dateParam}`);
-  }
-
   let selectedRange = null;
   let paletteElement = null;
   let paletteTimeout = null; // ⬅️ Track the auto-hide timeout
+  let highlighter = null; // TextHighlighter instance
+  let currentHighlightColor = null; // Track selected color
 
+  // Initialize TextHighlighter.js on the articles container
+  const articlesContainer = document.getElementById('articles-container');
+  if (articlesContainer && typeof TextHighlighter !== 'undefined') {
+    highlighter = new TextHighlighter(articlesContainer, {
+      color: '#ffff66', // Default yellow color
+      onAfterHighlight: function (range, highlights) {
+        // After highlight is applied, save to backend
+        highlights.forEach(highlight => {
+          const highlightedText = highlight.textContent;
+          const articleId = document.getElementById('article-meta')?.getAttribute('data-article-id');
+          const language = document.getElementById('article-meta')?.getAttribute('data-language') || 'en';
+
+          // Extract question/answer context
+          const questionEl = highlight.closest('[data-main_question_id], [data-prelims_question_id]');
+          const answerEl = highlight.closest('[data-main_answer_id], [data-prelims_answer_id]');
+
+          if (questionEl && articleId) {
+            const questionType = questionEl.hasAttribute('data-main_question_id') ? 'mains' : 'prelims';
+            const questionId = questionEl.getAttribute(`data-${questionType === 'mains' ? 'main' : 'prelims'}_question_id`);
+            const answerId = answerEl?.getAttribute(`data-${questionType === 'mains' ? 'main' : 'prelims'}_answer_id`) || null;
+
+            saveHighlightToBackend(
+              CURRENT_USER_ID || 'guest',
+              articleId,
+              language,
+              questionType,
+              questionId,
+              answerId,
+              highlightedText
+            );
+          }
+        });
+      }
+    });
+  }
 
   function createHighlightPalette(x, y) {
     // Remove existing palette
@@ -716,7 +564,7 @@ window.onload = function () {
 
     // Tick button (needs access in color-btn onclick)
     const tickButton = document.createElement('button');
-    tickButton.textContent = '✓✓';
+    tickButton.textContent = '✓';
     tickButton.className = 'tick-btn';
     tickButton.style.display = 'none';
 
@@ -738,16 +586,21 @@ window.onload = function () {
       button.onclick = function () {
         if (!selectedRange) return;
 
+        // Use TextHighlighter library if available
+        if (highlighter) {
+          currentHighlightColor = color;
+          highlighter.setColor(color);
+          highlighter.doHighlight();
+        } else {
+          // Fallback to manual highlighting
+          const span = document.createElement('span');
+          span.className = 'custom-highlight';
+          span.style.backgroundColor = color;
+          span.textContent = selectedRange.toString();
 
-        const span = document.createElement('span');
-        span.className = 'custom-highlight';
-        span.style.backgroundColor = color;
-        span.textContent = selectedRange.toString();
-
-
-        selectedRange.deleteContents();
-        selectedRange.insertNode(span);
-
+          selectedRange.deleteContents();
+          selectedRange.insertNode(span);
+        }
 
         tickButton.style.display = 'inline-block';
         clearTimeout(paletteTimeout); // ⬅️ Cancel auto-hide on color select
@@ -798,6 +651,71 @@ window.onload = function () {
     selectedRange = range.cloneRange();
     createHighlightPalette(rect.left + window.scrollX, rect.top + window.scrollY - 50);
   });
+
+  // ==================== Highlight Persistence Functions ====================
+
+  // Save highlights to backend
+  function saveHighlightsToBackend(userId, articleId) {
+    if (!highlighter) return;
+
+    const serializedHighlights = highlighter.serializeHighlights();
+
+    fetch('/api/save-all-highlights', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        article_id: articleId,
+        highlights_data: serializedHighlights
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        console.log("✅ All highlights saved successfully");
+      } else {
+        console.error("❌ Failed to save highlights:", data.message);
+      }
+    })
+    .catch(err => {
+      console.error("❌ Error saving highlights:", err);
+    });
+  }
+
+  // Load highlights from backend
+  function loadHighlightsFromBackend(userId, articleId) {
+    if (!highlighter) return;
+
+    fetch(`/api/load-highlights?user_id=${userId}&article_id=${articleId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.highlights_data) {
+          highlighter.deserializeHighlights(data.highlights_data);
+          console.log("✅ Highlights restored successfully");
+        }
+      })
+      .catch(err => {
+        console.error("❌ Error loading highlights:", err);
+      });
+  }
+
+  // Remove all highlights
+  function removeAllHighlights() {
+    if (highlighter) {
+      highlighter.removeHighlights();
+      console.log("✅ All highlights removed");
+    }
+  }
+
+  // Auto-save highlights when user leaves the page
+  window.addEventListener('beforeunload', function() {
+    const articleId = document.getElementById('article-meta')?.getAttribute('data-article-id');
+    const userId = CURRENT_USER_ID || 'guest';
+    if (articleId && userId) {
+      saveHighlightsToBackend(userId, articleId);
+    }
+  });
+
 // --- Step 1: Render hardcoded data immediately ---
   // renderArticles(sampleArticles);
 
@@ -819,32 +737,30 @@ window.onload = function () {
   // Optional article render logic
   renderArticles();
 
-  // ⬆ This delay ensures that buttons.js fully loads and that articles exist in the DOM before event listeners attach.
-  // Needed because buttons.js defines reinitializeButtons() but articles are rendered only after window.onload.
-  // WAIT for buttons.js to load, then safely initialize
+  // Load saved highlights after articles are rendered
   setTimeout(() => {
-    if (typeof window.reinitializeButtons === 'function') {
-      console.log('🔧 Initializing buttons...');
-      window.reinitializeButtons();
-      console.log('✅ Buttons initialized');
-    } else {
-      console.error('❌ window.reinitializeButtons not found!');
+    const articleId = document.getElementById('article-meta')?.getAttribute('data-article-id');
+    const userId = CURRENT_USER_ID || 'guest';
+    if (articleId && userId) {
+      loadHighlightsFromBackend(userId, articleId);
     }
-  }, 150);
+  }, 500);
 
-
-  const articleData = getArticleDataFromURL();
-  if (articleData && articleData.slug) {
+  const slugFromURL = getArticleSlugFromURL();
+  if (slugFromURL) {
     setTimeout(() => {
       const tiles = document.querySelectorAll(".article-tile");
       tiles.forEach(tile => {
         const title = tile.querySelector(".article-title")?.textContent || "";
-        if (slugifyTitle(title) === articleData.slug) {
+        if (slugifyTitle(title) === slugFromURL) {
           tile.querySelector(".main-arrow-btn")?.click();
         }
       });
     }, 100);
   }
+
+  // Expose removeAllHighlights globally for debugging/admin use
+  window.removeAllHighlights = removeAllHighlights;
 };
 function openFloatingViewer(src) {
   const viewer = document.getElementById("floating-image-viewer");

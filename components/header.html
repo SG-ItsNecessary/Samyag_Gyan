@@ -1,0 +1,32 @@
+<!-- Unified Header Component: Banner + Navigation -->
+<!-- To use: Include this file in all pages (except landing.html and profile.html) -->
+
+<!-- Mobile Rotate Message (Portrait mode only - Centered, Subtle, Voluntary) -->
+<div id="rotate-message" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0, 74, 173, 0.95); color:#ffffff; text-align:center; padding:2rem 1.5rem; font-weight:600; font-size:1.1rem; z-index:9999; box-shadow:0 8px 24px rgba(0,0,0,0.3); border-radius:16px; max-width:90%; backdrop-filter:blur(10px);">
+    <div style="font-size:3rem; margin-bottom:0.5rem;">📱</div>
+    <div style="margin-bottom:0.5rem;">For Better Experience</div>
+    <div style="font-size:1.3rem; font-weight:700; margin-bottom:1rem;">Please Rotate Your Phone</div>
+    <button id="rotate-got-it" style="background:#fff; color:#004AAD; border:none; padding:10px 24px; border-radius:8px; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2);">Got it</button>
+</div>
+
+<!-- Faint Reminder (appears after "Got it" clicked, only in portrait mode) -->
+<div id="rotate-reminder" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0, 74, 173, 0.3); color:#ffffff; text-align:center; padding:0.75rem 1.25rem; font-weight:500; font-size:0.9rem; z-index:9998; border-radius:12px; max-width:85%; backdrop-filter:blur(5px); pointer-events:none;">
+    <div style="font-size:1.5rem; display:inline-block; margin-right:0.5rem;">📱</div>
+    <span>Rotate for better experience</span>
+</div>
+
+<!-- Text-Only Banner -->
+<div class="banner-container" onclick="window.location.href='homepage.html'" role="button" tabindex="0" aria-label="Go to Homepage">
+    <span class="banner-text-hindi">सम्यक् ज्ञान</span>
+    <span class="banner-text-english">Samyak Gyan</span>
+</div>
+
+<!-- Navigation Ribbon -->
+<nav class="nav-container" id="main-nav">
+    <span class="home-icon" onclick="window.location.href='homepage.html'" title="Home">🏠</span>
+    <button class="nav-btn btn-main">How to Use?</button>
+    <button class="nav-btn btn-ethics">Ethics & Essay</button>
+    <button class="nav-btn btn-beginner">Beginners Corner</button>
+    <button class="nav-btn btn-tri-color">Mission & Vision</button>
+    <button class="nav-btn btn-journal" onclick="window.location.href='user_dashboard.html'">Your Journal</button>
+</nav>

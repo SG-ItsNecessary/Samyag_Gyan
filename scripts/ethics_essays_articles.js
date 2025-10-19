@@ -151,8 +151,8 @@ const sourceMap = { "the-hindu": "The Hindu", "indian-express": "Indian Express"
 
 const source_ribbon = { "the-hindu": "#009688", "indian-express": "#8BC34A", "both": "#2196F3", "pib-other": "#D32F2F" };
 
-function renderArticles() { 
-  const container = document.getElementById('articles-container'); 
+function renderEthicsEssayArticles() {
+  const container = document.getElementById('articles-container');
   container.innerHTML = '';
 
   articles.forEach((article) => {
@@ -227,6 +227,11 @@ function renderArticles() {
     subContentBox.style.display = 'none';
 
     article.endRibbons.forEach((r) => {
+      // Skip Mindmaps and Prelims pointer buttons for Ethics & Essay articles
+      if (r.type === 'mindmap' || r.type === 'prelims') {
+        return; // Skip this ribbon
+      }
+
       const ribbon = document.createElement('div');
       ribbon.className = 'end-content-ribbon-item';
       ribbon.textContent = r.label;
@@ -281,9 +286,6 @@ function renderArticles() {
         t.querySelector('.prelude-section').style.display = 'none';
         t.querySelector('.article-date').style.display = 'none';
         t.querySelector('.main-arrow-btn').classList.remove('rotated');
-        if (t.querySelector('.read-button-wrapper')) {
-          t.querySelector('.read-button-wrapper').style.display = 'none';
-        }
         // Hide button row when collapsing
         if (t.querySelector('.button-row')) {
           t.querySelector('.button-row').style.display = 'none';
@@ -308,7 +310,6 @@ function renderArticles() {
         dateBlock.style.display = 'block';
         arrowBtn.classList.add('rotated');
         updateURLForArticle(article.title, article.publish_date, article.article_type || 'news'); // ✅ Pass article type
-        readButtonWrapper.style.display = 'flex';
         showTileTooltip();
         // Show button row when expanding
         buttonRow.style.display = 'flex';
@@ -332,105 +333,29 @@ function renderArticles() {
     tile.appendChild(endRibbonZone);
     tile.appendChild(subContentBox);
 
-    const readButtonWrapper = document.createElement('div');
-    readButtonWrapper.className = 'read-button-wrapper';
-    readButtonWrapper.innerHTML = ``;
-    readButtonWrapper.style.display = 'none';
-    tile.appendChild(readButtonWrapper);
+    // Read button removed for Ethics & Essay articles (weekly content, no read tracking needed)
 
     const separator = document.createElement('hr');
     separator.className = 'tile-separator';
     tile.appendChild(separator);
 
-    // ==================== BUTTON ROW INTEGRATION ====================
+    // ==================== BUTTON ROW (SUMMARY + SHARE ONLY) ====================
     const buttonRow = document.createElement('div');
     buttonRow.className = 'button-row';
-    buttonRow.style.display = 'none'; // Hidden by default
-    buttonRow.dataset.articleId = article.article_id || article.title; // Use article_id or title as unique identifier
-
-    // Determine if this article is voteable (first article is editorial - not voteable)
-    const isFirstArticle = articles.indexOf(article) === 0;
-    const voteableAttr = isFirstArticle ? 'data-is-voteable="false"' : '';
+    buttonRow.style.display = 'none'; // Hidden by default, shown when tile expands
+    buttonRow.dataset.articleId = article.article_id || article.title;
 
     buttonRow.innerHTML = `
-      <!-- Mark as Read Button -->
-      <div class="button-wrapper">
-        <div class="mark-read-wrapper">
-          <button class="read-button" id="markReadBtn-${article.article_id || article.title}" title="Mark this article as read to unlock other actions">
-            <svg class="read-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M18 6V4a2 2 0 1 0-4 0v2"/>
-              <path d="M20 15v6a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H10"/>
-              <rect x="12" y="6" width="8" height="5" rx="1"/>
-            </svg>
-            <span class="read-text"> Read ??</span>
-          </button>
-          <span class="ticks" id="readTicks-${article.article_id || article.title}"></span>
-        </div>
-        <!-- Info Icon Component -->
-        <div class="info-container" data-target="read-info">
-          <div class="info-icon">i</div>
-          <div class="tooltip">
-            Click "Mark as Read" to unlock all interactive features for this article (voting, bookmarking, and summary notes).
-          </div>
-        </div>
-      </div>
-
-      <!-- Vote Button -->
-      <div class="button-wrapper">
-        <button class="action-btn" id="voteBtn-${article.article_id || article.title}" data-action="vote" ${voteableAttr} title="Vote for this article to be featured in the next magazine">
-          <svg viewBox="0 0 490.667 490.667" xml:space="preserve">
-            <path class="icon-path" d="M245.333,0C110.059,0,0,110.059,0,245.333s110.059,245.333,245.333,245.333s245.333-110.059,245.333-245.333 S380.608,0,245.333,0z M103.893,131.989C138.56,88.789,190.123,64,245.333,64s106.752,24.789,141.44,67.989 c3.691,4.587,2.944,11.307-1.643,14.997c-1.963,1.579-4.331,2.347-6.677,2.347c-3.115,0-6.229-1.365-8.341-3.989 c-30.613-38.144-76.075-60.011-124.8-60.011s-94.187,21.867-124.8,60.011c-3.691,4.608-10.389,5.333-14.997,1.643 C100.949,143.296,100.203,136.576,103.893,131.989z M256,213.333c-5.888,0-10.667-4.779-10.667-10.667S250.112,192,256,192h64 c5.888,0,10.667,4.779,10.667,10.667s-4.779,10.667-10.667,10.667h-21.333V288c0,5.888-4.779,10.667-10.667,10.667 s-10.667-4.779-10.667-10.667v-74.667H256z M234.667,224v42.667c0,17.643-14.357,32-32,32c-17.643,0-32-14.357-32-32V224 c0-17.643,14.357-32,32-32C220.309,192,234.667,206.357,234.667,224z M96.683,291.755l-32-85.333 c-2.069-5.525,0.725-11.669,6.229-13.739c5.525-2.027,11.669,0.725,13.739,6.229l22.016,58.709l22.016-58.709 c2.069-5.525,8.192-8.277,13.739-6.229c5.504,2.069,8.299,8.213,6.229,13.739l-32,85.333c-1.557,4.16-5.547,6.912-9.984,6.912 C102.229,298.667,98.24,295.915,96.683,291.755z M376.789,370.005c-34.667,36.523-81.344,56.661-131.456,56.661 s-96.811-20.117-131.456-56.661c-4.053-4.288-3.883-11.029,0.405-15.083c4.288-4.032,11.051-3.861,15.083,0.405 c30.592,32.256,71.787,50.005,115.989,50.005c44.203,0,85.397-17.771,115.989-50.005c4.053-4.267,10.816-4.437,15.083-0.405 C380.693,358.955,380.843,365.739,376.789,370.005z M373.333,234.667c5.888,0,10.667,4.779,10.667,10.667 S379.221,256,373.333,256h-10.667v21.333h32c5.888,0,10.667,4.779,10.667,10.667s-4.779,10.667-10.667,10.667H352 c-5.888,0-10.667-4.779-10.667-10.667v-85.333c0-5.888,4.779-10.667,10.667-10.667h42.667c5.888,0,10.667,4.779,10.667,10.667 s-4.779,10.667-10.667,10.667h-32v21.333H373.333z"/>
-            <path class="icon-path" d="M192,224v42.667c0,5.888,4.779,10.667,10.667,10.667s10.667-4.779,10.667-10.667V224c0-5.888-4.779-10.667-10.667-10.667 S192,218.112,192,224z"/>
-          </svg>
-          <span> Vote ?</span>
-        </button>
-        <!-- Info Icon Component (changes based on voteable status) -->
-        <div class="info-container" data-target="${isFirstArticle ? 'vote-editorial-disabled-info' : 'vote-info'}">
-          <div class="info-icon">i</div>
-          <div class="tooltip">
-            ${isFirstArticle
-              ? 'This is an Editorial article - always included in SG Magazine. Only news/current affairs can be community-voted.'
-              : 'Your vote decides what goes into the SG Magazine! Top 5 voted articles each fortnight will be condensed and included.'}
-          </div>
-        </div>
-      </div>
-
       <!-- Summary Button -->
-      <div class="button-wrapper">
-        <button class="action-btn" id="summaryBtn-${article.article_id || article.title}" data-action="summary" title="Write your own summary notes for this article">
-          <svg viewBox="0 0 24 24">
-            <path class="icon-path" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <path class="icon-path" d="M14 2v6h6M8 15h8M8 11h8M8 19h8"/>
-          </svg>
-          <span>Summary</span>
-        </button>
-        <!-- Info Icon Component -->
-        <div class="info-container" data-target="summary-info">
-          <div class="info-icon">i</div>
-          <div class="tooltip">
-            Use this button as your notepad. Jot down notes in any way you like for revision.
-          </div>
-        </div>
-      </div>
+      <button class="action-btn" id="summaryBtn-${article.article_id || article.title}" data-action="summary" title="Write your own summary notes for this article">
+        <svg viewBox="0 0 24 24">
+          <path class="icon-path" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path class="icon-path" d="M14 2v6h6M8 15h8M8 11h8M8 19h8"/>
+        </svg>
+        <span>Summary</span>
+      </button>
 
-      <!-- Bookmark Button -->
-      <div class="button-wrapper">
-        <button class="action-btn" id="bookmarkBtn-${article.article_id || article.title}" data-action="bookmark" title="Bookmark this article for Mains revision">
-          <svg viewBox="0 0 24 24">
-            <path class="icon-path" d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-          </svg>
-          <span id="bookmarkText-${article.article_id || article.title}">Bookmark</span>
-        </button>
-        <!-- Info Icon Component -->
-        <div class="info-container" data-target="bookmark-info">
-          <div class="info-icon">i</div>
-          <div class="tooltip">
-            Save this article for later revision. Access your bookmarked articles from "Your Journal" in the navigation menu.
-          </div>
-        </div>
-      </div>
-
+      <!-- Share Button -->
       <div class="share-btn-wrapper">
         <button class="share-btn" id="shareBtn-${article.article_id || article.title}" data-action="share" title="Share this article on Telegram with your peers">
           <svg class="telegram-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -449,6 +374,7 @@ function renderArticles() {
               c8.468,3.849,18.439-2.21,18.983-11.453l14.314-243.341C384.161,113.614,382.748,110.742,380.263,109.054z"/>
           </svg>
           <span class="share-text">Share</span>
+          <span class="tooltip">Share & Discuss with Peers !!!</span>
         </button>
       </div>
     `;
@@ -817,20 +743,11 @@ window.onload = function () {
 
 
   // Optional article render logic
-  renderArticles();
+  renderEthicsEssayArticles();
 
-  // ⬆ This delay ensures that buttons.js fully loads and that articles exist in the DOM before event listeners attach.
-  // Needed because buttons.js defines reinitializeButtons() but articles are rendered only after window.onload.
-  // WAIT for buttons.js to load, then safely initialize
-  setTimeout(() => {
-    if (typeof window.reinitializeButtons === 'function') {
-      console.log('🔧 Initializing buttons...');
-      window.reinitializeButtons();
-      console.log('✅ Buttons initialized');
-    } else {
-      console.error('❌ window.reinitializeButtons not found!');
-    }
-  }, 150);
+  // NOTE: For Ethics & Essay, buttons are handled by ethics_essays_buttons.js
+  // No need to call reinitializeButtons() - buttons work via event delegation
+  console.log('✅ Articles rendered - buttons ready (event delegation)');
 
 
   const articleData = getArticleDataFromURL();
@@ -911,13 +828,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ✅ Zoom toggle on image click
-document.getElementById("floating-image")?.addEventListener("click", function () {
-  this.classList.toggle("zoomed");
-});
-document.getElementById("floating-image").addEventListener("contextmenu", function (e) {
-  e.preventDefault();
-  alert("⚠️ This image is meant to aid your absorption of the issue. Downloading may not help. Nevertheless Samyag Gyan will be available each fortnight with all relevant Mindmaps.");
-});
+// Note: Ethics & Essay articles don't have floating images, so skip this
+const floatingImage = document.getElementById("floating-image");
+if (floatingImage) {
+  floatingImage.addEventListener("click", function () {
+    this.classList.toggle("zoomed");
+  });
+  floatingImage.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+    alert("⚠️ This image is meant to aid your absorption of the issue. Downloading may not help. Nevertheless Samyag Gyan will be available each fortnight with all relevant Mindmaps.");
+  });
+}
 
 // ========== Security Features JS ==========
 

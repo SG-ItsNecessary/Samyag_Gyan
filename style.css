@@ -44,6 +44,20 @@ main {
   margin: 28px auto;
   padding: 0 20px;
 }
+
+/* ===== ARTICLES CONTAINER ===== */
+#articles-container {
+  width: 100%;
+  max-width: 960px; /* Match main container width */
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  #articles-container {
+    width: 100%;
+    max-width: 100%;
+  }
+}
 /* ===== ARTICLE TILE ===== */
 .article-tile {
   background: #ffffff;
@@ -54,8 +68,70 @@ main {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15),
               0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Bottom-focused shadow */
   transition: all 0.25s ease;
-  overflow: hidden;
+  overflow: visible;             /* Allow badge to appear outside tile */
   position: relative;
+}
+
+/* ===== READ STATUS INDICATOR (PERSISTENT BUTTON ONLY) ===== */
+/* When article is marked as read: Show Read ✓ button on left side when tile is collapsed */
+
+/* ===== PERSISTENT READ ✓ BUTTON WHEN TILE IS COLLAPSED ===== */
+
+/* Show button-row when tile is collapsed AND article was read */
+.article-tile.read-completed:not(.expanded) .button-row {
+  display: flex !important; /* Override default hide */
+  position: absolute;
+  left: 15px;
+  bottom: 12px;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  z-index: 100;
+}
+
+/* Hide all button-wrapper divs EXCEPT the one containing mark-read-wrapper when collapsed */
+.article-tile.read-completed:not(.expanded) .button-row > .button-wrapper:not(:has(.mark-read-wrapper)),
+.article-tile.read-completed:not(.expanded) .button-row > .action-btn,
+.article-tile.read-completed:not(.expanded) .button-row > .share-btn-wrapper {
+  display: none !important;
+}
+
+/* Ensure the button-wrapper containing mark-read-wrapper stays visible */
+.article-tile.read-completed:not(.expanded) .button-row > .button-wrapper:has(.mark-read-wrapper) {
+  display: flex !important;
+}
+
+/* Ensure mark-read-wrapper itself stays visible */
+.article-tile.read-completed:not(.expanded) .mark-read-wrapper {
+  display: flex !important;
+}
+
+/* Hide the info icon when collapsed (only show the Read ✓ button) */
+.article-tile.read-completed:not(.expanded) .button-row .info-container {
+  display: none !important;
+}
+
+/* Style the persistent Read ✓ button - KEEP TEXT VISIBLE! */
+.article-tile.read-completed:not(.expanded) .read-button.read-done {
+  background-color: rgba(46, 204, 113, 0.12) !important; /* Very light green */
+  border: 2px solid #2ecc71 !important;
+  color: #2ecc71 !important; /* Green text */
+  font-weight: 700 !important;
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  box-shadow: 0 2px 6px rgba(46, 204, 113, 0.25) !important;
+  border-radius: 18px !important;
+}
+
+/* Ensure SVG icon is visible */
+.article-tile.read-completed:not(.expanded) .read-button.read-done .read-icon {
+  stroke: #2ecc71 !important;
+  fill: none !important;
+}
+
+/* Ensure text is visible */
+.article-tile.read-completed:not(.expanded) .read-button.read-done .read-text {
+  color: #2ecc71 !important;
 }
 
 

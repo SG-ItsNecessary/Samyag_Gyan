@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samyak Gyan - Create Your Profile</title>
+
+<style>
+:root {
+    --bg-color: #fefefe;
+    --button-bg: #007BFF;
+    --button-hover: #0056b3;
+    --maroon: #800000;
+    --text-color: #333;
+    --privacy-bg: #ECF0FC;
+    --highlight-color: #fff9b0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.container {
+    max-width: 700px;
+    width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    padding: 30px 20px;
+    text-align: center;
+}
+
+/* Profile Section */
+.profile-heading {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--maroon);
+    margin-bottom: 25px;
+}
+
+.profile-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.profile-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+/* Icons using Unicode instead of Font Awesome */
+.icon {
+    font-size: 24px;
+    width: 28px;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Hand-drawn highlight animation only for first item */
+.highlight-animate {
+    position: relative;
+    display: inline-block;
+    z-index: 0;
+    line-height: 1.2;
+}
+
+.highlight-animate::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.05em;
+    height: 0.9em;
+    width: 0;
+    background: var(--highlight-color);
+    z-index: -1;
+    border-radius: 2px;
+    animation: drawHighlight 1s forwards;
+}
+
+@keyframes drawHighlight {
+    0% { width: 0; }
+    100% { width: 100%; }
+}
+
+/* Telegram login widget container */
+.telegram-login-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50px;
+}
+
+/* Loading state */
+.loading {
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+}
+
+/* No Email/No OTP Info */
+.no-info {
+    font-size: 12px;
+    font-style: italic;
+    font-weight: bold;
+    color: #808080;
+    margin-top: 5px;
+}
+
+/* Login Info */
+.login-info {
+    margin-top: 25px;
+    font-size: 1rem;
+    color: var(--text-color);
+    line-height: 1.6em;
+    text-align: center;
+}
+
+.login-info b { font-weight: 700; }
+.login-info u { text-decoration: underline; }
+
+/* Privacy Box */
+.privacy-box {
+    margin-top: 25px;
+    max-height: 320px;
+    overflow-y: auto;
+    background-color: var(--privacy-bg);
+    border: 2px solid #a30000;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.5em;
+}
+
+.privacy-box h2, .privacy-box h3 {
+    color: #a30000;
+    margin-top: 15px;
+}
+
+.privacy-promise {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 15px 0;
+    text-align: center;
+    color: #a30000;
+}
+
+.privacy-box h3:first-of-type {
+    text-align: center;
+    font-size: 1.4rem;
+}
+
+.privacy-box h3:not(:first-of-type) {
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.privacy-box table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.privacy-box table th,
+.privacy-box table td {
+    border: 1px solid #a30000;
+    padding: 8px;
+    text-align: left;
+}
+
+.privacy-box table th {
+    background-color: #ffe5e5;
+    font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 20px 15px;
+        width: 95%;
+    }
+    .profile-heading {
+        font-size: 1.6rem;
+    }
+    .profile-list {
+        font-size: 18px;
+        gap: 16px;
+    }
+    .privacy-box {
+        max-height: 280px;
+        font-size: 0.85rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .profile-heading {
+        font-size: 1.4rem;
+    }
+    .privacy-box {
+        max-height: 250px;
+        font-size: 0.8rem;
+    }
+}
+</style>
+</head>
+<body class="no-rotate-warning">
+
+<div class="container">
+    <!-- Profile Section -->
+    <div class="profile-section">
+        <div class="profile-heading">Create Profile with Telegram to:</div>
+        <ul class="profile-list">
+            <li><span class="icon" style="color:#ff9800;">🖍️</span> <span class="highlight-animate">Highlight Keywords</span></li>
+            <li><span class="icon" style="color:#3f51b5;">📖</span> Add Summaries</li>
+            <li><span class="icon" style="color:#e53935;">🔖</span> Bookmark Articles</li>
+            <li><span class="icon" style="color:#388e3c;">📊</span> Track Your Progress</li>
+        </ul>
+
+        <!-- Telegram Login Widget Container -->
+        <div class="telegram-login-container" id="telegram-widget-container">
+            <p class="loading">Loading login widget...</p>
+        </div>
+
+        <p class="no-info">We Do Not Collect Personal Data</p>
+        <p class="no-info">No Phone / Email required</p>
+        <p class="no-info">No OTP, No Spam.</p>
+    </div>
+
+    <!-- Privacy Policy -->
+    <div class="privacy-box" id="privacy-policy">
+        <div class="privacy-promise">Our Promise !!</div>
+
+        <ul>
+            <li><b>No Personal Data</b> <i>collected</i> from any user.</li>
+            <li><b>No Digital Profiling</b> or <i>digital fingerprinting</i>.</li>
+            <li><b>No tracking codes</b> from GAFA or other third parties. <b>No-GAFA</b>.</li>
+            <li><b>No Data Collected</b> hence <i>No Trade</i> or <i>sharing of Data</i>.</li>
+            <li><b>No ADs ever</b> (Since No code of Google & Meta)</li>
+            <li>We utilize only essential cookies required for basic function.</li>
+            <li>Fully Compliant with the <b>DPDP Act (India)</b> and global laws.</li>
+        </ul>
+
+        <h3>Samyak Gyan Privacy Policy</h3>
+        <p><b>Effective Date:</b> October 3, 2025</p>
+        <p>At Samyak Gyan, your privacy is our foundational principle. This policy is written to be transparent and clear about our commitment to providing you with a seamless and enjoyable learning experience without collecting, tracking, or monetizing your personal data.</p>
+
+        <h3>Our Legal Commitment to Your Privacy</h3>
+        <ul>
+            <li><b>Indian Law:</b> Digital Personal Data Protection Act, 2023 (No. 22 of 2023)</li>
+            <li><b>European Union Law:</b> GDPR (Regulation (EU) 2016/679)</li>
+        </ul>
+
+        <h3>1. Our Core Privacy Philosophy: Zero Tracking & Zero Personal Data</h3>
+        <p><b>Zero Personal Data:</b> We have adopted a strict policy of collecting <b>NO Personal Data</b> from our users. This means we do not store, process, or have access to any information that can directly or indirectly identify you (such as email, phone number, or unique device identifiers).</p>
+        <ul>
+            <li><b>Zero Tracking & Profiling:</b> We do not employ any tracking scripts, pixels, digital fingerprinting tools, or analytics from large tech companies. Since we collect no personal data, we cannot and do not create user profiles, behavioral models, or target user groups.</li>
+            <li><b>No GAFAM Technology:</b> We have not integrated any code, libraries, or technologies from companies like Google, Amazon, Meta (Facebook), Apple, or others that could be used for third-party tracking or data aggregation.</li>
+            <li><b>Zero Ads:</b> You will never see third-party advertisements (such as Google AdSense or Meta Ads) on our platform. Our mission is to educate, not to serve ads.</li>
+            <li><b>Zero Data Sharing:</b> As we do not collect or possess personal data like email addresses or phone numbers, we have no data to trade, sell, or share with any third party, including advertisers or data brokers.</li>
+        </ul>
+
+        <h3>2. Information We Collect and How We Log In</h3>
+        <h4>A. Login via Telegram</h4>
+        <p>We use <b>Login with Telegram</b> as our exclusive method of authentication. This allows you to create a secure, persistent profile without ever giving us your Email ID, Phone Number, or a new password.</p>
+        <table>
+            <tr>
+                <th>Data We MAY Receive and Store (For Profile Creation)</th>
+                <th>Data We DO NOT Receive or Access</th>
+            </tr>
+            <tr>
+                <td><b>Telegram User ID:</b> A unique numerical identifier. This is the only mandatory key for your profile on our site.</td>
+                <td>Your Private Telegram Messages</td>
+            </tr>
+            <tr>
+                <td>First Name, Last Name, and Username (If you have these set on Telegram)</td>
+                <td>Your Private Telegram Contacts or Friends List</td>
+            </tr>
+            <tr>
+                <td>Profile Photo (If you have one set on Telegram)</td>
+                <td>Your Email Address</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Your Phone Number (It remains hidden by Telegram)</td>
+            </tr>
+        </table>
+
+        <h4>B. Automatically Collected Technical Data</h4>
+        <p>We may automatically collect non-personal, technical information for security, diagnostics, and maintaining site functionality. This data is <b>not linked to your identity for profiling purposes.</b></p>
+        <ul>
+            <li><b>IP Address:</b> Used solely for security, preventing abuse, and identifying service-breaking technical errors.</li>
+            <li><b>Browser and Device Type:</b> Used to ensure the website is displayed correctly across different devices.</li>
+        </ul>
+
+        <h3>3. Cookies and Tracking Technologies</h3>
+        <p>We use only <b>essential cookies</b> to ensure your session works smoothly and your experience is consistent across pages.</p>
+        <ul>
+            <li><b>Session Cookies:</b> These keep your login state and progress active while you navigate the website.</li>
+            <li><b>Preference Cookies:</b> These may remember simple choices like language settings or interface preferences during your visit.</li>
+        </ul>
+        <p><b>What we DO NOT do with cookies:</b></p>
+        <ul>
+            <li>We do not use cookies for marketing, advertising, or profiling purposes.</li>
+            <li>We do not use any third-party tracking or analytical cookies (like Google Analytics).</li>
+        </ul>
+
+        <h3>4. Security and Data Use</h3>
+        <h4>A. How We Use the Information</h4>
+        <ol>
+            <li><b>To Run and Operate Our Site:</b> The Telegram User ID is essential for allowing you to log in, access your profile, and use the core features of the Site.</li>
+            <li><b>To Personalize Experience:</b> We may use your optional name/username to personalize your view of the Site (e.g., displaying "Welcome back, [Username]").</li>
+            <li><b>For Security:</b> The IP address is used to protect against unauthorized access and troubleshoot technical issues.</li>
+        </ol>
+
+        <h4>B. How We Protect Your Information</h4>
+        <p>We adopt appropriate data storage and processing practices and security measures and industry-standard security practices, including <b>SSL/TLS encryption during transmission.</b></p>
+
+        <h3>5. Data Principal Rights and Grievance Redressal</h3>
+        <p>As a platform that collects <b>zero Personal Data</b>, many data rights are not applicable. However, we affirm your rights as established under the DPDP Act, 2023, and the GDPR:</p>
+        <ul>
+            <li><b>Right to Information/Be Informed:</b> You are informed by this policy that we collect no Personal Data.</li>
+            <li><b>Right to Correction and Erasure:</b> Any data we hold (e.g., your optional Telegram name) can be corrected or effectively erased by managing your public profile settings on Telegram.</li>
+        </ul>
+        <p>If you have any questions or concerns regarding our privacy-first practices, please contact our designated Grievance Officer:</p>
+        <ul>
+            <li><b>Email:</b> [Insert Contact Email]</li>
+            <li><b>Website:</b> [Insert Website URL]</li>
+        </ul>
+
+        <h3>6. Managing Cookies and Policy Changes</h3>
+        <h4>A. Managing Cookies</h4>
+        <p>Since we only use essential cookies, there is no separate "preference center" to manage them. You can manage or block all cookies using your browser settings (Chrome, Firefox, Safari, etc.). Please note that disabling essential cookies may prevent you from logging in or affect critical features of the website.</p>
+
+        <h4>B. Changes to this Policy</h4>
+        <p>Samyak Gyan may update this policy occasionally. When we make changes, we will revise the <b>Effective Date</b> at the top of this page. We encourage Users to check this page periodically.</p>
+    </div>
+</div>
+
+<script>
+// ==================== SESSION CHECK ====================
+// Check if user already logged in
+window.addEventListener('DOMContentLoaded', () => {
+    const telegramUser = localStorage.getItem('telegram_user');
+    const userId = localStorage.getItem('user_id');
+
+    if (telegramUser && userId) {
+        // User already logged in - redirect to homepage
+        console.log('User already logged in, redirecting to homepage...');
+        window.location.href = 'homepage.html';
+        return;
+    }
+
+    // New user - load Telegram widget
+    loadTelegramWidget();
+});
+
+// ==================== LOAD TELEGRAM WIDGET ====================
+function loadTelegramWidget() {
+    const container = document.getElementById('telegram-widget-container');
+    container.innerHTML = ''; // Clear loading message
+
+    // Create Telegram widget script
+    const script = document.createElement('script');
+    script.src = 'https://telegram.org/js/telegram-widget.js?22';
+    script.setAttribute('data-telegram-login', 'YOUR_BOT_USERNAME'); // ⚠️ REPLACE WITH YOUR BOT USERNAME
+    script.setAttribute('data-size', 'large');
+    script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+    script.setAttribute('data-request-access', 'write');
+    script.async = true;
+
+    container.appendChild(script);
+}
+
+// ==================== TELEGRAM AUTH CALLBACK ====================
+function onTelegramAuth(user) {
+    console.log('Telegram authentication successful:', user);
+
+    // Show loading state
+    const container = document.getElementById('telegram-widget-container');
+    container.innerHTML = '<p class="loading">Creating your profile...</p>';
+
+    // Send user data to backend
+    fetch('/api/auth/telegram', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: user.id,
+            first_name: user.first_name || '',
+            last_name: user.last_name || '',
+            username: user.username || '',
+            photo_url: user.photo_url || '',
+            auth_date: user.auth_date,
+            hash: user.hash
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            console.log('Backend response:', data);
+
+            // Store user data in localStorage
+            localStorage.setItem('telegram_user', JSON.stringify(user));
+            localStorage.setItem('user_id', user.id.toString());
+            localStorage.setItem('referral_code', data.referral_code || '');
+            localStorage.setItem('trial_end', data.trial_end || '');
+
+            // Show success message
+            container.innerHTML = '<p class="loading" style="color: green;">✓ Profile created! Redirecting...</p>';
+
+            // Redirect to homepage after 1 second
+            setTimeout(() => {
+                window.location.href = 'homepage.html';
+            }, 1000);
+        } else {
+            throw new Error(data.message || 'Login failed');
+        }
+    })
+    .catch(error => {
+        console.error('Authentication error:', error);
+
+        // Show error message
+        container.innerHTML = `
+            <p style="color: red; font-size: 14px;">
+                ❌ Login failed: ${error.message}<br>
+                <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; cursor: pointer;">
+                    Try Again
+                </button>
+            </p>
+        `;
+    });
+}
+</script>
+
+</body>
+</html>

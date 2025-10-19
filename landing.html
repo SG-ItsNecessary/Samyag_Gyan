@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samyak Gyan - Your Daily Spark of Knowledge</title>
+<style>
+:root {
+    --container-bg: #ffffff;
+    --text-color: #333;
+    --border-color: #005f73;
+    --button-color: #ff7f50;
+    --button-hover: #ff6347;
+    --accent-red: #a30000;
+    --breadcrumb-bg: #ffffff;
+    --breadcrumb-separator: #a30000;
+    --highlight-yellow: #fff9b0;
+}
+
+body {
+    background-color: #fefefe;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    padding: 30px 25px;
+    border: 4px solid var(--border-color);
+    border-radius: 12px;
+    background-color: var(--container-bg);
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    box-sizing: border-box;
+}
+
+.reveal-text {
+    font-size: 2rem;
+    line-height: 1.4em;
+    min-height: 4em;
+    color: var(--text-color);
+    font-weight: 700;
+    white-space: pre-wrap;
+    display: inline-block;
+    position: relative;
+}
+
+.cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.5em;
+    background-color: var(--accent-red);
+    position: absolute;
+    right: 0;
+    top: 0;
+    animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.fly-line {
+    font-size: 1.3rem;
+    line-height: 1.6em;
+    margin: 8px 0;
+}
+
+.header-black { color: #000; }
+.header-red { color: var(--accent-red); }
+
+.fly-in-left {
+    opacity: 0;
+    transform: translateX(-100%);
+    animation: flyInLeft 1s forwards;
+}
+
+.fly-in-right {
+    opacity: 0;
+    transform: translateX(100%);
+    animation: flyInRight 1s forwards;
+}
+
+@keyframes flyInLeft {
+    0% { opacity: 0; transform: translateX(-100%); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes flyInRight {
+    0% { opacity: 0; transform: translateX(100%); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+.highlight {
+    background-color: var(--highlight-yellow);
+    transition: background 0.3s ease;
+}
+
+.breadcrumbs {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.breadcrumb-chip {
+    background-color: var(--breadcrumb-bg);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+    color: #333;
+    white-space: nowrap;
+    border: 2px solid var(--accent-red);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+.breadcrumb-chip.highlight-animate {
+    background-color: var(--highlight-yellow);
+    animation: highlightBlink 0.8s ease 2;
+}
+
+@keyframes highlightBlink {
+    0% { background-color: var(--breadcrumb-bg); }
+    50% { background-color: var(--highlight-yellow); }
+    100% { background-color: var(--breadcrumb-bg); }
+}
+
+.breadcrumb-separator {
+    color: var(--breadcrumb-separator);
+    font-weight: bold;
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+#action-button {
+    margin-top: 25px;
+    padding: 14px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background-color: var(--button-color);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.7s ease, transform 0.2s, background-color 0.3s;
+    width: 40%;
+    max-width: 300px;
+}
+
+#action-button:hover {
+    background-color: var(--button-hover);
+    transform: translateY(-4px);
+}
+
+@media (max-width: 480px) {
+    .reveal-text { font-size: 1.6rem; line-height: 1.4em; }
+    .fly-line { font-size: 1.1rem; }
+    #action-button { padding: 12px 20px; font-size: 0.95rem; }
+}
+</style>
+</head>
+<body class="no-rotate-warning">
+
+<div class="container">
+    <div id="message-box" class="reveal-text">
+        <span class="cursor" id="typing-cursor"></span>
+    </div>
+
+    <div id="breadcrumbs" class="breadcrumbs">
+        <span class="breadcrumb-chip">Read</span>
+        <span class="breadcrumb-separator">↓</span>
+        <span class="breadcrumb-chip" id="highlight-chip">Highlight</span>
+        <span class="breadcrumb-separator">↓</span>
+        <span class="breadcrumb-chip">Summarize</span>
+        <span class="breadcrumb-separator">↓</span>
+        <span class="breadcrumb-chip">Download</span>
+    </div>
+
+    <button id="action-button" onclick="goToProfileCreation()">
+        Begin Your Journey
+    </button>
+</div>
+
+<script>
+// ==================== SESSION CHECK ====================
+// Check if user already logged in - if yes, redirect to homepage
+window.addEventListener('DOMContentLoaded', () => {
+    const telegramUser = localStorage.getItem('telegram_user');
+    const userId = localStorage.getItem('user_id');
+
+    if (telegramUser && userId) {
+        // User already logged in - redirect to homepage
+        console.log('User already logged in, redirecting to homepage...');
+        window.location.href = 'homepage.html';
+        return;
+    }
+
+    // New user - show landing page animation
+    initLandingPage();
+});
+
+// ==================== LANDING PAGE ANIMATION ====================
+const headerLines = [
+    { text: "Your Daily Spark of Knowledge", class: "header-black" },
+    { text: "Samyak Gyan !!", class: "header-red" }
+];
+
+const flyLines = [
+    { text: '📜 Read as Website', side: 'left' },
+    { text: '🖍️ Highlight as a Book', side: 'right', highlight: true },
+    { text: '📝 Use as your Notebook', side: 'left' },
+    { text: '⬇️ Daily CA Notes Maker Tool', side: 'right' }
+];
+
+const messageBox = document.getElementById('message-box');
+const breadcrumbs = document.getElementById('breadcrumbs');
+const actionButton = document.getElementById('action-button');
+const cursor = document.getElementById('typing-cursor');
+
+function typeHeader(lineIndex = 0, charIndex = 0) {
+    if (lineIndex >= headerLines.length) {
+        cursor.remove();
+        const spacer = document.createElement('div');
+        spacer.style.height = '1.5em';
+        messageBox.appendChild(spacer);
+        setTimeout(() => flyInLines(), 300);
+        return;
+    }
+
+    const line = headerLines[lineIndex];
+    if (charIndex === 0) {
+        const span = document.createElement('span');
+        span.className = line.class;
+        span.id = 'line-' + lineIndex;
+        messageBox.appendChild(span);
+    }
+
+    const span = document.getElementById('line-' + lineIndex);
+    if (charIndex < line.text.length) {
+        span.textContent += line.text[charIndex];
+        setTimeout(() => typeHeader(lineIndex, charIndex + 1), 80);
+    } else {
+        messageBox.appendChild(document.createElement('br'));
+        setTimeout(() => typeHeader(lineIndex + 1, 0), 200);
+    }
+}
+
+function flyInLines(index = 0) {
+    if (index >= flyLines.length) {
+        const spacer = document.createElement('div');
+        spacer.style.height = '1.5em';
+        messageBox.appendChild(spacer);
+        animateBreadcrumbs();
+        return;
+    }
+
+    const span = document.createElement('span');
+    span.className = 'fly-line ' + (flyLines[index].side === 'left' ? 'fly-in-left' : 'fly-in-right');
+    span.innerHTML = flyLines[index].highlight
+        ? `<span class="highlight">${flyLines[index].text}</span>`
+        : flyLines[index].text;
+
+    messageBox.appendChild(span);
+    messageBox.appendChild(document.createElement('br'));
+    setTimeout(() => flyInLines(index + 1), 1500);
+}
+
+function animateBreadcrumbs() {
+    const crumbs = [...breadcrumbs.children];
+    crumbs.forEach((el, idx) => {
+        setTimeout(() => {
+            el.style.opacity = 1;
+            if (el.id === 'highlight-chip') {
+                el.classList.add('highlight-animate');
+            }
+            if (idx === crumbs.length - 1) {
+                setTimeout(() => {
+                    actionButton.style.opacity = 1;
+                }, 500);
+            }
+        }, idx * 400);
+    });
+}
+
+function initLandingPage() {
+    [...breadcrumbs.children].forEach(el => el.style.opacity = 0);
+    actionButton.style.opacity = 0;
+    messageBox.innerHTML = '<span class="cursor" id="typing-cursor"></span>';
+    typeHeader();
+}
+
+// ==================== NAVIGATION ====================
+function goToProfileCreation() {
+    window.location.href = 'profile.html';
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(psql:*)",
+      "Bash(git --version)",
+      "Bash(dir:*)",
+      "Bash(git checkout:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(start user_dashboard_testbed.html)",
+      "Bash(start homepage.html)",
+      "Bash(start articles.html)",
+      "Bash(start ethics_essays_poll.html)",
+      "Bash(start msedge ethics_essays_poll.html)",
+      "Bash(curl -o \"scripts/ethics_essays_buttons.js\" \"https://gist.githubusercontent.com/placeholder/placeholder/raw/placeholder.js\")",
+      "Bash(git add .)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
