@@ -1,5 +1,79 @@
 const articles = [
   {
+    "title": "War and Energy: Global Economic Stability",
+    "article_type": "ethics", // ✅ ETHICS article
+    "hashtags": "#Ethics #Essay #Geopolitics",
+    "source_ribbon": "the-hindu",
+    "secondary_ribbon": "Ethics",
+    "publish_date": "19 October 2025",
+    "prelude_title": "What do you understand by war and energy?",
+    "prelude_body": "The relationship between war and energy is fundamentally one of causation and consequence, where energy resources—particularly crude oil—are both a frequent source of conflict and the immediate casualty of conflict.",
+    "content": [
+      {
+        "main_question_id": 901,
+        "main_answer_id": 1001,
+        "article_id": 9,
+        "language": "en",
+        "question": "✦ How does conflict in oil-producing regions immediately and directly impact the global economy?",
+        "answer": "Any conflict—whether internal instability, civil strife, or international war—in oil-producing regions has a direct and immediate impact on crude oil supply. Since crude oil is foundational to modern industrial economies, powering both production and transportation, any such disruption can severely affect global commerce. Maritime shipping of crude oil is particularly sensitive, given that finished goods and raw materials alike rely on petroleum-powered transport. Therefore, disruption in oil-producing areas or strategic sea lanes, such as those in the Middle East, can paralyze the flow of crude oil. The recent escalation between Iran and Israel has revived fears of a dual threat—disruption in oil production and in maritime oil transshipment routes critical to Asian and European economies."
+      },
+      {
+        "main_question_id": 902,
+        "main_answer_id": 1002,
+        "article_id": 9,
+        "language": "en",
+        "question": "✦ How did the economic impact of U.S. tariffs temporarily suppress crude oil prices despite rising geopolitical conflict?",
+        "answer": "Despite the looming specter of conflict, crude oil prices dropped from $71.53 in February to $62.52 by June 1, 2025. This decline was largely driven by the imposition of U.S. tariffs on imports from major trade partners including Japan, India, South Korea, China, and the European Union. These tariffs led to a fall in global trade volumes, which in turn reduced industrial output. Lower output translated into diminished demand for crude oil—both for manufacturing and shipping—contributing to a decrease in prices. Thus, while geopolitical conflict was rising, economic slowdown induced by trade protectionism temporarily suppressed oil demand, pulling prices down."
+      },
+      {
+        "main_question_id": 903,
+        "main_answer_id": 1003,
+        "article_id": 9,
+        "language": "en",
+        "question": "✦ Given Iran's reduced production, how does its geographic location and the actions of allied groups like the Houthis still elevate global oil market volatility?",
+        "answer": "Though Iran is not a dominant player in the current global oil market due to international sanctions, its geographic location remains pivotal. It sits astride the Strait of Hormuz, a vital artery through which a fifth of the world's oil passes. Any disruption here could panic the markets. Iran's current production has halved from 3.3 to 1.6 million barrels per day, yet its strategic position allows it to influence global shipping indirectly. Allied actors like the Houthis in Yemen amplify this threat by targeting Saudi oil infrastructure and disrupting Red Sea shipping lanes. In recent weeks, the Houthis have even dared to engage the advanced U.S. Navy in the Red Sea, escalating the perception of threat. These asymmetric pressures raise uncertainty in maritime transit, even when physical oil volumes are unaffected. The psychological and logistical risks converge to elevate market volatility."
+      }
+    ],
+    "endRibbons": []
+  },
+  {
+    "title": "OPEC+ Fragmentation and Strategic Petroleum Reserves",
+    "article_type": "ethics", // ✅ ETHICS article
+    "hashtags": "#Ethics #Essay #Energy",
+    "source_ribbon": "indian-express",
+    "secondary_ribbon": "Ethics",
+    "publish_date": "19 October 2025",
+    "prelude_title": "What do you understand by war and energy?",
+    "prelude_body": "The relationship between war and energy is fundamentally one of causation and consequence, where energy resources—particularly crude oil—are both a frequent source of conflict and the immediate casualty of conflict.",
+    "content": [
+      {
+        "main_question_id": 904,
+        "main_answer_id": 1004,
+        "article_id": 10,
+        "language": "en",
+        "question": "✦ What are the conflicting production incentives within the OPEC+ structure that fragment the cartel's control and limit its ability to stabilize global oil prices?",
+        "answer": "OPEC and its extended group, OPEC+, exercise considerable influence over global oil pricing by controlling production volumes. Many OPEC nations have economies heavily reliant on oil exports and, in times of price drops, resort to production cuts to artificially elevate prices and protect national revenues. In contrast, non-OPEC producers like Russia and Iran, often under sanctions or with separate geopolitical considerations, act unilaterally and sometimes increase output to meet fiscal needs. This fragmented control limits the cartel's ability to stabilize prices, making the market vulnerable to conflicting production incentives during times of tension or economic slowdown."
+      },
+      {
+        "main_question_id": 905,
+        "main_answer_id": 1005,
+        "article_id": 10,
+        "language": "en",
+        "question": "✦ How does India's significantly lower Strategic Petroleum Reserve (SPR) capacity compare to its major Asian counterparts and expose it to a strategic disadvantage?",
+        "answer": "Asia houses the world's largest oil importers—China, India, Japan, and South Korea—all of whom have limited domestic oil production and are vulnerable to supply shocks. Their energy security strategies hinge on robust Strategic Petroleum Reserves (SPRs), which differ significantly across countries. Japan maintains about 470 million barrels—240 days of import cover—while China holds roughly 400 million barrels for 90 days, and South Korea about 214 million barrels for up to 100 days. India, by contrast, holds just 39 million barrels, covering a mere 13–15 days. While India benefits from geographic proximity to West Asia and discounted Russian imports, this advantage is offset by its minimal buffer capacity. In a prolonged crisis, this could place India at a significant strategic disadvantage."
+      },
+      {
+        "main_question_id": 906,
+        "main_answer_id": 1006,
+        "article_id": 10,
+        "language": "en",
+        "question": "✦ Despite its energy independence, why must the United States maintain a substantial naval presence and seek renewed global collaboration to counter asymmetric threats to key international sea lanes?",
+        "answer": "The United States enjoys a unique geopolitical insulation due to its massive domestic production, shale oil boom, and secure continental positioning. Now a net exporter, the U.S. is both the world's largest producer and one of its largest consumers, enabling strategic autonomy in oil policy. In contrast, Europe remains exposed. Having cut Russian imports, it now relies on West Asian and American oil, making it acutely sensitive to West Asian instability. Asian economies, despite their storage reserves, remain logistically dependent on stable sea lanes. Meanwhile, oil-producing nations in OPEC+ continue to wield disproportionate influence despite fragmented alignment. The resulting configuration is an asymmetric oil order—where supply chains are tightly interdependent, but shock absorbers like SPRs, geography, and naval guarantees vary widely. Any disruption—or even the perceived possibility of disruption—in oil production or maritime flow drives up crude oil prices globally. The U.S. Navy's role in securing these sea lanes has been essential for decades, but now faces unprecedented challenges from non-state actors like the Houthis, necessitating renewed global collaboration to maintain maritime security and stabilize energy markets."
+      }
+    ],
+    "endRibbons": []
+  },
+  {
     "title": "Digital Public Infrastructure in India",
     "article_type": "news", // ➡️ NEW: Article category (news, editorial, ethics, essay)
     "hashtags": "#Governance #DigitalIndia #CurrentAffairs", //
