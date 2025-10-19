@@ -15,7 +15,9 @@
       "Bash(start ethics_essays_poll.html)",
       "Bash(start msedge ethics_essays_poll.html)",
       "Bash(curl -o \"scripts/ethics_essays_buttons.js\" \"https://gist.githubusercontent.com/placeholder/placeholder/raw/placeholder.js\")",
-      "Bash(git add .)"
+      "Bash(git add .)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nMajor project update: Add Ethics & Essay section, User Dashboard, and comprehensive documentation\n\nFeatures Added:\n- Ethics & Essay section (ethics_essays_poll.html) with Summary/Share buttons\n- User Dashboard (user_dashboard_testbed.html) with Stats & Subscriptions\n- Complete authentication system (auth.js)\n- Orientation detection for mobile devices\n- Articles section improvements (articles.html)\n- Landing page and profile setup (landing.html, profile.html)\n- Referral popup system\n\nDocumentation:\n- PROJECT_STATUS.md - Complete project status and user workflow\n- samyak_gyan_project_brief.md - Full project vision and requirements\n- Multiple testing and integration guides\n- Setup and deployment documentation\n\nAssets:\n- New banner images and user avatars\n- Mobile responsive screenshots\n- Component library organization\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push origin main)"
     ],
     "deny": [],
     "ask": []

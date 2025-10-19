@@ -1,7 +1,34 @@
 # Samyak Gyan - Project Status
 
 **Last Updated:** January 2025
-**Current Focus:** Ethics & Essay Section Development
+**Current Focus:** URL Structure Finalized + Ethics & Essay Section Development
+
+---
+
+## 🔗 FINALIZED URL STRUCTURE (v2.0)
+
+### Current Affairs Section:
+```
+Date Page:          /upsc-current-affairs/2025-01-18  (shows news + editorials mixed)
+News Article:       /upsc-current-affairs/2025-01-18/article-slug
+Editorial Article:  /upsc-editorials/2025-01-18/article-slug
+```
+
+### Ethics & Essays Section:
+```
+Landing Page:       /upsc-ethics-essays  (latest Sunday's content)
+Pagination:         /upsc-ethics-essays/page-1, /page-2, /page-3...
+Ethics Article:     /upsc-ethics/article-slug  (NO DATE - timeless!)
+Essay Article:      /upsc-essays/article-slug  (NO DATE - timeless!)
+```
+
+**Key Design:**
+- ✅ Option A behavior: URL updates when tile opens, page URL stays same
+- ✅ Cleaner URLs: `/upsc-editorials/` vs `/upsc-current-affairs/editorial/`
+- ✅ Smart dates: News/editorials have dates, ethics/essays don't (evergreen)
+- ✅ Page numbers for ethics/essays pagination (not dates)
+
+**See:** `docs/URL_STRUCTURE_AND_ACCESS_CONTROL.md` for complete documentation
 
 ---
 
