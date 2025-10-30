@@ -899,7 +899,7 @@ window.onload = async function () {
     // Normal highlight flow
     // Tick button (needs access in color-btn onclick)
     const tickButton = document.createElement('button');
-    tickButton.textContent = '✓✓';
+    tickButton.textContent = '✓';
     tickButton.className = 'tick-btn';
     tickButton.style.display = 'none';
 

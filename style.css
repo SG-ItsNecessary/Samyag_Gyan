@@ -630,7 +630,7 @@ transition: background-color 0.2s ease;
 background-color: #d32f2f; /* Darker red on hover */
 }
 
-/* ✨ NEW: Remove Button (Click/Long Press on Highlight) */
+/* ✨ NEW: Remove Button (Click/Long Press on Highlight) - Same size as color palette */
 .remove-highlight-button {
   z-index: 10000;
 }
@@ -638,31 +638,31 @@ background-color: #d32f2f; /* Darker red on hover */
 .remove-btn-content {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background-color: #f44336; /* Red */
+  gap: 4px;                      /* Smaller gap */
+  padding: 0 10px;               /* Match tick button padding */
+  background-color: #f44336;     /* Red */
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;            /* Match tick button radius */
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;               /* Smaller font */
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3); /* Smaller shadow */
   transition: all 0.2s ease;
 }
 
 .remove-btn-content:hover {
-  background-color: #d32f2f; /* Darker red */
-  transform: scale(1.05);
+  background-color: #d32f2f;     /* Darker red */
+  transform: scale(1.15);        /* Match color button hover */
 }
 
 .remove-x {
-  font-size: 20px;
+  font-size: 16px;               /* Smaller X */
   font-weight: 700;
 }
 
 .remove-text {
-  font-size: 14px;
+  font-size: 12px;               /* Smaller text */
   font-weight: 600;
 }
 
