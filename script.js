@@ -815,63 +815,88 @@ window.onload = async function () {
   let selectedRange = null;
   let paletteElement = null;
   let paletteTimeout = null; // ⬅️ Track the auto-hide timeout
+  let removeButtonElement = null; // Track remove button
 
+  // ==================== REMOVE HIGHLIGHT HANDLERS ====================
+  function attachRemoveHandlers(span) {
+    let longPressTimer = null;
+
+    // Desktop: Click handler
+    span.addEventListener('click', function(e) {
+      e.stopPropagation(); // Don't trigger other clicks
+      showRemoveButton(e.pageX, e.pageY, span);
+    });
+
+    // Mobile/Tablet: Long press handler
+    span.addEventListener('touchstart', function(e) {
+      longPressTimer = setTimeout(() => {
+        const touch = e.touches[0];
+        showRemoveButton(touch.pageX, touch.pageY, span);
+      }, 500); // 500ms = long press
+    });
+
+    span.addEventListener('touchend', function() {
+      clearTimeout(longPressTimer);
+    });
+
+    span.addEventListener('touchmove', function() {
+      clearTimeout(longPressTimer); // Cancel if user scrolls
+    });
+  }
+
+  function showRemoveButton(x, y, span) {
+    // Remove existing button
+    if (removeButtonElement) removeButtonElement.remove();
+
+    // Create remove button with X and "Remove" text
+    removeButtonElement = document.createElement('div');
+    removeButtonElement.className = 'remove-highlight-button';
+
+    const buttonContent = document.createElement('button');
+    buttonContent.className = 'remove-btn-content';
+    buttonContent.innerHTML = '<span class="remove-x">✕</span> <span class="remove-text">Remove</span>';
+
+    buttonContent.onclick = function() {
+      // Remove the highlight span, replace with plain text
+      const text = span.textContent;
+      span.parentNode.replaceChild(document.createTextNode(text), span);
+
+      // Remove button
+      removeButtonElement.remove();
+      removeButtonElement = null;
+    };
+
+    removeButtonElement.appendChild(buttonContent);
+    document.body.appendChild(removeButtonElement);
+
+    // Position the button
+    const isMobile = window.innerWidth <= 767;
+    const offsetY = isMobile ? 60 : 40;
+    removeButtonElement.style.position = 'absolute';
+    removeButtonElement.style.top = `${y + offsetY}px`;
+    removeButtonElement.style.left = `${x}px`;
+    removeButtonElement.style.transform = 'translateX(-50%)';
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      if (removeButtonElement) {
+        removeButtonElement.remove();
+        removeButtonElement = null;
+      }
+    }, 5000);
+  }
 
   function createHighlightPalette(x, y, range) {
     // Remove existing palette
     if (paletteElement) paletteElement.remove();
     clearTimeout(paletteTimeout); // ⬅️ Clear any previous timeout
 
-    // Check if selection is inside an existing highlight
-    const parentElement = range.startContainer.parentElement;
-    const isInsideHighlight = parentElement && parentElement.classList.contains('custom-highlight');
-
     // Create palette
     const colors = ['#ffff66', '#a2faa3', '#9df2ff', '#ffb3ba'];
     paletteElement = document.createElement('div');
     paletteElement.className = 'highlight-palette';
 
-    // If selecting highlighted text, show X button to remove
-    if (isInsideHighlight) {
-      const removeButton = document.createElement('button');
-      removeButton.textContent = '✕';
-      removeButton.className = 'remove-highlight-btn';
-      removeButton.title = 'Remove highlight';
-
-      removeButton.onclick = function () {
-        // Remove the highlight span, replace with plain text
-        const text = parentElement.textContent;
-        parentElement.parentNode.replaceChild(document.createTextNode(text), parentElement);
-
-        paletteElement.remove();
-        paletteElement = null;
-        selectedRange = null;
-        window.getSelection()?.removeAllRanges();
-      };
-
-      paletteElement.appendChild(removeButton);
-      document.body.appendChild(paletteElement);
-
-      // Position the palette
-      const isMobile = window.innerWidth <= 767;
-      const offsetY = isMobile ? 110 : 75;
-      paletteElement.style.position = 'absolute';
-      paletteElement.style.top = `${y + offsetY}px`;
-      paletteElement.style.left = `${x}px`;
-      paletteElement.style.transform = 'translateX(0)';
-
-      // Auto-hide after 5 seconds
-      paletteTimeout = setTimeout(() => {
-        if (paletteElement) {
-          paletteElement.remove();
-          paletteElement = null;
-        }
-      }, 5000);
-
-      return; // Don't show color buttons
-    }
-
-    // Normal highlight flow (not inside existing highlight)
+    // Normal highlight flow
     // Tick button (needs access in color-btn onclick)
     const tickButton = document.createElement('button');
     tickButton.textContent = '✓✓';
@@ -943,6 +968,9 @@ window.onload = async function () {
         selectedRange.deleteContents();
         selectedRange.insertNode(span);
         currentHighlight = span; // Store reference to current highlight
+
+        // ✨ ADD CLICK/LONG PRESS HANDLERS FOR REMOVAL
+        attachRemoveHandlers(span);
 
         tickButton.style.display = 'inline-block';
         clearTimeout(paletteTimeout); // Cancel previous timer

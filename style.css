@@ -613,7 +613,7 @@ background-color: #45a049;
 
 }
 
-/* Remove Highlight Button (X) */
+/* Remove Highlight Button (Old - kept for compatibility) */
 .highlight-palette .remove-highlight-btn {
 font-size: 20px;
 padding: 8px 16px;
@@ -630,11 +630,53 @@ transition: background-color 0.2s ease;
 background-color: #d32f2f; /* Darker red on hover */
 }
 
+/* ✨ NEW: Remove Button (Click/Long Press on Highlight) */
+.remove-highlight-button {
+  z-index: 10000;
+}
+
+.remove-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: #f44336; /* Red */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+  transition: all 0.2s ease;
+}
+
+.remove-btn-content:hover {
+  background-color: #d32f2f; /* Darker red */
+  transform: scale(1.05);
+}
+
+.remove-x {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.remove-text {
+  font-size: 14px;
+  font-weight: 600;
+}
+
 /* --- The actual highlight span styling --- */
 
 .custom-highlight {
 border-radius: 3px;
 padding: 0 2px;
+cursor: pointer; /* Show it's clickable */
+transition: opacity 0.2s ease;
+}
+
+.custom-highlight:hover {
+opacity: 0.8; /* Subtle feedback on hover */
 }
 
 .highlight-yellow { background-color: #fff59d; }
@@ -758,6 +800,13 @@ img, .no-save {
   -webkit-touch-callout: none;
   -webkit-user-drag: none;
   pointer-events: none;
+}
+
+/* ✅ EXCEPTION: Enable touch/click events on highlighted spans */
+.custom-highlight {
+  -webkit-touch-callout: auto !important;
+  pointer-events: auto !important;
+  -webkit-user-drag: auto !important;
 }
 
 /* Optional: Allow readable areas only */
