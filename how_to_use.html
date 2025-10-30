@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Use - Samyak Gyan</title>
+    <link rel="stylesheet" href="styles/header.css">
+    <style>
+        .guide-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: #faf9f8;
+            border-radius: 0.75rem;
+            border: 1px solid #eee;
+        }
+
+        .section-title {
+            color: #004aad;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-item {
+            margin-bottom: 1.2rem;
+            padding-left: 2rem;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .feature-item::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #fc7306;
+            font-weight: bold;
+        }
+
+        .highlight-box {
+            background: #fff3e6;
+            border-left: 4px solid #fc7306;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+
+        .pro-tip {
+            background: #e6f3ff;
+            border: 1px dashed #004aad;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .guide-container {
+                padding: 1rem;
+                margin: 0.5rem;
+            }
+
+            .section {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the header component -->
+    <div id="header-placeholder"></div>
+
+    <div class="guide-container">
+        <h1 style="color: #004aad; text-align: center; margin-bottom: 2rem;">Welcome to Samyak Gyan! 🎯</h1>
+
+        <div class="section">
+            <div class="section-title">📚 Reading Articles</div>
+            <ul class="feature-list">
+                <li class="feature-item">Access daily curated articles from our homepage or your personalized dashboard</li>
+                <li class="feature-item">Articles are organized by topics and categorized for easy navigation</li>
+                <li class="feature-item">Use landscape mode on mobile devices for the best reading experience</li>
+            </ul>
+            <div class="pro-tip">💡 Pro Tip: Bookmark important articles to create your personal reading list!</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">✨ Smart Highlighting</div>
+            <ul class="feature-list">
+                <li class="feature-item">Select any text to highlight important points</li>
+                <li class="feature-item">Choose from multiple colors to organize different types of information</li>
+                <li class="feature-item">Each article allows highlighting up to 20% of its content</li>
+            </ul>
+            <div class="highlight-box">
+                Remember: Your highlights are automatically saved and can be accessed anytime from "Your Journal"
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">📝 Summaries & Notes</div>
+            <ul class="feature-list">
+                <li class="feature-item">Create concise 100-word summaries for each article</li>
+                <li class="feature-item">Your summaries are saved automatically and can be edited anytime</li>
+                <li class="feature-item">Download compiled notes in text format for offline study</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🗳️ Magazine Worthy</div>
+            <ul class="feature-list">
+                <li class="feature-item">Vote for articles you find particularly valuable</li>
+                <li class="feature-item">Top-voted articles are featured in our monthly magazine</li>
+                <li class="feature-item">Help shape the community's learning resources</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">📊 Track Your Progress</div>
+            <ul class="feature-list">
+                <li class="feature-item">Monitor your reading habits and engagement</li>
+                <li class="feature-item">View your learning analytics in "Your Journal"</li>
+                <li class="feature-item">Set and track your study goals</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🎁 Referral Program</div>
+            <ul class="feature-list">
+                <li class="feature-item">Share Samyak Gyan with fellow UPSC aspirants</li>
+                <li class="feature-item">Earn 15 extra trial days for every 3 successful referrals</li>
+                <li class="feature-item">Access your referral stats from your profile</li>
+            </ul>
+            <div class="pro-tip">💡 Pro Tip: Use the share button to quickly send articles via Telegram!</div>
+        </div>
+    </div>
+
+    <script>
+        // Load the header component
+        fetch('components/header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+                
+                // Update the active state of the "How to Use" button
+                const howToUseBtn = document.querySelector('.btn-main');
+                if (howToUseBtn) {
+                    howToUseBtn.style.transform = 'scale(1.08)';
+                    howToUseBtn.style.boxShadow = '0 0 12px rgba(230,126,34,0.6)';
+                }
+            });
+    </script>
+</body>
+</html>

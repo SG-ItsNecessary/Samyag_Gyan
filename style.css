@@ -264,6 +264,13 @@ main {
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
 }
 /* ===== END CONTENT RIBBONS ===== */
+.end-content-ribbon-item {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -ms-user-select: none !important;
+  -moz-user-select: none !important;
+}
+
 .end-content-ribbons {
   display: flex;
   justify-content: center;
@@ -659,37 +666,21 @@ body,
 }
 /* ========== Text Selection CSS ========== */
 
-/* ✅ Allow selection ONLY inside these zones */
-.readable-content,
-.article-tile,
-.summary-box,
-.highlight-zone p,
-.prelims-answer {
-  user-select: text;
-  -webkit-user-select: text;
-  -ms-user-select: text;
-  -moz-user-select: text;
+/* ❌ DEFAULT: Disable selection EVERYWHERE */
+* {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -ms-user-select: none !important;
+  -moz-user-select: none !important;
 }
 
-/* ❌ Disable selection for rest of the page */
-body,
-button,
-.nav-bar,
-.toolbar,
-.secure-lock,
-header,
-footer,
-aside,
-input,
-textarea,
-select,
-.tags,
-.brand-title,
-.article-title {
-  user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  -moz-user-select: none;
+/* ✅ EXCEPTION: Allow selection ONLY in answer paragraphs (main content and prelims) */
+.answer,
+.prelims-qa-answer {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -ms-user-select: text !important;
+  -moz-user-select: text !important;
 }
 
 /* ========== Block Mobile Print Visibility ========== */
@@ -784,4 +775,211 @@ img, .no-save {
 .tile-tooltip li {
   margin-bottom: 8px;
 }
+
+/* ===== PRELIMS POINTERS OVERLAY ===== */
+.prelims-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(128, 128, 128, 0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.prelims-overlay.hidden {
+  display: none;
+}
+
+.prelims-overlay-header {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.prelims-overlay-title {
+  font-family: Arial, sans-serif;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #fc7306;
+  background: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.prelims-overlay-close {
+  position: absolute;
+  right: 24px;
+  background: #fc7306;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.prelims-overlay-close:hover {
+  background: #e45e00;
+  transform: scale(1.1);
+}
+
+.prelims-overlay-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 900px;
+  width: 90%;
+  max-height: 75vh;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  margin-top: 80px;
+  scroll-behavior: smooth;
+}
+
+.prelims-overlay-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.prelims-overlay-content::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.prelims-overlay-content::-webkit-scrollbar-thumb {
+  background-color: #fc7306;
+  border-radius: 10px;
+  border: 2px solid #f5f5f5;
+}
+
+.prelims-qa-item {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.prelims-qa-item:last-child {
+  border-bottom: none;
+}
+
+.prelims-qa-question {
+  display: block;
+  font-family: Arial, sans-serif;
+  font-size: 1.38rem;
+  font-weight: bold;
+  color: #1f2937;
+  text-align: center;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.prelims-qa-answer {
+  font-size: 1.20rem;
+  color: #4b5563;
+  text-align: justify;
+  margin: 0;
+  padding: 0 10px;
+  line-height: 1.625;
+  hyphens: auto;
+  text-justify: inter-word;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -ms-user-select: text !important;
+}
+
+.prelims-scroll-indicator {
+  display: none !important;
+}
+
+/* ===== SAVE MINDMAP BUTTON ===== */
+.save-mindmap-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #FF9800;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+  transition: all 0.3s ease;
+  z-index: 10001;
+}
+
+.save-mindmap-button:hover {
+  background: #F57C00;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 152, 0, 0.6);
+}
+
+.save-mindmap-button svg {
+  stroke: white;
+  width: 16px;
+  height: 16px;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .prelims-overlay-content {
+    width: 95%;
+    max-height: 70vh;
+    padding: 16px;
+  }
+
+  .prelims-overlay-title {
+    font-size: 1.1rem;
+    padding: 6px 12px;
+  }
+
+  .prelims-overlay-close {
+    width: 36px;
+    height: 36px;
+    font-size: 1.8rem;
+  }
+
+  .prelims-qa-item {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .prelims-qa-question {
+    font-size: 1rem;
+  }
+
+  .prelims-qa-answer {
+    font-size: 0.9rem;
+  }
+
+  .save-mindmap-button {
+    bottom: 20px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+
 /* Till here */

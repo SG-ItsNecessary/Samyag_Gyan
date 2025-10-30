@@ -464,5 +464,5 @@ console.log('📦 buttons.js loaded – awaiting manual initialization (reinitia
 // Export the initialization function for manual triggering
 window.reinitializeButtons = initializeArticleButtons;
 
-// Export vote info icon updater for use in script.js
-window.updateVoteInfoIcon = updateVoteInfoIcon;
+// Export vote info icon updater for use in script.js (commented out - function not defined)
+// window.updateVoteInfoIcon = updateVoteInfoIcon;

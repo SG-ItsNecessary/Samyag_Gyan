@@ -304,7 +304,19 @@ function initLandingPage() {
 
 // ==================== NAVIGATION ====================
 function goToProfileCreation() {
-    window.location.href = 'profile.html';
+    // Smooth 1.5-second transition before redirecting to profile creation
+    console.log('Redirecting to profile creation in 1.5 seconds...');
+
+    // Add fade-out effect to container
+    const container = document.querySelector('.container');
+    container.style.transition = 'opacity 1.5s ease, transform 1.5s ease';
+    container.style.opacity = '0';
+    container.style.transform = 'scale(0.95)';
+
+    // Redirect after 1.5 seconds
+    setTimeout(() => {
+        window.location.href = 'profile.html';
+    }, 1500);
 }
 </script>
 

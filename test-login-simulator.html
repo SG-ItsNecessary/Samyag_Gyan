@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samyak Gyan - Login Simulator (Testing Only)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #800000;
+            margin-bottom: 10px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+        button {
+            background: #007BFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #007BFF;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .status.success {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Login Simulator</h1>
+        <p style="color: #666; margin-bottom: 20px;">Testing tool for local development</p>
+
+        <div class="warning">
+            ⚠️ <strong>Testing Mode Only!</strong><br>
+            This page simulates a logged-in user for testing. Real Telegram login requires a deployed domain with HTTPS.
+        </div>
+
+        <h3>Simulate Login As:</h3>
+
+        <button onclick="simulateLogin('deepanshu')">
+            Login as Deepanshu (Your Account)
+        </button>
+
+        <button onclick="simulateLogin('test')">
+            Login as Test User
+        </button>
+
+        <button onclick="simulateLogin('new')">
+            Login as New Random User
+        </button>
+
+        <button onclick="clearLogin()" style="background: #dc3545;">
+            Clear All Login Data
+        </button>
+
+        <div id="status"></div>
+
+        <div class="info">
+            <h4>What This Does:</h4>
+            <ul>
+                <li>Sets localStorage data (same as Telegram login would)</li>
+                <li>Allows you to test dashboard, referrals, etc.</li>
+                <li>Test all features except actual Telegram authentication</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h4>After Simulating Login:</h4>
+            <ol>
+                <li>Click one of the buttons above</li>
+                <li>Open <a href="homepage.html">homepage.html</a></li>
+                <li>Or open <a href="user_dashboard_testbed.html">dashboard</a></li>
+                <li>You'll be "logged in" and can test features!</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function simulateLogin(userType) {
+            let userData = {};
+            let userId = '';
+            let referralCode = '';
+            let trialEnd = '';
+            let name = '';
+
+            if (userType === 'deepanshu') {
+                // Your actual account from database
+                userId = '681522234';
+                userData = {
+                    id: 681522234,
+                    first_name: 'Deepanshu',
+                    last_name: 'Anand',
+                    username: 'D2313'
+                };
+                referralCode = 'XjL4Z#Si'; // Your actual referral code
+                name = 'Deepanshu Anand';
+
+                // Trial end: 22 days from now (with referral bonus)
+                const trialDate = new Date();
+                trialDate.setDate(trialDate.getDate() + 22);
+                trialEnd = trialDate.toISOString();
+
+            } else if (userType === 'test') {
+                // Test user account
+                userId = '999888777';
+                userData = {
+                    id: 999888777,
+                    first_name: 'Test',
+                    last_name: 'User',
+                    username: 'testuser'
+                };
+                referralCode = 'A7Lcj3zX'; // Test user referral code
+                name = 'Test User';
+
+                // Trial end: 15 days from now
+                const trialDate = new Date();
+                trialDate.setDate(trialDate.getDate() + 15);
+                trialEnd = trialDate.toISOString();
+
+            } else {
+                // New random user
+                const randomId = Math.floor(Math.random() * 1000000000);
+                userId = randomId.toString();
+                userData = {
+                    id: randomId,
+                    first_name: 'Random',
+                    last_name: 'User',
+                    username: 'random' + randomId
+                };
+                referralCode = generateRandomCode();
+                name = 'Random User';
+
+                // Trial end: 15 days from now
+                const trialDate = new Date();
+                trialDate.setDate(trialDate.getDate() + 15);
+                trialEnd = trialDate.toISOString();
+            }
+
+            // Set localStorage (same as real Telegram login)
+            localStorage.setItem('telegram_user', JSON.stringify(userData));
+            localStorage.setItem('user_id', userId);
+            localStorage.setItem('referral_code', referralCode);
+            localStorage.setItem('trial_end', trialEnd);
+            localStorage.setItem('subscription_status', 'inactive');
+
+            // Show success message
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status success';
+            statusDiv.innerHTML = `
+                <strong>✓ Login Simulated Successfully!</strong><br><br>
+                <strong>User Details:</strong><br>
+                • Name: ${name}<br>
+                • User ID: ${userId}<br>
+                • Referral Code: ${referralCode}<br>
+                • Trial End: ${new Date(trialEnd).toLocaleDateString()}<br><br>
+                <strong>✓ localStorage updated</strong><br>
+                You can now open homepage.html or dashboard to test!
+            `;
+        }
+
+        function clearLogin() {
+            localStorage.removeItem('telegram_user');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('referral_code');
+            localStorage.removeItem('trial_end');
+            localStorage.removeItem('subscription_status');
+
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status success';
+            statusDiv.innerHTML = `
+                <strong>✓ All login data cleared!</strong><br>
+                You are now "logged out"
+            `;
+        }
+
+        function generateRandomCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#@$';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+    </script>
+</body>
+</html>

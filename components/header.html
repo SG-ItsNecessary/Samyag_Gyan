@@ -9,10 +9,10 @@
     <button id="rotate-got-it" style="background:#fff; color:#004AAD; border:none; padding:10px 24px; border-radius:8px; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2);">Got it</button>
 </div>
 
-<!-- Faint Reminder (appears after "Got it" clicked, only in portrait mode) -->
-<div id="rotate-reminder" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0, 74, 173, 0.3); color:#ffffff; text-align:center; padding:0.75rem 1.25rem; font-weight:500; font-size:0.9rem; z-index:9998; border-radius:12px; max-width:85%; backdrop-filter:blur(5px); pointer-events:none;">
-    <div style="font-size:1.5rem; display:inline-block; margin-right:0.5rem;">📱</div>
-    <span>Rotate for better experience</span>
+<!-- Faint Reminder (appears after "Got it" clicked, only in portrait mode) - CENTER WATERMARK -->
+<div id="rotate-reminder" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(255, 255, 255, 0.12); color:rgba(0, 74, 173, 0.5); text-align:center; padding:1.5rem 2.5rem; font-weight:500; font-size:1.1rem; z-index:1; border-radius:16px; backdrop-filter:blur(3px); pointer-events:none; border:1px solid rgba(0, 74, 173, 0.15);">
+    <div style="font-size:2.5rem; margin-bottom:0.5rem; opacity:0.6;">📱</div>
+    <div style="opacity:0.7;">Rotate device for better experience</div>
 </div>
 
 <!-- Text-Only Banner -->
@@ -24,8 +24,8 @@
 <!-- Navigation Ribbon -->
 <nav class="nav-container" id="main-nav">
     <span class="home-icon" onclick="window.location.href='homepage.html'" title="Home">🏠</span>
-    <button class="nav-btn btn-main">How to Use?</button>
-    <button class="nav-btn btn-ethics">Ethics & Essay</button>
+    <button class="nav-btn btn-main" onclick="window.location.href='how_to_use.html'">How to Use?</button>
+    <button class="nav-btn btn-ethics" onclick="window.location.href='ethics_essays_poll.html'">Ethics & Essay</button>
     <button class="nav-btn btn-beginner">Beginners Corner</button>
     <button class="nav-btn btn-tri-color">Mission & Vision</button>
     <button class="nav-btn btn-journal" onclick="window.location.href='user_dashboard.html'">Your Journal</button>

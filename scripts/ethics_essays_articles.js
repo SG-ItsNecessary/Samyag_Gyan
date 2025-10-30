@@ -38,10 +38,10 @@ const articles = [
   },
   {
     "title": "OPEC+ Fragmentation and Strategic Petroleum Reserves",
-    "article_type": "ethics", // ✅ ETHICS article
+    "article_type": "essay", // ✅ ESSAY article
     "hashtags": "#Ethics #Essay #Energy",
     "source_ribbon": "indian-express",
-    "secondary_ribbon": "Ethics",
+    "secondary_ribbon": "Essay",
     "publish_date": "19 October 2025",
     "prelude_title": "What do you understand by war and energy?",
     "prelude_body": "The relationship between war and energy is fundamentally one of causation and consequence, where energy resources—particularly crude oil—are both a frequent source of conflict and the immediate casualty of conflict.",
@@ -72,152 +72,6 @@ const articles = [
       }
     ],
     "endRibbons": []
-  },
-  {
-    "title": "Digital Public Infrastructure in India",
-    "article_type": "news", // ➡️ NEW: Article category (news, editorial, ethics, essay)
-    "hashtags": "#Governance #DigitalIndia #CurrentAffairs", //
-    "source_ribbon": "the-hindu", // ➡️ Renamed property
-    "secondary_ribbon": "Essay + GS2", // ➡️ Renamed property
-    "publish_date": "18 July 2025", // ➡️ Renamed property
-    "prelude_title": "Why should I read it?", // ➡️ Split into two properties
-    "prelude_body": "It ties digital India with delivery on the ground. You'll see governance come alive in numbers. Also, it's a gem for GS2 introductions.", // ➡️ Split into two properties
-    "content": [
-      {
-        "main_question_id": 101, // Example ID for the database
-        "main_answer_id": 201, // Example ID for the database
-        "article_id": 1,
-        "language": "en",
-        "question": "✦ What is Digital Public Infrastructure (DPI)?",
-        "answer": "DPI refers to foundational systems like Aadhaar, UPI, DigiLocker and more that create a base for scalable public digital services. These systems enable identity, payments, and document verification at scale. Together, they make service delivery faster, cheaper, and more inclusive. This public-facing technology stack is built on open standards, promoting a shared ecosystem for innovation. It operates on a consent-based framework, giving citizens control over their data while ensuring security and privacy. The integrated nature of these platforms is what allows for a seamless and interconnected digital economy."
-      },
-      {
-        "main_question_id": 102,
-        "main_answer_id": 202,
-        "article_id": 1,
-        "language": "en",
-        "question": "✦ How is DPI transforming governance?",
-        "answer": "Government schemes use Aadhaar-based DBT to directly transfer benefits, avoiding middlemen and leakages. DigiLocker digitizes records like driving licenses and academic certificates. UPI allows anyone with a phone and bank account to send or receive payments instantly, without transaction fees. This direct transfer model has revolutionized welfare distribution, ensuring that subsidies reach the intended beneficiaries efficiently. The digitization of documents reduces bureaucratic hurdles and makes government services more accessible to a wider population. The widespread adoption of UPI has also bolstered financial inclusion, bringing millions into the formal banking system for the first time."
-      },
-      {
-        "main_question_id": 103,
-        "main_answer_id": 203,
-        "article_id": 1,
-        "language": "en",
-        "question": "✦ Why is India's model globally praised?",
-        "answer": "India's DPI stack is open, low-cost, scalable, and sovereign. It's being adapted by countries in Africa, Latin America, and Southeast Asia. The absence of corporate dependencies (like GAFA) makes it attractive for nations seeking self-reliance in digital governance. This approach provides a viable alternative to proprietary, corporate-driven models, which often come with high costs and data control issues. The open-source nature of the technology encourages global collaboration and co-creation. Ultimately, India's model demonstrates that a public-good approach can be a powerful engine for both economic growth and social equity."
-      }
-    ],
-    "endRibbons": [
-      {
-        "label": " Mindmap (English)",
-        "color": "#FF9800",
-        "type": "mindmap",
-        "src": "1.jpeg"
-      },
-      {
-        "label": " Prelims Pointers",
-        "color": "#673AB7",
-        "type": "prelims",
-        "content": [
-          {
-            "prelims_question_id": 301, // Example ID for the database
-            "prelims_answer_id": 401, // Example ID for the database
-            "article_id": 1,
-            "language": "en",
-            "q": "What is DPI?",
-            "a": "DPI is the foundational digital infrastructure for public services like Aadhaar and UPI, providing a secure and interoperable platform for identity, payments, and data exchange. It enables efficient and inclusive service delivery across various sectors, creating a robust digital ecosystem that benefits all citizens."
-          },
-          {
-            "prelims_question_id": 302,
-            "prelims_answer_id": 402,
-            "article_id": 1,
-            "language": "en",
-            "q": "Why important?",
-            "a": "DPI is crucial for ensuring financial and social inclusion, as it provides a low-cost, scalable, and transparent way to deliver benefits and services directly to citizens. By reducing leakages and streamlining processes, it enhances governance, fosters economic growth, and helps India achieve its Sustainable Development Goals."
-          }
-        ]
-      },
-      {
-        "label": " माइंडमैप (Hindi)",
-        "color": "#FF9800",
-        "type": "mindmap",
-        "src": "mindmap_hin1.jpg"
-      }
-    ]
-  },
-  {
-    "title": "India's Renewable Energy Transition",
-    "article_type": "editorial", // ➡️ NEW: Editorial article type
-    "hashtags": "#Environment #Energy #GS3",
-    "source_ribbon": "indian-express",
-    "secondary_ribbon": "GS3 Case Study + SDG Linkage",
-    "publish_date": "18 July 2025",
-    "prelude_title": "Why should I read it?",
-    "prelude_body": "This ties India's green push to global promises. Makes SDGs, solar parks and hydrogen efforts easy to cite. Every sentence can become a pointer in notes.",
-    "content": [
-      {
-        "main_question_id": 104,
-        "main_answer_id": 204,
-        "article_id": 2,
-        "language": "en",
-        "question": "✦ Why renewable energy for India?",
-        "answer": "India has rising energy needs, a large rural population, and global climate commitments. Renewable sources like solar and wind offer sustainable, decentralized alternatives to coal-based energy. Clean energy reduces pollution and dependency on imported oil. Shifting to renewables also enhances the country's energy security, protecting it from volatile international fuel markets. The transition supports sustainable development goals and creates new job opportunities in the green sector. Moreover, decentralized renewable energy solutions are ideal for electrifying remote rural areas that are difficult to connect to the traditional grid."
-      },
-      {
-        "main_question_id": 105,
-        "main_answer_id": 205,
-        "article_id": 2,
-        "language": "en",
-        "question": "✦ What major steps has India taken?",
-        "answer": "The National Solar Mission has scaled solar parks across states. New incentives encourage green hydrogen and battery storage. India aims to install 500 GW of non-fossil capacity by 2030, supporting SDG 7 (Affordable & Clean Energy). The government has implemented a Production Linked Incentive (PLI) scheme to boost domestic manufacturing of solar PV modules and advanced chemistry cells. Programs like PM-KUSUM help farmers adopt solar pumps, which reduces reliance on fossil fuels for irrigation. The country is also focusing on developing a robust green energy corridor to transmit renewable power from generation sites to consumption centers efficiently."
-      },
-      {
-        "main_question_id": 106,
-        "main_answer_id": 206,
-        "article_id": 2,
-        "language": "en",
-        "question": "✦ What challenges remain?",
-        "answer": "Energy storage tech is still evolving. Land acquisition delays big projects. Transmission infrastructure needs investment. The intermittent nature of solar and wind power requires sophisticated grid management and large-scale battery storage solutions. Social challenges include the potential for job displacement in the traditional coal industry and the need for reskilling the workforce. Securing financing for large-scale renewable projects, especially in the early stages, also presents a significant hurdle for developers and investors."
-      }
-    ],
-    "endRibbons": [
-      {
-        "label": " Mindmap (English)",
-        "color": "#FF9800",
-        "type": "mindmap",
-        "src": "mindmap_eng2.jpg"
-      },
-      {
-        "label": " Prelims Pointers",
-        "color": "#673AB7",
-        "type": "prelims",
-        "content": [
-          {
-            "prelims_question_id": 303,
-            "prelims_answer_id": 403,
-            "article_id": 2,
-            "language": "en",
-            "q": "Target by 2030?",
-            "a": "India has set a highly ambitious target of achieving 500 GW of non-fossil fuel electricity generation capacity by 2030, which is a key component of its commitment to combating climate change. This goal is crucial for meeting the country's growing energy needs in a sustainable manner and reducing its reliance on fossil fuels."
-          },
-          {
-            "prelims_question_id": 304,
-            "prelims_answer_id": 404,
-            "article_id": 2,
-            "language": "en",
-            "q": "New initiatives?",
-            "a": "Recent initiatives include a strong policy push for green hydrogen, which is seen as a key fuel for the future, and new incentives for battery storage projects to address the intermittency of renewable sources. The government is also promoting the establishment of large-scale solar parks to achieve economies of scale and accelerate the deployment of solar energy across the country."
-          }
-        ]
-      },
-      {
-        "label": " माइंडमैप (हिन्दी)",
-        "color": "#FF9800",
-        "type": "mindmap",
-        "src": "mindmap_hin2.jpg"
-      }
-    ]
   }
 ];
 

@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="styles/buttons.css" />
   <link rel="stylesheet" href="styles/download_button.css" />
+  <link rel="stylesheet" href="styles/access-control.css" />
 
   <!-- TextHighlighter.js Library -->
   <script src="https://unpkg.com/text-highlighter/dist/text-highlighter.min.js"></script>
@@ -63,18 +64,44 @@
 
   <footer>
     &copy; 2025 Samyak Gyan. All rights reserved.
-  </footer>  <div id="floating-image-viewer" class="floating-viewer hidden">
+  </footer>  <!-- Mind Map Overlay Viewer -->
+  <div id="floating-image-viewer" class="floating-viewer hidden">
     <div class="floating-image-header">
-      <span class="floating-image-title">Mindmap</span>
+      <span class="floating-image-title" id="mindmap-title">Mindmap</span>
       <button id="close-floating-image" class="floating-image-close">×</button>
     </div>
     <div class="floating-image-content">
       <img id="floating-image" src="" alt="Mindmap Preview" />
+      <button id="save-mindmap-btn" class="save-mindmap-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Save MindMap
+      </button>
+    </div>
+  </div>
+
+  <!-- Prelims Pointers Overlay -->
+  <div id="prelims-overlay" class="prelims-overlay hidden">
+    <div class="prelims-overlay-header">
+      <span class="prelims-overlay-title">Prelims Pointers</span>
+      <button id="close-prelims-overlay" class="prelims-overlay-close">×</button>
+    </div>
+    <div class="prelims-overlay-content" id="prelims-overlay-content">
+      <!-- Prelims content will be injected here dynamically -->
+    </div>
+    <div class="prelims-scroll-indicator" id="prelims-scroll-indicator">
+      ↓ Scroll for more ↓
     </div>
   </div>
 
   <!-- Authentication Script (must be loaded first) -->
   <script src="scripts/auth.js"></script>
+
+  <!-- Access Control Script (load after auth, before article loading) -->
+  <script src="scripts/access-control.js"></script>
 
   <!-- Orientation Detection Script (load before header so functions are available) -->
   <script src="scripts/orientation-detection.js"></script>

@@ -2,7 +2,7 @@
 
 **Project:** Samyak Gyan - Digital Learning Platform for UPSC Aspirants
 **Developer:** Deepanshu Anand
-**Development Partner:** Claude AI
+**Development Partner:** AI
 **Date:** October 2025
 **Status:** Frontend Complete, Backend Ready for Development
 
@@ -21,10 +21,13 @@ Unauthorized use, reproduction, or distribution is strictly prohibited.
 6. [External Integrations](#external-integrations)
 7. [Security & Compliance](#security-compliance)
 8. [Deployment Requirements](#deployment-requirements)
-9. [📚 Bookmarks System](#-bookmarks-system) **(NEW)**
-10. [📊 Reading Insights Analytics](#-reading-insights-analytics) **(NEW)**
-11. [🔍 SEO Optimization & Server-Side Rendering](#-seo-optimization--server-side-rendering) **(NEW - CRITICAL)**
-12. [Testing Checklist](#-testing-checklist)
+9. [🗳️ Voting System & Magazine Curation](#️-voting-system--magazine-curation) **(NEW)**
+10. [📚 Bookmarks System](#-bookmarks-system) **(NEW)**
+11. [📊 Reading Insights Analytics](#-reading-insights-analytics) **(NEW)**
+12. [⏱️ Time Spent Analytics](#️-time-spent-analytics) **(NEW)**
+13. [🗳️ Tracking Preference Poll](#️-tracking-preference-poll) **(NEW)**
+14. [🔍 SEO Optimization & Server-Side Rendering](#-seo-optimization--server-side-rendering) **(NEW - CRITICAL)**
+15. [Testing Checklist](#-testing-checklist)
 
 ---
 
@@ -35,7 +38,7 @@ Eliminate friction in digital learning by integrating note-taking directly into 
 
 ### Core Features
 - **Read**: Web-based article reading
-- **Highlight**: Book-like highlighting (20% limit per article)
+- **Highlight**: Book-like highlighting.
 - **Summarize**: 100-word summary creation
 - **Download**: Daily compiled notes in `.txt` format
 
@@ -709,7 +712,9 @@ CREATE TABLE IF NOT EXISTS articles (
     prelude_body TEXT,
     source_ribbon TEXT,
     secondary_ribbon TEXT,
-    total_word_count INTEGER
+    total_word_count INTEGER,
+    is_votable BOOLEAN DEFAULT TRUE,
+    total_votes INTEGER DEFAULT 0
 );
 ```
 
@@ -718,6 +723,8 @@ CREATE TABLE IF NOT EXISTS articles (
 - `language`: 'en' (English) or 'hi' (Hindi)
 - `slug`: URL-friendly identifier (format: `YYYY-MM-DD/article-title`)
 - `total_word_count`: Sum of all answer word counts (for 20% highlight limit)
+- `is_votable`: Admin can disable voting (FALSE for important editorials)
+- `total_votes`: Cached count of votes (updated via trigger or cron job)
 
 **Indexes**:
 ```sql
@@ -2383,25 +2390,82 @@ WHERE user_id = $4
 ```
 
 **2. Voting Pattern** (`stat=voting`):
+
+**Purpose**: Show user which dates they voted on + Top 5 community-voted articles per day + whether user voted on each
+
+**Expected Response Format**:
+```json
+{
+  "success": true,
+  "stat": "voting",
+  "month": "2025-02",
+  "fortnight": 1,
+  "data": {
+    "activeDates": [1, 2, 3, 4, 5],
+    "votingData": {
+      "1": {
+        "top5": [
+          {
+            "articleId": 142,
+            "title": "Clean Energy Mission",
+            "votes": 520,
+            "userVoted": true
+          },
+          {
+            "articleId": 156,
+            "title": "Youth Parliament Highlights",
+            "votes": 480,
+            "userVoted": false
+          }
+        ]
+      },
+      "2": { "top5": [...] }
+    }
+  }
+}
+```
+
+**Backend Implementation**:
+
+**Step 1**: Get dates user was active (voted on ANY article):
 ```sql
--- User's voted articles
-SELECT article_id, created_at
+SELECT DISTINCT EXTRACT(DAY FROM created_at) as day
 FROM public_interactions
 WHERE user_id = $1
   AND action_type = 'magazine_worthy'
   AND EXTRACT(MONTH FROM created_at) = $2
-  AND EXTRACT(DAY FROM created_at) BETWEEN $3 AND $4;
-
--- Community's top voted articles
-SELECT article_id, COUNT(*) as vote_count
-FROM public_interactions
-WHERE action_type = 'magazine_worthy'
-  AND EXTRACT(MONTH FROM created_at) = $1
-  AND EXTRACT(DAY FROM created_at) BETWEEN $2 AND $3
-GROUP BY article_id
-ORDER BY vote_count DESC
-LIMIT 10;
+  AND EXTRACT(YEAR FROM created_at) = $3
+  AND EXTRACT(DAY FROM created_at) BETWEEN $4 AND $5
+ORDER BY day;
 ```
+
+**Step 2**: For EACH active date, get Top 5 community-voted articles:
+```sql
+SELECT
+  a.article_id,
+  a.title,
+  COUNT(pi.id) as vote_count,
+  EXISTS(
+    SELECT 1 FROM public_interactions uv
+    WHERE uv.user_id = $1
+      AND uv.article_id = a.article_id
+      AND uv.action_type = 'magazine_worthy'
+  ) as user_voted
+FROM public_interactions pi
+JOIN articles a ON a.article_id = pi.article_id
+WHERE pi.action_type = 'magazine_worthy'
+  AND a.is_votable = TRUE
+  AND DATE(pi.created_at) = $2
+GROUP BY a.article_id, a.title
+ORDER BY vote_count DESC
+LIMIT 5;
+```
+
+**Important Notes**:
+- ✅ Filter `is_votable = TRUE` to exclude editorials from Top 5
+- ✅ Each date has its own Top 5 (not fortnight-wide)
+- ✅ `user_voted` uses EXISTS subquery for efficiency
+- ✅ Only articles with `is_votable = TRUE` can appear in rankings
 
 **3. Notes Dashboard** (`stat=notes`):
 ```sql
@@ -2636,7 +2700,7 @@ Content-Disposition: attachment; filename="SamyakGyan_Notes_2025-10-04.txt"
    - Check interaction statuses
 3. Format as plain text (template below)
 
-**Response Body (Plain Text)** - Enhanced Format with Question Context:
+**Response Body (Plain Text)** - Complete Format with All Fields:
 ```
 ========================================
 SAMYAK GYAN - DAILY NOTES
@@ -2647,14 +2711,20 @@ Date: October 4, 2025
 Title: Digital Public Infrastructure in India
 Published: 2025-10-04
 Source: The Hindu
-Tags: #Governance #DigitalIndia
+Topics: #Governance #DigitalIndia
+Usability: Essay + GS2
+
+Why should I read it?
+It ties digital India with delivery on the ground, showing how DPI
+enables efficient governance and inclusive development through
+foundational infrastructure like Aadhaar, UPI, and DigiLocker.
 
 Status:
 ✓ Read: Yes
 ✓ Bookmarked: Yes
 ✓ Summary: Yes
 
---- QUESTIONS & HIGHLIGHTS ---
+--- MAINS QUESTIONS & HIGHLIGHTS ---
 
 Q1: What is Digital Public Infrastructure (DPI)?
 Highlights:
@@ -2671,9 +2741,23 @@ Highlights:
 Q3: What are the challenges in DPI implementation?
 (No highlights for this question)
 
+--- PRELIMS QUESTIONS & HIGHLIGHTS ---
+
+Q1: What is DPI?
+Highlights:
+1. DPI is the foundational infrastructure for digital services
+2. Includes Aadhaar (identity), UPI (payments), DigiLocker (documents)
+
+Q2: When was UPI launched in India?
+Highlights:
+1. UPI was launched by NPCI in 2016
+
+(If no prelims questions exist for article, skip this section entirely)
+
 --- MY SUMMARY ---
 DPI like Aadhaar and UPI enable digital governance by providing
-foundational infrastructure for direct benefit transfers...
+foundational infrastructure for direct benefit transfers, reducing
+corruption and ensuring last-mile delivery of government services.
 
 ========================================
 
@@ -2681,19 +2765,31 @@ foundational infrastructure for direct benefit transfers...
 Title: Renewable Energy Transition in India
 Published: 2025-10-03
 Source: Down To Earth
-Tags: #Environment #Energy
+Topics: #Environment #Energy
+Usability: Essay + GS3
+
+Why should I read it?
+This article examines India's renewable energy targets and the
+challenges in achieving them, crucial for understanding climate
+policy and sustainable development.
 
 Status:
 ✓ Read: Yes
 ✓ Bookmarked: No
 ✓ Summary: No
 
---- QUESTIONS & HIGHLIGHTS ---
+--- MAINS QUESTIONS & HIGHLIGHTS ---
 
 Q1: What is India's renewable energy target?
 Highlights:
 1. Target of 500 GW non-fossil fuel capacity by 2030
 2. Currently at 180 GW as of 2025
+
+--- PRELIMS QUESTIONS & HIGHLIGHTS ---
+
+Q1: What is India's current renewable energy capacity?
+Highlights:
+1. 180 GW as of January 2025
 
 --- MY SUMMARY ---
 (No summary provided)
@@ -2904,6 +3000,198 @@ DOMAIN=https://[YOUR_DOMAIN_HERE]
 2. Point domain to server IP
 3. Install SSL certificate
 4. Configure Telegram bot domain in @BotFather
+
+---
+
+## 🗳️ VOTING SYSTEM & MAGAZINE CURATION
+
+### Overview
+
+The Voting System allows users to vote on articles they find important. The **Top 5 most-voted articles per day** are identified and will be included in the fortnightly SG Magazine. Users can track their voting patterns in the **User Dashboard → My Voting Pattern** section.
+
+### How Voting Works
+
+1. **User votes** on articles via "Magazine Worthy??" button after marking as read
+2. **System records** vote in `public_interactions` table with `action_type = 'magazine_worthy'`
+3. **Daily Top 5** is calculated based on vote count (only articles with `is_votable = TRUE`)
+4. **Dashboard displays** honeycomb layout showing dates user voted + Top 5 articles per date
+5. **Magazine publication** uses Top 5 articles for condensed coverage
+
+### Database Schema
+
+**Table Used**: `public_interactions` (already exists - see Table 9 in Database Schema section)
+
+**Vote Records**:
+- `user_id`: Telegram user ID (who voted)
+- `article_id`: Article that was voted on
+- `action_type`: Must be `'magazine_worthy'` for vote records
+- `created_at`: When the vote was cast (used for daily grouping)
+- `UNIQUE` constraint: User can only vote once per article
+
+**Articles Table Fields** (for voting control):
+```sql
+is_votable BOOLEAN DEFAULT TRUE  -- Admin can disable for editorials
+total_votes INTEGER DEFAULT 0    -- Cached vote count (updated via trigger/cron)
+```
+
+### Voting Workflow
+
+#### 1. User Clicks Vote Button (Frontend)
+
+**File**: `scripts/buttons.js` (lines 34-44 in buttons.html)
+
+```javascript
+// When user clicks "Magazine Worthy??" button after marking article as read
+voteBtn.addEventListener('click', function(e) {
+  e.preventDefault();
+
+  // Check if article is votable (editorials have is_votable = FALSE)
+  if (!article.is_votable) {
+    showModal('vote-editorial-disabled-info');
+    return;
+  }
+
+  // Log vote interaction
+  logInteraction(articleId, userId, 'magazine_worthy');
+
+  // Visual feedback
+  voteBtn.classList.add('voted');
+  voteBtn.disabled = true;
+});
+```
+
+#### 2. Backend Receives Vote (API)
+
+**Endpoint**: `POST /api/articles/interact`
+
+**Request Body**:
+```json
+{
+  "userId": "123456789",
+  "articleId": 42,
+  "actionType": "magazine_worthy"
+}
+```
+
+**Backend Logic**:
+```javascript
+app.post('/api/articles/interact', authenticateUser, async (req, res) => {
+  const { userId, articleId, actionType } = req.body;
+
+  // 1. Check if article allows voting
+  const article = await db.query(
+    'SELECT is_votable FROM articles WHERE article_id = $1',
+    [articleId]
+  );
+
+  if (!article.rows[0]?.is_votable) {
+    return res.status(403).json({ error: 'Voting disabled for this article' });
+  }
+
+  // 2. Record vote (UNIQUE constraint prevents duplicate votes)
+  try {
+    await db.query(`
+      INSERT INTO public_interactions (user_id, article_id, action_type)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (user_id, article_id, action_type) DO NOTHING
+    `, [userId, articleId, actionType]);
+
+    // 3. Update cached vote count
+    await db.query(`
+      UPDATE articles
+      SET total_votes = total_votes + 1
+      WHERE article_id = $1
+    `, [articleId]);
+
+    res.json({ success: true, message: 'Vote recorded' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to record vote' });
+  }
+});
+```
+
+#### 3. Admin Disables Voting (Content Upload)
+
+**File**: Admin panel article upload form (see docs/BACKEND_COMPLETE.md #4440-4451)
+
+```html
+<fieldset>
+  <legend>Community Voting</legend>
+  <label>
+    <input type="checkbox" name="is_votable" value="true" checked>
+    Allow community voting on this article
+  </label>
+  <small>
+    ℹ️ Uncheck for important editorials that should ALWAYS be included in magazine.
+    Editorials with voting disabled won't appear in Top 5 rankings.
+  </small>
+</fieldset>
+```
+
+**Backend Handler**: Sets `is_votable = FALSE` for editorials
+
+#### 4. Dashboard Displays Voting Pattern
+
+**Endpoint**: `GET /api/users/:userId/analytics?stat=voting&month=2025-02&fortnight=1`
+
+**Response** (see API section above for SQL queries):
+```json
+{
+  "success": true,
+  "stat": "voting",
+  "month": "2025-02",
+  "fortnight": 1,
+  "data": {
+    "activeDates": [1, 2, 3, 4, 5],
+    "votingData": {
+      "1": {
+        "top5": [
+          { "articleId": 142, "title": "Clean Energy Mission", "votes": 520, "userVoted": true },
+          { "articleId": 156, "title": "Youth Parliament", "votes": 480, "userVoted": false }
+        ]
+      }
+    }
+  }
+}
+```
+
+**Frontend Rendering**: `user_dashboard_testbed.html` lines 2816-3090
+
+- Honeycomb layout shows active voting dates
+- Click date → displays Top 5 articles for that day
+- Green checkmark if user voted, red X if not
+
+### Key Business Logic
+
+**Top 5 Calculation Rules**:
+1. ✅ Only count articles where `is_votable = TRUE`
+2. ✅ Calculate DAILY Top 5 (not fortnight-wide)
+3. ✅ Each day's Top 5 is independent
+4. ✅ Editorials never appear in Top 5 (is_votable = FALSE)
+
+**Magazine Publication Workflow**:
+1. At end of fortnight, backend generates list of all Top 5 articles across 15 days
+2. Maximum 75 articles per fortnight (15 days × 5 articles)
+3. These articles get condensed into Mains-ready notes
+4. Published in SG Magazine PDF
+
+### Frontend Files
+
+- `buttons.html` (lines 32-44): Vote button with info icon
+- `scripts/buttons.js`: Vote button click handler + API integration
+- `user_dashboard_testbed.html` (lines 2816-3090): Voting pattern honeycomb display
+- `articles.html` (lines 138-148): Vote dialog explaining system
+
+### Testing Checklist
+
+- [ ] Vote button disabled for editorials (is_votable = FALSE)
+- [ ] Clicking vote records in public_interactions table
+- [ ] Duplicate votes prevented by UNIQUE constraint
+- [ ] total_votes field increments correctly
+- [ ] Top 5 API excludes editorials
+- [ ] Dashboard honeycomb shows correct active dates
+- [ ] userVoted field accurately reflects user's vote status
+- [ ] Admin panel checkbox sets is_votable correctly
 
 ---
 
@@ -3912,6 +4200,781 @@ if (unreadArticles.length === 0 && totalPublished > 0) {
 
 ---
 
+## ⏱️ TIME SPENT ANALYTICS
+
+### 🎯 OVERVIEW
+
+**Purpose:** Track and visualize user engagement across the platform to help users monitor their learning consistency.
+
+**Key Features:**
+- Privacy-first tracking (no URLs logged, no granular event data)
+- Self-comparison only (no community benchmarks)
+- Universal tracking across all pages
+- Idle detection (pauses when user inactive)
+- Midnight session splitting (automatic daily snapshots)
+- Line + dot hybrid visualization with mesh background
+
+**Privacy Philosophy:**
+- Only track **total time per day** (no page-level data)
+- No third-party analytics (GAFA-free)
+- User can view their own data only
+- Optional opt-out toggle (Phase 2)
+
+---
+
+### 📊 DATABASE SCHEMA
+
+#### Table: `daily_time_spent`
+
+```sql
+CREATE TABLE IF NOT EXISTS daily_time_spent (
+  id SERIAL PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  date DATE NOT NULL,
+  total_time_seconds INT DEFAULT 0,
+  is_frozen BOOLEAN DEFAULT FALSE,
+  last_updated TIMESTAMP DEFAULT NOW(),
+  UNIQUE(user_id, date)
+);
+
+-- Indexes for performance
+CREATE INDEX idx_daily_time_spent_user_date ON daily_time_spent(user_id, date);
+CREATE INDEX idx_daily_time_spent_frozen ON daily_time_spent(user_id, date) WHERE is_frozen = FALSE;
+```
+
+**Field Descriptions:**
+- `user_id`: Telegram user ID (TEXT, matches users table)
+- `date`: Date in YYYY-MM-DD format (DATE)
+- `total_time_seconds`: Accumulated time in seconds for that day (INT)
+- `is_frozen`: TRUE once day is complete (prevents further updates) (BOOLEAN)
+- `last_updated`: Timestamp of last update (TIMESTAMP)
+
+**Unique Constraint:** `(user_id, date)` ensures one row per user per day
+
+---
+
+### 🔌 API ENDPOINTS
+
+#### 1. Track Engagement (UPSERT)
+
+**Endpoint:** `POST /api/track-engagement`
+
+**Purpose:** Receives time spent data from frontend and merges with existing data
+
+**Request Body:**
+```json
+{
+  "userId": "123456789",
+  "date": "2025-02-15",
+  "timeSpentSeconds": 3600
+}
+```
+
+**Backend Logic:**
+```javascript
+// Pseudocode
+async function trackEngagement(req, res) {
+  const { userId, date, timeSpentSeconds } = req.body;
+
+  // Validate input
+  if (!userId || !date || timeSpentSeconds === undefined) {
+    return res.status(400).json({
+      success: false,
+      error: "Missing required fields"
+    });
+  }
+
+  // UPSERT pattern (merge with existing data)
+  const result = await db.query(`
+    INSERT INTO daily_time_spent (user_id, date, total_time_seconds, last_updated)
+    VALUES ($1, $2, $3, NOW())
+    ON CONFLICT (user_id, date)
+    DO UPDATE SET
+      total_time_seconds = daily_time_spent.total_time_seconds + EXCLUDED.total_time_seconds,
+      last_updated = NOW()
+    WHERE daily_time_spent.is_frozen = FALSE
+    RETURNING total_time_seconds
+  `, [userId, date, timeSpentSeconds]);
+
+  // Return updated total
+  return res.json({
+    success: true,
+    date: date,
+    totalSeconds: result.rows[0]?.total_time_seconds || timeSpentSeconds
+  });
+}
+```
+
+**Key Points:**
+- Use `ON CONFLICT ... DO UPDATE` to merge data (UPSERT)
+- Only update if `is_frozen = FALSE` (don't update past days)
+- Return updated `totalSeconds` so frontend can sync
+- Accept small inaccuracies for multi-device users (<1% cases)
+
+**Response:**
+```json
+{
+  "success": true,
+  "date": "2025-02-15",
+  "totalSeconds": 7200
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "error": "Invalid date format"
+}
+```
+
+---
+
+#### 2. Get Time Spent Analytics
+
+**Endpoint:** `GET /api/users/:userId/analytics?stat=time&month=YYYY-MM&fortnight=1`
+
+**Purpose:** Returns time spent data for dashboard visualization
+
+**Query Parameters:**
+- `stat=time` (required): Identifies this as time spent request
+- `month=YYYY-MM` (required): Month in YYYY-MM format (e.g., "2025-02")
+- `fortnight=1|2` (required): 1 = days 1-15, 2 = days 16-end
+
+**Example Request:**
+```
+GET /api/users/123456789/analytics?stat=time&month=2025-02&fortnight=1
+```
+
+**Backend Logic:**
+```javascript
+async function getTimeSpentAnalytics(req, res) {
+  const { userId } = req.params;
+  const { month, fortnight } = req.query;
+
+  // Parse month and determine date range
+  const [year, monthNum] = month.split('-').map(Number);
+  const daysInMonth = new Date(year, monthNum, 0).getDate();
+
+  let startDay, endDay;
+  if (fortnight === '1') {
+    startDay = 1;
+    endDay = 15;
+  } else {
+    startDay = 16;
+    endDay = daysInMonth;
+  }
+
+  const startDate = `${year}-${monthNum.toString().padStart(2, '0')}-${startDay.toString().padStart(2, '0')}`;
+  const endDate = `${year}-${monthNum.toString().padStart(2, '0')}-${endDay.toString().padStart(2, '0')}`;
+
+  // Fetch data from database
+  const result = await db.query(`
+    SELECT
+      EXTRACT(DAY FROM date) AS day,
+      ROUND(total_time_seconds / 60.0) AS minutes
+    FROM daily_time_spent
+    WHERE user_id = $1
+      AND date >= $2
+      AND date <= $3
+    ORDER BY date ASC
+  `, [userId, startDate, endDate]);
+
+  // Fill missing days with 0 minutes
+  const dataMap = {};
+  result.rows.forEach(row => {
+    dataMap[row.day] = row.minutes;
+  });
+
+  const days = [];
+  for (let day = startDay; day <= endDay; day++) {
+    days.push({
+      day: day,
+      minutes: dataMap[day] || 0
+    });
+  }
+
+  // Calculate statistics
+  const totalMinutes = days.reduce((sum, d) => sum + d.minutes, 0);
+  const activeDays = days.filter(d => d.minutes > 0).length;
+
+  // Calculate longest streak
+  let longestStreak = 0;
+  let currentStreak = 0;
+  days.forEach(d => {
+    if (d.minutes > 0) {
+      currentStreak++;
+      longestStreak = Math.max(longestStreak, currentStreak);
+    } else {
+      currentStreak = 0;
+    }
+  });
+
+  // Check if fortnight is frozen (all days in the past)
+  const today = new Date();
+  const lastDayOfFortnight = new Date(year, monthNum - 1, endDay);
+  const isFrozen = lastDayOfFortnight < today;
+
+  return res.json({
+    success: true,
+    stat: "time",
+    month: month,
+    fortnight: parseInt(fortnight),
+    data: {
+      days: days,
+      isFrozen: isFrozen,
+      totalMinutes: totalMinutes,
+      activeDays: activeDays,
+      longestStreak: longestStreak
+    }
+  });
+}
+```
+
+**Response Format:**
+```json
+{
+  "success": true,
+  "stat": "time",
+  "month": "2025-02",
+  "fortnight": 1,
+  "data": {
+    "days": [
+      { "day": 1, "minutes": 125 },
+      { "day": 2, "minutes": 98 },
+      { "day": 3, "minutes": 142 },
+      { "day": 4, "minutes": 88 },
+      { "day": 5, "minutes": 0 },
+      ...
+    ],
+    "isFrozen": true,
+    "totalMinutes": 1814,
+    "activeDays": 14,
+    "longestStreak": 7
+  }
+}
+```
+
+**Field Descriptions:**
+- `days`: Array of all days in fortnight with time spent (minutes)
+- `isFrozen`: TRUE if fortnight is complete (all dates in past), FALSE if ongoing
+- `totalMinutes`: Sum of all minutes in fortnight
+- `activeDays`: Number of days with minutes > 0
+- `longestStreak`: Longest consecutive days with activity
+
+---
+
+### ⚙️ CRON JOBS
+
+#### 1. Daily Snapshot (11:59 PM)
+
+**Purpose:** Freeze yesterday's data to prevent further updates
+
+**Schedule:** Every day at 11:59 PM server time
+
+**Logic:**
+```javascript
+// Run at 23:59 every day
+const cronJob = schedule.scheduleJob('59 23 * * *', async () => {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayDate = yesterday.toISOString().split('T')[0];
+
+  await db.query(`
+    UPDATE daily_time_spent
+    SET is_frozen = TRUE
+    WHERE date = $1
+      AND is_frozen = FALSE
+  `, [yesterdayDate]);
+
+  console.log(`[Cron] Froze time spent data for ${yesterdayDate}`);
+});
+```
+
+**Why This Matters:**
+- Prevents users from retroactively updating past days
+- Ensures historical data integrity
+- Improves dashboard performance (no need to check date boundaries)
+
+---
+
+#### 2. Fortnight Snapshot (Optional - Phase 2)
+
+**Purpose:** Pre-aggregate fortnight statistics for faster dashboard loads
+
+**Schedule:** Runs on 1st and 16th of each month at midnight
+
+**Logic:**
+```javascript
+// Run at midnight on 1st and 16th of every month
+const fortnightCron = schedule.scheduleJob('0 0 1,16 * *', async () => {
+  // Pre-calculate fortnight stats for all users
+  // Store in `fortnight_stats` table (optional optimization)
+  console.log('[Cron] Calculating fortnight stats...');
+});
+```
+
+**Note:** This is optional. Dashboard API can calculate on-demand initially.
+
+---
+
+### 🎨 FRONTEND INTEGRATION
+
+#### Universal Tracking Script
+
+**File:** `scripts/engagement-tracker.js`
+
+**Include on ALL pages:**
+```html
+<!-- Include AFTER user authentication check -->
+<script src="/scripts/engagement-tracker.js"></script>
+```
+
+**Pages to Include:**
+- homepage.html
+- articles.html
+- ethics_essays_poll.html
+- user_dashboard_testbed.html
+- profile.html
+- landing.html
+
+**How It Works:**
+1. Script detects user ID from page context (`DEMO_USER.user_id` or `window.currentUserId`)
+2. Starts tracking immediately on page load
+3. Pauses when user idle (100s desktop, 130s mobile)
+4. Saves to localStorage every 30 seconds
+5. Sends to API every 6 hours + on page unload
+6. Checks for midnight every 60 seconds (splits sessions)
+
+**Event Listeners:**
+- `mousemove`, `keydown`, `scroll` (throttled to 100ms)
+- `touchstart`, `touchmove`, `touchend` (mobile)
+- `visibilitychange` (tab switching)
+- `beforeunload` (page close/refresh)
+
+**localStorage Structure:**
+```json
+{
+  "date": "2025-02-15",
+  "startTime": 1708012800000,
+  "accumulatedSeconds": 3600,
+  "lastActive": 1708016400000,
+  "lastSendTime": 1708014000000
+}
+```
+
+---
+
+#### Dashboard Visualization
+
+**File:** `user_dashboard_testbed.html`
+
+**Visualization Type:** Line + dot hybrid with D3.js
+
+**Design Elements:**
+- **Mesh Background:** 20px grid, 0.14 opacity, black color
+- **Colors:**
+  - Orange (#fc7306): Above average days
+  - Blue (#3b82f6): Below average days
+  - Gray (#6b7280): Average line (dotted)
+- **Y-axis:** Dynamic scaling (starts below minimum, not at zero)
+- **X-axis:** All days labeled (1, 2, 3, ..., 15 or 16-31)
+- **Tooltip:** Color-matched to dot, shows date + minutes
+- **Legend:** Horizontal layout (Below Avg, Above Avg, Average line)
+
+**Stats Panel (Top):**
+- **Total Time:** "30 hrs 14 min"
+- **Active Days:** "14/15"
+- **Longest Streak:** "7 days"
+
+**Privacy Notice:**
+- Only shown if `isFrozen = false` (ongoing fortnight)
+- Text: "ℹ️ Approximate Data. Data might change if Ongoing fortnight/Month."
+
+**Empty State:**
+- Shown when no data exists for fortnight
+- Message: "No Data Available. Start exploring articles to see your engagement analytics!"
+
+---
+
+### 🔒 PRIVACY & SECURITY
+
+**What We Track:**
+- ✅ Total time spent per day (seconds)
+- ✅ Date of activity (YYYY-MM-DD)
+
+**What We DON'T Track:**
+- ❌ Page URLs visited
+- ❌ Mouse coordinates / click positions
+- ❌ Scroll depth per article
+- ❌ Section-level engagement
+- ❌ IP addresses (beyond rate limiting)
+- ❌ Third-party analytics (Google, Facebook, etc.)
+
+**Security Measures:**
+- Rate limiting on API endpoint (max 10 requests/minute per user)
+- Input validation (date format, seconds range)
+- SQL injection prevention (parameterized queries)
+- CORS restrictions (only allow your domain)
+- HTTPS only (no HTTP tracking)
+
+**GDPR Compliance:**
+- User owns their data (can request deletion)
+- No data sharing with third parties
+- Opt-out toggle (Phase 2 feature)
+- Clear privacy notice in dashboard
+
+---
+
+### 📊 TESTING CHECKLIST
+
+**Backend Testing:**
+- [ ] `POST /api/track-engagement` accepts valid data
+- [ ] UPSERT merges data correctly (no duplicates)
+- [ ] `is_frozen = TRUE` prevents updates to past days
+- [ ] `GET /api/users/:userId/analytics?stat=time` returns correct fortnight data
+- [ ] Fortnight calculation handles Feb (28/29 days), 30-day, 31-day months
+- [ ] Ongoing fortnight returns `isFrozen: false`
+- [ ] Past fortnight returns `isFrozen: true`
+- [ ] Longest streak calculation handles zero days correctly
+- [ ] Empty fortnights return all days with 0 minutes (not error)
+- [ ] Cron job runs at 11:59 PM and freezes yesterday's data
+- [ ] Rate limiting prevents API spam
+- [ ] Invalid date formats return 400 error
+
+**Frontend Testing:**
+- [ ] `engagement-tracker.js` loads on all pages
+- [ ] Script detects user ID from `DEMO_USER` or `window.currentUserId`
+- [ ] Timer starts on page load
+- [ ] Timer pauses when user idle (100s desktop, 130s mobile)
+- [ ] Timer resumes when user returns from idle
+- [ ] localStorage persists session across page refreshes
+- [ ] Data sends to API every 6 hours automatically
+- [ ] Data sends on page unload (`beforeunload` event)
+- [ ] Midnight check detects date change (every 60s)
+- [ ] Yesterday's data sent automatically at midnight
+- [ ] New session starts after midnight with 0 seconds
+- [ ] Dashboard loads Time Spent visualization correctly
+- [ ] All 5 fortnight scenarios render (Feb 28-day, 30-day, 31-day, ongoing, 1st fortnight)
+- [ ] Stats panel shows correct Total Time, Active Days, Longest Streak
+- [ ] Graph renders with mesh background, orange/blue dots, average line
+- [ ] Tooltip shows correct date and minutes on hover
+- [ ] Legend displays correctly (horizontal layout)
+- [ ] Privacy notice appears only for ongoing fortnights
+- [ ] Empty state appears when no data exists
+- [ ] Month dropdown switches fortnights correctly
+- [ ] Fortnight chips toggle between 1st and 2nd
+
+**Performance Testing:**
+- [ ] API responds in < 200ms for analytics endpoint
+- [ ] localStorage size stays < 1KB per user
+- [ ] Throttled events (scroll, mousemove) don't cause lag
+- [ ] D3.js chart renders in < 500ms
+- [ ] No memory leaks after long sessions (4+ hours)
+
+**Edge Cases:**
+- [ ] Leap year (Feb 29) handled correctly in fortnight calculation
+- [ ] Multi-device usage accepted (small data inaccuracy OK)
+- [ ] Session spanning midnight splits correctly into two days
+- [ ] User closes browser mid-session (data saved via `beforeunload`)
+- [ ] Network error during API send (data retained in localStorage for retry)
+- [ ] Very long sessions (8+ hours) tracked accurately
+- [ ] User switches tabs frequently (visibilitychange events work)
+- [ ] Mobile device rotation detected (touch events continue working)
+
+---
+
+## 🗳️ TRACKING PREFERENCE POLL
+
+### 🎯 OVERVIEW
+
+**Purpose:** Allow users to vote on whether Samyak Gyan should continue tracking time spent or disable tracking entirely.
+
+**Key Features:**
+- Binary choice poll (YES, DO NOT TRACK vs Continue TO TRACK)
+- One vote per user (tied to Telegram user_id)
+- Real-time vote count display
+- Progress bar showing votes towards 10,000 goal
+- Displayed only in Time Spent Analytics dashboard
+
+**Business Decision:** If 10,000 votes are collected and majority votes "DO NOT TRACK", tracking feature will be disabled.
+
+---
+
+### 📊 DATABASE SCHEMA
+
+#### Table: `tracking_poll_votes`
+
+```sql
+CREATE TABLE IF NOT EXISTS tracking_poll_votes (
+  id SERIAL PRIMARY KEY,
+  user_id TEXT NOT NULL UNIQUE,
+  vote_choice TEXT CHECK(vote_choice IN ('no_track', 'continue_track')) NOT NULL,
+  voted_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Index for performance
+CREATE INDEX idx_tracking_poll_user ON tracking_poll_votes(user_id);
+CREATE INDEX idx_tracking_poll_choice ON tracking_poll_votes(vote_choice);
+```
+
+**Field Descriptions:**
+- `user_id`: Telegram user ID (TEXT, unique - one vote per user)
+- `vote_choice`: User's choice (`'no_track'` or `'continue_track'`)
+- `voted_at`: Timestamp of when vote was cast
+
+**Unique Constraint:** `user_id` ensures one vote per user (no duplicate voting)
+
+---
+
+### 🔌 API ENDPOINTS
+
+#### 1. Get Poll Results
+
+**Endpoint:** `GET /api/poll/tracking-preference`
+
+**Purpose:** Returns current poll vote counts and user's voting status
+
+**Query Parameters:** None (user identified via session/auth)
+
+**Backend Logic:**
+```javascript
+async function getTrackingPollResults(req, res) {
+  const userId = req.session.userId || req.query.userId; // Get from session/auth
+
+  // Get vote counts
+  const noTrackCount = await db.query(`
+    SELECT COUNT(*) as count
+    FROM tracking_poll_votes
+    WHERE vote_choice = 'no_track'
+  `);
+
+  const continueTrackCount = await db.query(`
+    SELECT COUNT(*) as count
+    FROM tracking_poll_votes
+    WHERE vote_choice = 'continue_track'
+  `);
+
+  // Check if user has voted
+  const userVote = await db.query(`
+    SELECT vote_choice
+    FROM tracking_poll_votes
+    WHERE user_id = $1
+  `, [userId]);
+
+  return res.json({
+    success: true,
+    noTrack: parseInt(noTrackCount.rows[0].count),
+    continueTrack: parseInt(continueTrackCount.rows[0].count),
+    userVoted: userVote.rows.length > 0 ? userVote.rows[0].vote_choice : null
+  });
+}
+```
+
+**Response Format:**
+```json
+{
+  "success": true,
+  "noTrack": 1247,
+  "continueTrack": 5823,
+  "userVoted": null
+}
+```
+
+**Field Descriptions:**
+- `noTrack`: Number of votes for "YES, DO NOT TRACK"
+- `continueTrack`: Number of votes for "Continue TO TRACK"
+- `userVoted`: `null` (not voted) | `"no_track"` | `"continue_track"`
+
+---
+
+#### 2. Cast Vote
+
+**Endpoint:** `POST /api/poll/tracking-preference/vote`
+
+**Purpose:** Records user's vote (one vote per user)
+
+**Request Body:**
+```json
+{
+  "userId": "123456789",
+  "vote": "no_track"
+}
+```
+
+**Backend Logic:**
+```javascript
+async function castTrackingPollVote(req, res) {
+  const { userId, vote } = req.body;
+
+  // Validate input
+  if (!userId || !vote) {
+    return res.status(400).json({
+      success: false,
+      error: "Missing required fields"
+    });
+  }
+
+  if (vote !== 'no_track' && vote !== 'continue_track') {
+    return res.status(400).json({
+      success: false,
+      error: "Invalid vote choice"
+    });
+  }
+
+  // Check if user has already voted
+  const existingVote = await db.query(`
+    SELECT id FROM tracking_poll_votes
+    WHERE user_id = $1
+  `, [userId]);
+
+  if (existingVote.rows.length > 0) {
+    return res.status(400).json({
+      success: false,
+      error: "User has already voted"
+    });
+  }
+
+  // Insert vote
+  await db.query(`
+    INSERT INTO tracking_poll_votes (user_id, vote_choice)
+    VALUES ($1, $2)
+  `, [userId, vote]);
+
+  // Get updated counts
+  const noTrackCount = await db.query(`
+    SELECT COUNT(*) as count
+    FROM tracking_poll_votes
+    WHERE vote_choice = 'no_track'
+  `);
+
+  const continueTrackCount = await db.query(`
+    SELECT COUNT(*) as count
+    FROM tracking_poll_votes
+    WHERE vote_choice = 'continue_track'
+  `);
+
+  return res.json({
+    success: true,
+    message: "Vote recorded successfully",
+    noTrack: parseInt(noTrackCount.rows[0].count),
+    continueTrack: parseInt(continueTrackCount.rows[0].count),
+    userVoted: vote
+  });
+}
+```
+
+**Response (Success):**
+```json
+{
+  "success": true,
+  "message": "Vote recorded successfully",
+  "noTrack": 1248,
+  "continueTrack": 5823,
+  "userVoted": "no_track"
+}
+```
+
+**Response (Already Voted):**
+```json
+{
+  "success": false,
+  "error": "User has already voted"
+}
+```
+
+---
+
+### 🎨 FRONTEND INTEGRATION
+
+**Location:** `user_dashboard_testbed.html` - Time Spent Analytics section
+
+**Components:**
+
+1. **Privacy Policy Dropdown** (collapsible)
+   - Explains tracking policy
+   - Lists what is NOT tracked (GAFA-free)
+   - Clarifies data storage (Telegram user_id only)
+
+2. **Poll Interface**
+   - Title: "We are adding this Poll. Please Vote if You Care"
+   - Question: "Do you want Samyak Gyan to NOT TRACK your usage (Time Spent)?"
+   - Two buttons:
+     - Red button: "YES, DO NOT TRACK"
+     - Green button: "Continue TO TRACK my usage (Time Spent)"
+
+3. **Real-time Results Display**
+   - Vote counts for each option
+   - Progress bar (towards 10,000 votes)
+   - Total votes count
+   - Footer: "*10,000 Votes required for Samyak Gyan"
+
+4. **Voting Logic**
+   - User can vote only once
+   - After voting, buttons are disabled
+   - Voted button shows active state (colored background)
+   - Vote stored in localStorage + backend
+
+---
+
+### 📊 TESTING CHECKLIST
+
+**Backend Testing:**
+- [ ] `GET /api/poll/tracking-preference` returns correct vote counts
+- [ ] `POST /api/poll/tracking-preference/vote` accepts valid votes
+- [ ] Duplicate voting is prevented (unique user_id constraint)
+- [ ] Invalid vote choices are rejected (not 'no_track' or 'continue_track')
+- [ ] Vote counts update correctly after each vote
+- [ ] User's voting status is returned correctly
+- [ ] Rate limiting prevents vote spam
+
+**Frontend Testing:**
+- [ ] Poll loads with current vote counts on page load
+- [ ] Privacy policy dropdown opens/closes correctly
+- [ ] Arrow rotates when dropdown is toggled
+- [ ] Vote buttons are clickable when user hasn't voted
+- [ ] Clicking "YES, DO NOT TRACK" records vote and disables buttons
+- [ ] Clicking "Continue TO TRACK" records vote and disables buttons
+- [ ] Voted button shows colored background (red/green)
+- [ ] Progress bar updates correctly after vote
+- [ ] Total vote count displays with comma separators (1,247 not 1247)
+- [ ] Progress bar reaches 100% at 10,000 votes
+- [ ] "Already voted" alert appears if user tries to vote twice
+- [ ] localStorage persists vote across page refreshes
+
+**Edge Cases:**
+- [ ] User tries to vote twice (alert + API rejection)
+- [ ] User votes, refreshes page (vote state persists)
+- [ ] Multiple users vote simultaneously (no race conditions)
+- [ ] Poll reaches 10,000 votes (UI shows completion)
+- [ ] Network error during vote (user can retry)
+
+---
+
+### 🔐 SECURITY & PRIVACY
+
+**Voting Security:**
+- One vote per Telegram user_id (enforced by database unique constraint)
+- No IP-based voting (would violate privacy)
+- Votes are anonymous (only user_id stored, no personal data)
+- No vote changing (once voted, decision is final)
+
+**Data Retention:**
+- Votes stored indefinitely for decision-making
+- No personal information stored (only Telegram user_id)
+- User can request vote deletion (GDPR compliance)
+
+**Business Logic:**
+- If 10,000 votes collected AND majority votes "NO TRACK":
+  - Disable tracking feature platform-wide
+  - Remove `engagement-tracker.js` from all pages
+  - Display notice: "Tracking disabled by community vote"
+- If majority votes "Continue TRACK":
+  - Keep tracking feature enabled
+  - Thank users for participation
+
+---
+
 ## 🔍 SEO OPTIMIZATION & SERVER-SIDE RENDERING
 
 ### 🎯 CRITICAL REQUIREMENT
@@ -4376,6 +5439,19 @@ CREATE INDEX idx_articles_publish_date ON articles(publish_date);
   <textarea name="content" placeholder="Article content..." required></textarea>
   <input type="date" name="publish_date" required>
 
+  <!-- VOTING CONTROL (for editorials/important articles) -->
+  <fieldset>
+    <legend>Community Voting</legend>
+    <label>
+      <input type="checkbox" name="is_votable" value="true" checked>
+      Allow community voting on this article
+    </label>
+    <small>
+      ℹ️ Uncheck for important editorials that should ALWAYS be included in magazine.
+      Editorials with voting disabled won't appear in Top 5 rankings.
+    </small>
+  </fieldset>
+
   <!-- SEO FIELDS (CRITICAL) -->
   <fieldset>
     <legend>SEO Optimization</legend>
@@ -4438,7 +5514,8 @@ app.post('/admin/articles/create', authenticateAdmin, async (req, res) => {
     meta_title,
     meta_description,
     meta_keywords,
-    slug
+    slug,
+    is_votable
   } = req.body;
 
   // 1. Validate slug uniqueness
@@ -4447,14 +5524,15 @@ app.post('/admin/articles/create', authenticateAdmin, async (req, res) => {
     return res.status(400).json({ error: 'Slug already exists' });
   }
 
-  // 2. Insert article with SEO fields
+  // 2. Insert article with SEO fields + voting control
   const result = await db.query(`
     INSERT INTO articles (
       title, content, publish_date,
       meta_title, meta_description, meta_keywords,
-      slug, canonical_url, status
+      slug, canonical_url, status,
+      is_votable, total_votes
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'published')
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'published', $9, 0)
     RETURNING id, slug, publish_date
   `, [
     title,
@@ -4464,7 +5542,8 @@ app.post('/admin/articles/create', authenticateAdmin, async (req, res) => {
     meta_description || content.substring(0, 160),
     meta_keywords,
     slug,
-    `https://www.samyak-gyan.com/upsc-current-affairs/${formatDateISO(publish_date)}/${slug}`
+    `https://www.samyak-gyan.com/upsc-current-affairs/${formatDateISO(publish_date)}/${slug}`,
+    is_votable === 'true' ? true : false  // Checkbox value → boolean
   ]);
 
   // 3. Regenerate sitemap.xml

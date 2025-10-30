@@ -149,7 +149,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (contentDates.includes(fullDate)) {
                 dayCell.classList.add('day-active');
-                dayCell.onclick = () => goToDatePage(fullDate);
+
+                // Check if Sunday (0 = Sunday)
+                const clickedDate = new Date(year, month, d);
+                const isSunday = clickedDate.getDay() === 0;
+
+                if (isSunday) {
+                    // Sunday → Ethics & Essays
+                    dayCell.onclick = () => window.location.href = '/upsc-ethics-essays';
+                } else {
+                    // Weekday → Current Affairs
+                    dayCell.onclick = () => goToDatePage(fullDate);
+                }
             }
 
             calendarGrid.appendChild(dayCell);
