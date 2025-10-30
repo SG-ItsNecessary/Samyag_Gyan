@@ -16,7 +16,9 @@ const articles = [
         "article_id": 1,
         "language": "en",
         "question": "✦ What is Digital Public Infrastructure (DPI)?",
-        "answer": "DPI refers to foundational systems like Aadhaar, UPI, DigiLocker and more that create a base for scalable public digital services. These systems enable identity, payments, and document verification at scale. Together, they make service delivery faster, cheaper, and more inclusive. This public-facing technology stack is built on open standards, promoting a shared ecosystem for innovation. It operates on a consent-based framework, giving citizens control over their data while ensuring security and privacy. The integrated nature of these platforms is what allows for a seamless and interconnected digital economy."
+        "answer": "DPI refers to foundational systems like Aadhaar, UPI, DigiLocker and more that create a base for scalable public digital services. These systems enable identity, payments, and document verification at scale. Together, they make service delivery faster, cheaper, and more inclusive. This public-facing technology stack is built on open standards, promoting a shared ecosystem for innovation. It operates on a consent-based framework, giving citizens control over their data while ensuring security and privacy. The integrated nature of these platforms is what allows for a seamless and interconnected digital economy.",
+        "image": "images/1.png",
+        "image_caption": "Digital Public Infrastructure"
       },
       {
         "main_question_id": 102,
@@ -32,7 +34,9 @@ const articles = [
         "article_id": 1,
         "language": "en",
         "question": "✦ Why is India's model globally praised?",
-        "answer": "India's DPI stack is open, low-cost, scalable, and sovereign. It's being adapted by countries in Africa, Latin America, and Southeast Asia. The absence of corporate dependencies (like GAFA) makes it attractive for nations seeking self-reliance in digital governance. This approach provides a viable alternative to proprietary, corporate-driven models, which often come with high costs and data control issues. The open-source nature of the technology encourages global collaboration and co-creation. Ultimately, India's model demonstrates that a public-good approach can be a powerful engine for both economic growth and social equity."
+        "answer": "India's DPI stack is open, low-cost, scalable, and sovereign. It's being adapted by countries in Africa, Latin America, and Southeast Asia. The absence of corporate dependencies (like GAFA) makes it attractive for nations seeking self-reliance in digital governance. This approach provides a viable alternative to proprietary, corporate-driven models, which often come with high costs and data control issues. The open-source nature of the technology encourages global collaboration and co-creation. Ultimately, India's model demonstrates that a public-good approach can be a powerful engine for both economic growth and social equity.",
+        "image": null,
+        "image_caption": null
       }
     ],
     "endRibbons": [
@@ -286,6 +290,30 @@ function renderArticles() {
 
       contentArea.appendChild(q);
       contentArea.appendChild(a);
+
+      // ==================== PARAGRAPH IMAGE (OPTIONAL) ====================
+      if (qna.image) {
+        const imageWrapper = document.createElement('div');
+        imageWrapper.className = 'content-image-wrapper';
+
+        const img = document.createElement('img');
+        img.className = 'content-image';
+        img.src = qna.image.startsWith('/') ? qna.image : '/' + qna.image;
+        img.alt = qna.image_caption || 'Content illustration';
+        img.loading = 'lazy'; // Lazy loading for performance
+
+        imageWrapper.appendChild(img);
+
+        // Add caption if provided
+        if (qna.image_caption) {
+          const caption = document.createElement('div');
+          caption.className = 'image-caption';
+          caption.textContent = qna.image_caption;
+          imageWrapper.appendChild(caption);
+        }
+
+        contentArea.appendChild(imageWrapper);
+      }
     });
 
     const endRibbonZone = document.createElement('div');
@@ -789,18 +817,61 @@ window.onload = async function () {
   let paletteTimeout = null; // ⬅️ Track the auto-hide timeout
 
 
-  function createHighlightPalette(x, y) {
+  function createHighlightPalette(x, y, range) {
     // Remove existing palette
     if (paletteElement) paletteElement.remove();
     clearTimeout(paletteTimeout); // ⬅️ Clear any previous timeout
 
+    // Check if selection is inside an existing highlight
+    const parentElement = range.startContainer.parentElement;
+    const isInsideHighlight = parentElement && parentElement.classList.contains('custom-highlight');
 
     // Create palette
     const colors = ['#ffff66', '#a2faa3', '#9df2ff', '#ffb3ba'];
     paletteElement = document.createElement('div');
     paletteElement.className = 'highlight-palette';
 
+    // If selecting highlighted text, show X button to remove
+    if (isInsideHighlight) {
+      const removeButton = document.createElement('button');
+      removeButton.textContent = '✕';
+      removeButton.className = 'remove-highlight-btn';
+      removeButton.title = 'Remove highlight';
 
+      removeButton.onclick = function () {
+        // Remove the highlight span, replace with plain text
+        const text = parentElement.textContent;
+        parentElement.parentNode.replaceChild(document.createTextNode(text), parentElement);
+
+        paletteElement.remove();
+        paletteElement = null;
+        selectedRange = null;
+        window.getSelection()?.removeAllRanges();
+      };
+
+      paletteElement.appendChild(removeButton);
+      document.body.appendChild(paletteElement);
+
+      // Position the palette
+      const isMobile = window.innerWidth <= 767;
+      const offsetY = isMobile ? 110 : 75;
+      paletteElement.style.position = 'absolute';
+      paletteElement.style.top = `${y + offsetY}px`;
+      paletteElement.style.left = `${x}px`;
+      paletteElement.style.transform = 'translateX(0)';
+
+      // Auto-hide after 5 seconds
+      paletteTimeout = setTimeout(() => {
+        if (paletteElement) {
+          paletteElement.remove();
+          paletteElement = null;
+        }
+      }, 5000);
+
+      return; // Don't show color buttons
+    }
+
+    // Normal highlight flow (not inside existing highlight)
     // Tick button (needs access in color-btn onclick)
     const tickButton = document.createElement('button');
     tickButton.textContent = '✓✓';
@@ -830,6 +901,38 @@ window.onload = async function () {
         if (currentHighlight && currentHighlight.parentNode) {
           const text = currentHighlight.textContent;
           currentHighlight.parentNode.replaceChild(document.createTextNode(text), currentHighlight);
+        }
+
+        // ✨ AUTO-EXPAND TO FULL WORD BOUNDARIES
+        try {
+          selectedRange.expand('word');
+        } catch (e) {
+          // expand() not supported in all browsers, fallback to manual expansion
+          const text = selectedRange.toString();
+          if (text.length > 0) {
+            const startContainer = selectedRange.startContainer;
+            const endContainer = selectedRange.endContainer;
+
+            // Only expand if selection is in a text node
+            if (startContainer.nodeType === Node.TEXT_NODE && endContainer.nodeType === Node.TEXT_NODE) {
+              const fullText = startContainer.textContent;
+              let startOffset = selectedRange.startOffset;
+              let endOffset = selectedRange.endOffset;
+
+              // Expand start to word boundary (move left until whitespace or start)
+              while (startOffset > 0 && !/\s/.test(fullText[startOffset - 1])) {
+                startOffset--;
+              }
+
+              // Expand end to word boundary (move right until whitespace or end)
+              while (endOffset < fullText.length && !/\s/.test(fullText[endOffset])) {
+                endOffset++;
+              }
+
+              selectedRange.setStart(startContainer, startOffset);
+              selectedRange.setEnd(endContainer, endOffset);
+            }
+          }
         }
 
         const span = document.createElement('span');
@@ -904,7 +1007,7 @@ window.onload = async function () {
 
 
     selectedRange = range.cloneRange();
-    createHighlightPalette(rect.left + window.scrollX, rect.top + window.scrollY - 50);
+    createHighlightPalette(rect.left + window.scrollX, rect.top + window.scrollY - 50, range);
   });
 // --- Step 1: Render hardcoded data immediately ---
   renderArticles();

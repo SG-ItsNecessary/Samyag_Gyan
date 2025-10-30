@@ -144,6 +144,30 @@ function renderEthicsEssayArticles() {
 
       contentArea.appendChild(q);
       contentArea.appendChild(a);
+
+      // ==================== PARAGRAPH IMAGE (OPTIONAL) ====================
+      if (qna.image) {
+        const imageWrapper = document.createElement('div');
+        imageWrapper.className = 'content-image-wrapper';
+
+        const img = document.createElement('img');
+        img.className = 'content-image';
+        img.src = qna.image.startsWith('/') ? qna.image : '/' + qna.image;
+        img.alt = qna.image_caption || 'Content illustration';
+        img.loading = 'lazy'; // Lazy loading for performance
+
+        imageWrapper.appendChild(img);
+
+        // Add caption if provided
+        if (qna.image_caption) {
+          const caption = document.createElement('div');
+          caption.className = 'image-caption';
+          caption.textContent = qna.image_caption;
+          imageWrapper.appendChild(caption);
+        }
+
+        contentArea.appendChild(imageWrapper);
+      }
     });
 
     const endRibbonZone = document.createElement('div');

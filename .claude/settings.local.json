@@ -26,7 +26,8 @@
       "Read(//c/Users/danan/SamyakGyan_Backend/routes/**)",
       "Read(//c/Users/danan/SamyakGyan_Backend/**)",
       "Bash(start msedge user_dashboard_testbed.html)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
