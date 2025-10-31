@@ -1,0 +1,89 @@
+========================================
+   MOBILE ACCESS - START HERE
+========================================
+
+YOUR CONFIGURATION:
+  IP Address: 192.168.1.10
+  Port: 8000
+  Mobile URL: http://192.168.1.10:8000/articles.html
+
+========================================
+   STEP-BY-STEP INSTRUCTIONS
+========================================
+
+STEP 1: FIX FIREWALL (CRITICAL!)
+--------------------------------
+1. Press Windows + R
+2. Type: firewall.cpl
+3. Press Enter
+4. Click "Allow an app or feature through Windows Defender Firewall"
+5. Click "Change settings"
+6. Click "Allow another app..."
+7. Browse to python.exe (usually in C:\Users\danan\AppData\Local\Programs\Python\Python314\)
+8. Click "Add"
+9. CHECK BOTH boxes (Private and Public)
+10. Click "OK"
+
+STEP 2: START SERVER
+--------------------
+Double-click: start-server.bat
+(Keep the black window open!)
+
+STEP 3: TEST ON COMPUTER
+-------------------------
+Open browser and go to:
+http://localhost:8000/articles.html
+
+If this works, continue to Step 4.
+If this doesn't work, server isn't running.
+
+STEP 4: TEST WITH IP ON COMPUTER
+---------------------------------
+On same computer, open:
+http://192.168.1.10:8000/articles.html
+
+If this works, continue to Step 5.
+If this doesn't work, firewall is blocking.
+
+STEP 5: TEST ON MOBILE
+-----------------------
+1. Make sure phone is on SAME WiFi
+2. Open browser on phone
+3. Type: http://192.168.1.10:8000/articles.html
+
+========================================
+   TROUBLESHOOTING
+========================================
+
+Problem: Step 3 works but Step 4 doesn't
+Solution: Firewall blocking → Redo Step 1
+
+Problem: Steps 3 & 4 work but mobile doesn't
+Solution: Not on same WiFi or wrong IP
+
+Problem: Nothing works
+Solution: Open Command Prompt and run:
+  cd C:\Users\danan\Frontend
+  python -m http.server 8000
+  (Look for error messages)
+
+========================================
+   NEED DETAILED HELP?
+========================================
+
+Read these files (in order):
+1. MOBILE_ACCESS_COMPLETE_GUIDE.md (full instructions)
+2. FIREWALL_FIX.md (firewall specific help)
+3. SERVER_SETUP.md (alternative methods)
+
+========================================
+   QUICK CHECK
+========================================
+
+□ Firewall configured? (Step 1 done)
+□ Server running? (black window open)
+□ Both devices on same WiFi?
+□ Using http:// (not https://)?
+□ Using correct IP (192.168.1.10)?
+
+========================================

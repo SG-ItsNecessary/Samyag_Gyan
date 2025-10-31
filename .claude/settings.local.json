@@ -27,7 +27,12 @@
       "Read(//c/Users/danan/SamyakGyan_Backend/**)",
       "Bash(start msedge user_dashboard_testbed.html)",
       "Bash(curl:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(start cmd /k \"python -m http.server 8000\")",
+      "Bash(ipconfig:*)",
+      "Bash(findstr:*)",
+      "Bash(netstat:*)",
+      "Bash(netsh advfirewall firewall add rule name=\"Python HTTP Server\" dir=in action=allow protocol=TCP localport=8000)"
     ],
     "deny": [],
     "ask": []
