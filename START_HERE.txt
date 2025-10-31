@@ -19,10 +19,11 @@ STEP 1: FIX FIREWALL (CRITICAL!)
 4. Click "Allow an app or feature through Windows Defender Firewall"
 5. Click "Change settings"
 6. Click "Allow another app..."
-7. Browse to python.exe (usually in C:\Users\danan\AppData\Local\Programs\Python\Python314\)
-8. Click "Add"
-9. CHECK BOTH boxes (Private and Public)
-10. Click "OK"
+7. Browse to: C:\Python314\python.exe
+8. Select python.exe and click "Open"
+9. Click "Add"
+10. CHECK BOTH boxes (Private and Public)
+11. Click "OK"
 
 STEP 2: START SERVER
 --------------------
