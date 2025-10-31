@@ -2689,26 +2689,30 @@ Content-Disposition: attachment; filename="SamyakGyan_Notes_2025-10-04.txt"
 ```
 
 **Backend Logic**:
-1. Find all `article_id`s from:
+1. Fetch user name from `users` table: `SELECT name FROM users WHERE telegram_user_id = :userId`
+2. Find all `article_id`s from:
    - `public_interactions` where `DATE(created_at) = :date`
    - `highlights` where `DATE(created_at) = :date`
    - `summaries` where `DATE(created_at) = :date`
-2. For each article:
-   - Fetch article details
+   - `votes` where `DATE(created_at) = :date` (NEW)
+3. For each article:
+   - Fetch article details (including article URL)
    - Fetch highlights
    - Fetch summary
-   - Check interaction statuses
-3. Format as plain text (template below)
+   - Check interaction statuses (read, bookmarked, summary, voted)
+   - Fetch mindmap URLs (if available)
+4. Format as plain text (template below)
 
 **Response Body (Plain Text)** - Complete Format with All Fields:
 ```
 ========================================
-SAMYAK GYAN - DAILY NOTES
+SAMYAK NOTES created by [USER NAME]
 Date: October 4, 2025
 ========================================
 
 [Article 1]
 Title: Digital Public Infrastructure in India
+Article Link: https://samyakgyan.com/upsc-editorials/2025-10-04/digital-public-infrastructure
 Published: 2025-10-04
 Source: The Hindu
 Topics: #Governance #DigitalIndia
@@ -2723,6 +2727,7 @@ Status:
 ✓ Read: Yes
 ✓ Bookmarked: Yes
 ✓ Summary: Yes
+✓ Voted: Yes
 
 --- MAINS QUESTIONS & HIGHLIGHTS ---
 
@@ -2759,10 +2764,17 @@ DPI like Aadhaar and UPI enable digital governance by providing
 foundational infrastructure for direct benefit transfers, reducing
 corruption and ensuring last-mile delivery of government services.
 
+--- MINDMAPS ---
+English: https://samyakgyan.com/mindmaps/2025-10-04-dpi-en.png
+Hindi: https://samyakgyan.com/mindmaps/2025-10-04-dpi-hi.png
+
+*Add to your own Notes Compilation. Download Mindmap to add there TXT does not support Image*
+
 ========================================
 
 [Article 2]
 Title: Renewable Energy Transition in India
+Article Link: https://samyakgyan.com/upsc-editorials/2025-10-03/renewable-energy
 Published: 2025-10-03
 Source: Down To Earth
 Topics: #Environment #Energy
@@ -2775,8 +2787,9 @@ policy and sustainable development.
 
 Status:
 ✓ Read: Yes
-✓ Bookmarked: No
-✓ Summary: No
+✗ Bookmarked: No
+✗ Summary: No
+✗ Voted: No
 
 --- MAINS QUESTIONS & HIGHLIGHTS ---
 
@@ -2794,10 +2807,56 @@ Highlights:
 --- MY SUMMARY ---
 (No summary provided)
 
+--- MINDMAPS ---
+(No mindmaps available for this article)
+
 ========================================
 END OF NOTES
 ========================================
 ```
+
+**MINDMAPS Section - Different Scenarios**:
+
+**Case 1: Both English and Hindi mindmaps available**
+```
+--- MINDMAPS ---
+English: https://samyakgyan.com/mindmaps/2025-10-04-dpi-en.png
+Hindi: https://samyakgyan.com/mindmaps/2025-10-04-dpi-hi.png
+
+*Add to your own Notes Compilation. Download Mindmap to add there TXT does not support Image*
+```
+
+**Case 2: Only English mindmap available**
+```
+--- MINDMAPS ---
+English: https://samyakgyan.com/mindmaps/2025-10-04-dpi-en.png
+
+*Add to your own Notes Compilation. Download Mindmap to add there TXT does not support Image*
+```
+
+**Case 3: Only Hindi mindmap available**
+```
+--- MINDMAPS ---
+Hindi: https://samyakgyan.com/mindmaps/2025-10-04-dpi-hi.png
+
+*Add to your own Notes Compilation. Download Mindmap to add there TXT does not support Image*
+```
+
+**Case 4: No mindmaps available**
+```
+--- MINDMAPS ---
+(No mindmaps available for this article)
+```
+
+**Backend Implementation Notes**:
+- Fetch user name: `SELECT name FROM users WHERE telegram_user_id = :userId`
+- Fetch vote status: `SELECT vote_type FROM votes WHERE user_id = :userId AND article_id = :articleId`
+- Generate article URL based on article type and slug:
+  - Editorials: `/upsc-editorials/:date/:slug`
+  - Ethics: `/upsc-ethics/:slug`
+  - Essays: `/upsc-essays/:slug`
+- Fetch mindmap URLs from article metadata (if stored) or construct from naming convention
+- Status indicators use ✓ for Yes and ✗ for No
 
 ---
 
